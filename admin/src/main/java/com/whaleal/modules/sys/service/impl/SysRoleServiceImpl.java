@@ -22,7 +22,6 @@ import com.whaleal.modules.sys.enums.SuperAdminEnum;
 import com.whaleal.modules.sys.service.*;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
-import io.renren.modules.sys.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

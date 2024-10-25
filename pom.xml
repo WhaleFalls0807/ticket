@@ -1,24 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.renren</groupId>
-    <artifactId>renren-security</artifactId>
-    <version>5.4.0</version>
+    <groupId>com.whaleal</groupId>
+    <artifactId>ticket</artifactId>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
 
-    <name>renren-security</name>
-    <description>人人权限系统</description>
-    <url>https://www.renren.io</url>
+    <name>ticket</name>
+    <description>工单系统</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.6</version>
+		<version>3.3.4</version>
 	</parent>
 
     <modules>
         <module>common</module>
-		<module>datasource</module>
         <module>admin</module>
     </modules>
 
