@@ -17,9 +17,9 @@
 	</parent>
 
     <modules>
-        <module>renren-common</module>
-		<module>renren-dynamic-datasource</module>
-        <module>renren-admin</module>
+        <module>common</module>
+		<module>datasource</module>
+        <module>admin</module>
     </modules>
 
     <properties>
