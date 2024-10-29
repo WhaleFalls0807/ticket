@@ -14,11 +14,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 
-/**
- * renren-admin
- *
- * @author Mark sunlightcs@gmail.com
- */
+
 @SpringBootApplication
 public class AdminApplication extends SpringBootServletInitializer {
 
