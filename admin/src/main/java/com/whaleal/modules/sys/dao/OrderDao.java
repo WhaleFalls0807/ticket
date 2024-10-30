@@ -1,7 +1,7 @@
 package com.whaleal.modules.sys.dao;
 
 import com.whaleal.common.dao.BaseDao;
-import com.whaleal.modules.sys.entity.TicketEntity;
+import com.whaleal.modules.sys.entity.OrderEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -10,5 +10,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @create: 2024-10-29 18:18
  **/
 @Mapper
-public interface TicketDao extends BaseDao<TicketEntity> {
+public interface OrderDao extends BaseDao<OrderEntity> {
 }

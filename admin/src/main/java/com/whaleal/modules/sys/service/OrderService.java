@@ -1,12 +1,12 @@
 package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.entity.TicketEntity;
+import com.whaleal.modules.sys.entity.OrderEntity;
 
 /**
  * @author lyz
  * @desc
  * @create: 2024-10-29 18:20
  **/
-public interface TicketService extends BaseService<TicketEntity> {
+public interface OrderService extends BaseService<OrderEntity> {
 }

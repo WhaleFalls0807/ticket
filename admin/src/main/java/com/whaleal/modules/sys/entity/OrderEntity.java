@@ -16,8 +16,8 @@ import java.util.Date;
  **/
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName("ticket")
-public class TicketEntity extends BaseEntity {
+@TableName("order")
+public class OrderEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
