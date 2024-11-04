@@ -8,7 +8,6 @@
 
 package com.whaleal.service;
 
-import com.whaleal.commons.dynamic.datasource.annotation.DataSource;
 import com.whaleal.modules.sys.dao.SysUserDao;
 import com.whaleal.modules.sys.entity.SysUserEntity;
 import jakarta.annotation.Resource;
@@ -36,7 +35,7 @@ public class DynamicDataSourceTestService {
         System.out.println(sysUserDao.selectById(id));
     }
 
-    @DataSource("slave1")
+//    @DataSource("slave1")
     @Transactional
     public void updateUserBySlave1(Long id) {
         SysUserEntity user = new SysUserEntity();
