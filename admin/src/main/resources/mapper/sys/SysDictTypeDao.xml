@@ -3,7 +3,7 @@
 
 <mapper namespace="com.whaleal.modules.sys.dao.SysDictTypeDao">
 
-    <select id="getDictTypeList" resultType="com.whaleal.modules.sys.entity.DictType">
+    <select id="getDictTypeList" resultType="com.whaleal.modules.sys.entity.po.DictType">
         select id, dict_type from sys_dict_type order by dict_type, sort
     </select>
 

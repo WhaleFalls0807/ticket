@@ -13,7 +13,7 @@ import com.whaleal.common.constant.Constant;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.ExcelUtils;
 import com.whaleal.common.utils.Result;
-import com.whaleal.modules.sys.dto.SysParamsDTO;
+import com.whaleal.modules.sys.entity.dto.SysParamsDTO;
 import com.whaleal.modules.sys.excel.SysParamsExcel;
 import com.whaleal.modules.sys.service.SysParamsService;
 import com.whaleal.common.validator.AssertUtils;

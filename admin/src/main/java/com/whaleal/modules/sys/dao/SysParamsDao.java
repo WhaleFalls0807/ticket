@@ -8,7 +8,7 @@
 
 package com.whaleal.modules.sys.dao;
 
-import com.whaleal.modules.sys.entity.SysParamsEntity;
+import com.whaleal.modules.sys.entity.po.SysParamsEntity;
 import com.whaleal.common.dao.BaseDao;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

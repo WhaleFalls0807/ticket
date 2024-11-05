@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.whaleal.modules.sys.entity;
+package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -18,29 +18,55 @@ import lombok.EqualsAndHashCode;
 import java.util.Date;
 
 /**
- * 角色
+ * 系统用户
  * 
  * @author Mark sunlightcs@gmail.com
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName("sys_role")
-public class SysRoleEntity extends BaseEntity {
+@TableName("sys_user")
+public class SysUserEntity extends BaseEntity {
 	private static final long serialVersionUID = 1L;
-
 	/**
-	 * 角色名称
+	 * 用户名
 	 */
-	private String name;
+	private String username;
 	/**
-	 * 备注
+	 * 密码
 	 */
-	private String remark;
+	private String password;
+	/**
+	 * 姓名
+	 */
+	private String realName;
+	/**
+	 * 头像
+	 */
+	private String headUrl;
+	/**
+	 * 性别   0：男   1：女    2：保密
+	 */
+	private Integer gender;
+	/**
+	 * 邮箱
+	 */
+	private String email;
+	/**
+	 * 手机号
+	 */
+	private String mobile;
 	/**
 	 * 部门ID
 	 */
-	@TableField(fill = FieldFill.INSERT)
 	private Long deptId;
+	/**
+	 * 超级管理员   0：否   1：是
+	 */
+	private Integer superAdmin;
+	/**
+	 * 状态  0：停用   1：正常
+	 */
+	private Integer status;
 	/**
 	 * 更新者
 	 */
@@ -51,4 +77,10 @@ public class SysRoleEntity extends BaseEntity {
 	 */
 	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private Date updateDate;
+	/**
+	 * 部门名称
+	 */
+	@TableField(exist=false)
+	private String deptName;
+
 }

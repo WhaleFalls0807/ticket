@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.whaleal.modules.sys.dto;
+package com.whaleal.modules.sys.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.whaleal.common.validator.group.AddGroup;

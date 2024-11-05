@@ -9,7 +9,7 @@
 package com.whaleal.modules.security.service;
 
 import com.whaleal.modules.security.entity.SysUserTokenEntity;
-import com.whaleal.modules.sys.entity.SysUserEntity;
+import com.whaleal.modules.sys.entity.po.SysUserEntity;
 import com.whaleal.modules.security.user.UserDetail;
 
 import java.util.List;

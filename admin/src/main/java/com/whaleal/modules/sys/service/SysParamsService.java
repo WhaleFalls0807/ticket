@@ -9,10 +9,10 @@
 package com.whaleal.modules.sys.service;
 
 
-import com.whaleal.modules.sys.entity.SysParamsEntity;
+import com.whaleal.modules.sys.entity.po.SysParamsEntity;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.dto.SysParamsDTO;
+import com.whaleal.modules.sys.entity.dto.SysParamsDTO;
 
 import java.util.List;
 import java.util.Map;

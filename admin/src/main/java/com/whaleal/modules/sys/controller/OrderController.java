@@ -2,7 +2,7 @@ package com.whaleal.modules.sys.controller;
 
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
-import com.whaleal.modules.sys.dto.SysUserDTO;
+import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

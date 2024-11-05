@@ -1,7 +1,7 @@
 package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.entity.OrderEntity;
+import com.whaleal.modules.sys.entity.po.OrderEntity;
 
 /**
  * @author lyz

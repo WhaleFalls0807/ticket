@@ -11,7 +11,7 @@ package com.whaleal.modules.sys.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.modules.sys.dao.SysRoleMenuDao;
-import com.whaleal.modules.sys.entity.SysRoleMenuEntity;
+import com.whaleal.modules.sys.entity.po.SysRoleMenuEntity;
 import com.whaleal.modules.sys.service.SysRoleMenuService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

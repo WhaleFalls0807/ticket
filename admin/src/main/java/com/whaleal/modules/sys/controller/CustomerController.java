@@ -1,15 +1,16 @@
 package com.whaleal.modules.sys.controller;
 
+import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
 import com.whaleal.common.validator.AssertUtils;
-import com.whaleal.modules.sys.dto.CustomerDTO;
-import com.whaleal.modules.sys.dto.SysDictDataDTO;
-import com.whaleal.modules.sys.entity.CustomerEntity;
+import com.whaleal.modules.sys.entity.dto.CustomerDTO;
+import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,10 +31,11 @@ public class CustomerController {
 
     @Operation(summary = "保存或更新客户")
     @PostMapping("/saveOrUpdate")
+    @LogOperation("保存")
+    @RequiresPermissions("customer:save")
     public Result saveCustomer(@RequestBody CustomerDTO customerDTO){
         customerService.saveOrUpdate(customerDTO);
-
-        return new Result();
+        return new Result().ok("操作成功");
     }
 
     @GetMapping("/page")

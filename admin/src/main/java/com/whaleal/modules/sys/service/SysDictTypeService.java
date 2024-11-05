@@ -8,11 +8,11 @@
 
 package com.whaleal.modules.sys.service;
 
-import com.whaleal.modules.sys.entity.SysDictTypeEntity;
+import com.whaleal.modules.sys.entity.po.SysDictTypeEntity;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.dto.SysDictTypeDTO;
-import com.whaleal.modules.sys.entity.DictType;
+import com.whaleal.modules.sys.entity.dto.SysDictTypeDTO;
+import com.whaleal.modules.sys.entity.po.DictType;
 
 import java.util.List;
 import java.util.Map;

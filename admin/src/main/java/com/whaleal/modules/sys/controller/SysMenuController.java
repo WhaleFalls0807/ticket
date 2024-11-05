@@ -11,7 +11,7 @@ package com.whaleal.modules.sys.controller;
 import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.exception.ErrorCode;
 import com.whaleal.common.utils.Result;
-import com.whaleal.modules.sys.dto.SysMenuDTO;
+import com.whaleal.modules.sys.entity.dto.SysMenuDTO;
 import com.whaleal.modules.sys.enums.MenuTypeEnum;
 import com.whaleal.modules.sys.service.SysMenuService;
 import com.whaleal.common.validator.AssertUtils;

@@ -9,10 +9,10 @@
 package com.whaleal.modules.sys.service;
 
 
-import com.whaleal.modules.sys.entity.SysRoleEntity;
+import com.whaleal.modules.sys.entity.po.SysRoleEntity;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.dto.SysRoleDTO;
+import com.whaleal.modules.sys.entity.dto.SysRoleDTO;
 
 import java.util.List;
 import java.util.Map;

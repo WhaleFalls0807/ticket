@@ -1,9 +1,11 @@
 package com.whaleal.modules.sys.service;
 
+import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.entity.ActivityEntity;
+import com.whaleal.modules.sys.entity.dto.ActivityDTO;
+import com.whaleal.modules.sys.entity.po.ActivityEntity;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -11,9 +13,14 @@ import java.util.List;
  * @create: 2024-10-29 21:55
  **/
 public interface ActivityService extends BaseService<ActivityEntity> {
-    List<ActivityEntity> listAllById(Long id);
+    /**
+     *  获取一个客户/联系人/订单的跟进详情
+     * @param params
+     * @return
+     */
+    PageData<ActivityEntity> listAllById(Map<String, Object> params);
 
-    void createActivity(ActivityEntity activityEntity);
+    void createActivity(ActivityDTO activityDTO);
 
     void updateActivity(ActivityEntity activityEntity);
 

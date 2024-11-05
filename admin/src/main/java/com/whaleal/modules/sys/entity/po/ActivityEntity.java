@@ -1,4 +1,4 @@
-package com.whaleal.modules.sys.entity;
+package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.whaleal.common.entity.BaseEntity;
@@ -42,6 +42,11 @@ public class ActivityEntity extends BaseEntity {
      * 关联业务id
      */
     private Long associationId;
+
+    /**
+     *
+     */
+    private Long contactId;
 
     /**
      * 是否已删除

@@ -11,7 +11,7 @@ package com.whaleal.modules.security.oauth2;
 import com.whaleal.common.exception.ErrorCode;
 import com.whaleal.common.utils.ConvertUtils;
 import com.whaleal.common.utils.MessageUtils;
-import com.whaleal.modules.sys.entity.SysUserEntity;
+import com.whaleal.modules.sys.entity.po.SysUserEntity;
 import com.whaleal.modules.security.entity.SysUserTokenEntity;
 import com.whaleal.modules.security.service.ShiroService;
 import com.whaleal.modules.security.user.UserDetail;

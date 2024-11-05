@@ -3,7 +3,7 @@
 
 <mapper namespace="com.whaleal.modules.sys.dao.SysUserDao">
 
-	<select id="getList" resultType="com.whaleal.modules.sys.entity.SysUserEntity">
+	<select id="getList" resultType="com.whaleal.modules.sys.entity.po.SysUserEntity">
 		select t1.*, (select t2.name from sys_dept t2 where t2.id=t1.dept_id) deptName from sys_user t1
 		where t1.super_admin = 0
 		<if test="username != null and username.trim() != ''">
@@ -23,12 +23,12 @@
 		</if>
 	</select>
 
-	<select id="getById" resultType="com.whaleal.modules.sys.entity.SysUserEntity">
+	<select id="getById" resultType="com.whaleal.modules.sys.entity.po.SysUserEntity">
 		select t1.*, (select t2.name from sys_dept t2 where t2.id=t1.dept_id) deptName from sys_user t1
 			where t1.id = #{value}
 	</select>
 
-	<select id="getByUsername" resultType="com.whaleal.modules.sys.entity.SysUserEntity">
+	<select id="getByUsername" resultType="com.whaleal.modules.sys.entity.po.SysUserEntity">
 		select * from sys_user where username = #{value}
 	</select>
 

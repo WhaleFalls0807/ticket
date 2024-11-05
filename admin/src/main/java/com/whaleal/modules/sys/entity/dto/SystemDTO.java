@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.whaleal.modules.sys.dto;
+package com.whaleal.modules.sys.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

@@ -10,8 +10,8 @@ package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.security.user.UserDetail;
-import com.whaleal.modules.sys.dto.SysMenuDTO;
-import com.whaleal.modules.sys.entity.SysMenuEntity;
+import com.whaleal.modules.sys.entity.dto.SysMenuDTO;
+import com.whaleal.modules.sys.entity.po.SysMenuEntity;
 
 import java.util.List;
 

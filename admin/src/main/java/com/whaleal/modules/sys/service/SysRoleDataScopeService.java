@@ -8,7 +8,7 @@
 
 package com.whaleal.modules.sys.service;
 
-import com.whaleal.modules.sys.entity.SysRoleDataScopeEntity;
+import com.whaleal.modules.sys.entity.po.SysRoleDataScopeEntity;
 import com.whaleal.common.service.BaseService;
 
 import java.util.List;

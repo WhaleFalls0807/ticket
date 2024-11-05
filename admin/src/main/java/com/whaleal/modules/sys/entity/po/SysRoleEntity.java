@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.whaleal.modules.sys.entity;
+package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -18,31 +18,29 @@ import lombok.EqualsAndHashCode;
 import java.util.Date;
 
 /**
- * 字典类型
- *
+ * 角色
+ * 
  * @author Mark sunlightcs@gmail.com
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName("sys_dict_type")
-public class SysDictTypeEntity extends BaseEntity {
+@TableName("sys_role")
+public class SysRoleEntity extends BaseEntity {
 	private static final long serialVersionUID = 1L;
+
 	/**
-	 * 字典类型
+	 * 角色名称
 	 */
-	private String dictType;
-	/**
-	 * 字典名称
-	 */
-	private String dictName;
+	private String name;
 	/**
 	 * 备注
 	 */
 	private String remark;
 	/**
-	 * 排序
+	 * 部门ID
 	 */
-	private Integer sort;
+	@TableField(fill = FieldFill.INSERT)
+	private Long deptId;
 	/**
 	 * 更新者
 	 */

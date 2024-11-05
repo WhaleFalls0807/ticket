@@ -5,23 +5,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.common.utils.ConvertUtils;
+import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.sys.dao.CustomerDao;
-import com.whaleal.modules.sys.dto.CustomerDTO;
-import com.whaleal.modules.sys.dto.SysDictDataDTO;
-import com.whaleal.modules.sys.entity.CustomerEntity;
-import com.whaleal.modules.sys.entity.SysDictDataEntity;
-import com.whaleal.modules.sys.entity.SysDictTypeEntity;
+import com.whaleal.modules.sys.entity.dto.CustomerDTO;
+import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lyz
@@ -38,18 +32,17 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
 
         if(ObjectUtils.isEmpty(customerDTO.getId())){
             // 新增
+            if(ObjectUtils.isEmpty(entity.getOwnerUserId())){
+                entity.setOwnerUserId(SecurityUser.getUserId());
+            }
             insert(entity);
             log.info("新增一条客户信息");
         }else {
             // 更新
+            entity.setUpdateTime(new Date());
             updateById(entity);
+            log.info("修改了一条客户信息");
         }
-    }
-
-    @Override
-    public List<CustomerEntity> listALl() {
-
-        return null;
     }
 
     @Override
@@ -65,11 +58,18 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
         return getPageData(page, CustomerEntity.class);
     }
 
+    @Override
+    public List<CustomerEntity> listALl() {
+
+        return null;
+    }
+
+
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(Long[] ids) {
         //删除
         deleteBatchIds(Arrays.asList(ids));
-
     }
 }

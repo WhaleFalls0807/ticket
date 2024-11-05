@@ -1,4 +1,4 @@
-package com.whaleal.modules.sys.entity;
+package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.whaleal.common.entity.BaseEntity;
@@ -24,10 +24,14 @@ public class CustomerEntity extends BaseEntity {
     private String customerName;
 
     /**
+     * 客户来源
+     */
+    private Integer source;
+
+    /**
      *  是否已跟进  0未跟进1已跟进
      */
     private Integer followup;
-
 
     /**
      * 成交状态 0 未成交 1 已成交
@@ -53,6 +57,11 @@ public class CustomerEntity extends BaseEntity {
      * 手机
      */
     private String telephone;
+
+    /**
+     * 行业
+     */
+    private Integer industry;
 
     /**
      * 公司首页

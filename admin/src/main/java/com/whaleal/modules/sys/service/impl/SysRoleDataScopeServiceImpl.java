@@ -11,7 +11,7 @@ package com.whaleal.modules.sys.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.modules.sys.dao.SysRoleDataScopeDao;
-import com.whaleal.modules.sys.entity.SysRoleDataScopeEntity;
+import com.whaleal.modules.sys.entity.po.SysRoleDataScopeEntity;
 import com.whaleal.modules.sys.service.SysRoleDataScopeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

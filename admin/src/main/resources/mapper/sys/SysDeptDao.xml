@@ -3,7 +3,7 @@
 
 <mapper namespace="com.whaleal.modules.sys.dao.SysDeptDao">
 
-	<select id="getList" resultType="com.whaleal.modules.sys.entity.SysDeptEntity">
+	<select id="getList" resultType="com.whaleal.modules.sys.entity.po.SysDeptEntity">
 		select t1.*,(select t2.name from sys_dept t2 where t2.id=t1.pid)parentName from sys_dept t1
 		<where>
 			<if test="deptIdList != null">
@@ -16,12 +16,12 @@
 		order by t1.sort asc
 	</select>
 
-	<select id="getById" resultType="com.whaleal.modules.sys.entity.SysDeptEntity">
+	<select id="getById" resultType="com.whaleal.modules.sys.entity.po.SysDeptEntity">
 		select t1.*,(select t2.name from sys_dept t2 where t2.id=t1.pid)parentName from sys_dept t1
 		where t1.id = #{value}
 	</select>
 
-	<select id="getIdAndPidList" resultType="com.whaleal.modules.sys.entity.SysDeptEntity">
+	<select id="getIdAndPidList" resultType="com.whaleal.modules.sys.entity.po.SysDeptEntity">
 		select t1.id, t1.pid from sys_dept t1
 	</select>
 

@@ -2,8 +2,8 @@ package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.dto.CustomerDTO;
-import com.whaleal.modules.sys.entity.CustomerEntity;
+import com.whaleal.modules.sys.entity.dto.CustomerDTO;
+import com.whaleal.modules.sys.entity.po.CustomerEntity;
 
 import java.util.List;
 

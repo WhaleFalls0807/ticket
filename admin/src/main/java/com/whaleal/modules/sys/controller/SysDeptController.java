@@ -10,7 +10,7 @@ package com.whaleal.modules.sys.controller;
 
 import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.utils.Result;
-import com.whaleal.modules.sys.dto.SysDeptDTO;
+import com.whaleal.modules.sys.entity.dto.SysDeptDTO;
 import com.whaleal.modules.sys.service.SysDeptService;
 import com.whaleal.common.validator.AssertUtils;
 import com.whaleal.common.validator.ValidatorUtils;

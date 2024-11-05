@@ -8,8 +8,8 @@
 
 package com.whaleal.modules.sys.dao;
 
-import com.whaleal.modules.sys.entity.DictData;
-import com.whaleal.modules.sys.entity.SysDictDataEntity;
+import com.whaleal.modules.sys.entity.po.DictData;
+import com.whaleal.modules.sys.entity.po.SysDictDataEntity;
 import com.whaleal.common.dao.BaseDao;
 import org.apache.ibatis.annotations.Mapper;
 

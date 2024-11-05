@@ -1,12 +1,17 @@
 package com.whaleal.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.impl.BaseServiceImpl;
+import com.whaleal.common.utils.ConvertUtils;
 import com.whaleal.modules.sys.dao.ActivityDao;
-import com.whaleal.modules.sys.entity.ActivityEntity;
+import com.whaleal.modules.sys.entity.dto.ActivityDTO;
+import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import com.whaleal.modules.sys.service.ActivityService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -16,14 +21,21 @@ import java.util.List;
 @Service
 public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEntity> implements ActivityService {
 
+
     @Override
-    public List<ActivityEntity> listAllById(Long id) {
-        return null;
+    public PageData<ActivityEntity> listAllById(Map<String, Object> params) {
+        QueryWrapper<ActivityEntity> qw = new QueryWrapper<>();
+
+        IPage<ActivityEntity> data = baseDao.selectPage(getPage(params, "create_time", false),
+                qw);
+
+        return getPageData(data,ActivityEntity.class);
     }
 
     @Override
-    public void createActivity(ActivityEntity activityEntity) {
-
+    public void createActivity(ActivityDTO activityDTO) {
+        ActivityEntity entity = ConvertUtils.sourceToTarget(activityDTO, ActivityEntity.class);
+        insert(entity);
     }
 
     @Override

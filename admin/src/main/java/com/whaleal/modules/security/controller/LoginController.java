@@ -17,7 +17,7 @@ import com.whaleal.modules.log.enums.LoginStatusEnum;
 import com.whaleal.modules.log.service.SysLogLoginService;
 import com.whaleal.modules.security.service.CaptchaService;
 import com.whaleal.modules.security.service.SysUserTokenService;
-import com.whaleal.modules.sys.dto.SysUserDTO;
+import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.enums.UserStatusEnum;
 import com.whaleal.modules.sys.service.SysUserService;
 import com.whaleal.common.exception.RenException;

@@ -8,7 +8,7 @@
 
 package com.whaleal.modules.sys.dao;
 
-import com.whaleal.modules.sys.entity.SysRoleDataScopeEntity;
+import com.whaleal.modules.sys.entity.po.SysRoleDataScopeEntity;
 import com.whaleal.common.dao.BaseDao;
 import org.apache.ibatis.annotations.Mapper;
 

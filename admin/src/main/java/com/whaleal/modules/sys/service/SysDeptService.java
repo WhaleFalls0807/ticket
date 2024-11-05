@@ -8,9 +8,9 @@
 
 package com.whaleal.modules.sys.service;
 
-import com.whaleal.modules.sys.entity.SysDeptEntity;
+import com.whaleal.modules.sys.entity.po.SysDeptEntity;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.dto.SysDeptDTO;
+import com.whaleal.modules.sys.entity.dto.SysDeptDTO;
 
 import java.util.List;
 import java.util.Map;

@@ -6,23 +6,20 @@
  * 版权所有，侵权必究！
  */
 
-package com.whaleal.modules.sys.entity;
+package com.whaleal.modules.sys.entity.po;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * 字典类型
+ *  字典数据
  *
  * @author Mark sunlightcs@gmail.com
  */
 @Data
-public class DictType {
+public class DictData {
     @JsonIgnore
-    private Long id;
-    private String dictType;
-    private List<DictData> dataList = new ArrayList<>();
+    private Long dictTypeId;
+    private String dictLabel;
+    private String dictValue;
 }

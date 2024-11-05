@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.whaleal.modules.sys.entity;
+package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -18,33 +18,31 @@ import lombok.EqualsAndHashCode;
 import java.util.Date;
 
 /**
- * 参数管理
+ * 字典类型
  *
  * @author Mark sunlightcs@gmail.com
- * @since 1.0.0
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName("sys_params")
-public class SysParamsEntity extends BaseEntity {
+@TableName("sys_dict_type")
+public class SysDictTypeEntity extends BaseEntity {
 	private static final long serialVersionUID = 1L;
-
 	/**
-	 * 参数编码
+	 * 字典类型
 	 */
-	private String paramCode;
+	private String dictType;
 	/**
-	 * 参数值
+	 * 字典名称
 	 */
-	private String paramValue;
-	/**
-	 * 类型   0：系统参数   1：非系统参数
-	 */
-	private Integer paramType;
+	private String dictName;
 	/**
 	 * 备注
 	 */
 	private String remark;
+	/**
+	 * 排序
+	 */
+	private Integer sort;
 	/**
 	 * 更新者
 	 */
@@ -55,5 +53,4 @@ public class SysParamsEntity extends BaseEntity {
 	 */
 	@TableField(fill = FieldFill.INSERT_UPDATE)
 	private Date updateDate;
-
 }

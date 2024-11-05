@@ -9,7 +9,7 @@
 package com.whaleal.service;
 
 import com.whaleal.modules.sys.dao.SysUserDao;
-import com.whaleal.modules.sys.entity.SysUserEntity;
+import com.whaleal.modules.sys.entity.po.SysUserEntity;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -9,7 +9,7 @@
 package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.entity.SysRoleUserEntity;
+import com.whaleal.modules.sys.entity.po.SysRoleUserEntity;
 
 import java.util.List;
 

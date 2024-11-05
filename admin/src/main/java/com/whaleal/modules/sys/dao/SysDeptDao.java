@@ -9,7 +9,7 @@
 package com.whaleal.modules.sys.dao;
 
 import com.whaleal.common.dao.BaseDao;
-import com.whaleal.modules.sys.entity.SysDeptEntity;
+import com.whaleal.modules.sys.entity.po.SysDeptEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

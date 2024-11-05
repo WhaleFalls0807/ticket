@@ -11,7 +11,7 @@ package com.whaleal.modules.sys.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.modules.sys.dao.SysRoleUserDao;
-import com.whaleal.modules.sys.entity.SysRoleUserEntity;
+import com.whaleal.modules.sys.entity.po.SysRoleUserEntity;
 import com.whaleal.modules.sys.service.SysRoleUserService;
 import org.springframework.stereotype.Service;
 

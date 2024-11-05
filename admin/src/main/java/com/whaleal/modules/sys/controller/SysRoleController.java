@@ -12,7 +12,7 @@ import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.constant.Constant;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
-import com.whaleal.modules.sys.dto.SysRoleDTO;
+import com.whaleal.modules.sys.entity.dto.SysRoleDTO;
 import com.whaleal.modules.sys.service.SysRoleMenuService;
 import com.whaleal.modules.sys.service.SysRoleService;
 import com.whaleal.common.validator.AssertUtils;

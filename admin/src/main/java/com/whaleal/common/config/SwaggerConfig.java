@@ -25,6 +25,8 @@ import java.util.List;
  */
 @Configuration
 public class SwaggerConfig {
+
+    // 访问地址：http://127.0.0.1:8080/doc.html#/home
     @Bean
     public OpenAPI createRestApi() {
         return new OpenAPI()
@@ -34,8 +36,8 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("人人开源")
-                .description("renren-admin文档")
+                .title("CRM")
+                .description("crm系统文档")
                 .version("5.x");
     }
 

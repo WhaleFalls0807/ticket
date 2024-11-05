@@ -10,8 +10,8 @@ package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.dto.SysDictDataDTO;
-import com.whaleal.modules.sys.entity.SysDictDataEntity;
+import com.whaleal.modules.sys.entity.dto.SysDictDataDTO;
+import com.whaleal.modules.sys.entity.po.SysDictDataEntity;
 
 import java.util.Map;
 

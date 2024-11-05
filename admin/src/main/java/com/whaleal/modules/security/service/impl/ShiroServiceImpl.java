@@ -12,7 +12,7 @@ import cn.hutool.core.util.StrUtil;
 import com.whaleal.modules.sys.dao.SysMenuDao;
 import com.whaleal.modules.sys.dao.SysRoleDataScopeDao;
 import com.whaleal.modules.sys.dao.SysUserDao;
-import com.whaleal.modules.sys.entity.SysUserEntity;
+import com.whaleal.modules.sys.entity.po.SysUserEntity;
 import com.whaleal.modules.sys.enums.SuperAdminEnum;
 import com.whaleal.modules.security.dao.SysUserTokenDao;
 import com.whaleal.modules.security.entity.SysUserTokenEntity;
