@@ -24,7 +24,10 @@ public class CustomerDTO {
     @Schema(title = "客户网站首页")
     private String website;
 
-    @Schema(title = "联系人名称")
+    @Schema(title = "客户公司地址")
+    private String address;
+
+    @Schema(title = "联系人")
     private String contactName;
 
     @Schema(title = "客户电话")
@@ -33,12 +36,9 @@ public class CustomerDTO {
     @Schema(title = "客户联系邮箱")
     private String email;
 
-    @Schema(title = "客户公司地址")
-    private String address;
-
     @Schema(title = "备注")
-    private String content;
+    private String remark;
 
     @Schema(title = "负责人id")
-    private Long ownerId;
+    private Long ownerUserId;
 }

@@ -29,6 +29,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
     @Override
     public void saveOrUpdate(CustomerDTO customerDTO) {
         CustomerEntity entity = ConvertUtils.sourceToTarget(customerDTO, CustomerEntity.class);
+        entity.setUpdateDate(new Date());
 
         if(ObjectUtils.isEmpty(customerDTO.getId())){
             // 新增
@@ -39,19 +40,22 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
             log.info("新增一条客户信息");
         }else {
             // 更新
-            entity.setUpdateTime(new Date());
             updateById(entity);
             log.info("修改了一条客户信息");
         }
     }
 
     @Override
-    public PageData<CustomerEntity> page() {
-        Map<String, Object> params = new HashMap<>();
+    public PageData<CustomerEntity> page(Map<String, Object> params) {
         QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();
 
+        // 如果未传入排序字段 默认采用创建时间作为排序依据
+        if(ObjectUtils.isEmpty(params.get("sortField"))){
+            params.put("sortField","update_time");
+        }
+
         IPage<CustomerEntity> page = baseDao.selectPage(
-                getPage(params, "sort", true),
+                getPage(params, "sort", (Boolean) params.getOrDefault("isAsc",true)),
                 wrapper
         );
 
@@ -60,8 +64,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
 
     @Override
     public List<CustomerEntity> listALl() {
-
-        return null;
+        return baseDao.selectList(null);
     }
 
 
@@ -71,5 +74,14 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
     public void delete(Long[] ids) {
         //删除
         deleteBatchIds(Arrays.asList(ids));
+    }
+
+    @Override
+    public boolean checkCustomer(String customerName) {
+        QueryWrapper<CustomerEntity> qw = new QueryWrapper<>();
+        qw.eq("customer_name",customerName);
+        CustomerEntity customerEntity = baseDao.selectOne(qw);
+
+        return ObjectUtils.isEmpty(customerEntity);
     }
 }

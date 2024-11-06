@@ -17,7 +17,6 @@ import java.util.Date;
 @TableName("customer")
 public class CustomerEntity extends BaseEntity {
 
-
     /**
      * 客户名称
      */
@@ -26,12 +25,48 @@ public class CustomerEntity extends BaseEntity {
     /**
      * 客户来源
      */
-    private Integer source;
+    private String source;
 
     /**
-     *  是否已跟进  0未跟进1已跟进
+     * 客户公司首页
      */
-    private Integer followup;
+    private String website;
+
+    /**
+     * 客户公司地址
+     */
+    private String address;
+
+    /**
+     *  联系人
+     */
+    private String contactName;
+
+    /**
+     * 客户电话
+     */
+    private String phone;
+
+    /**
+     * 客户联系邮箱
+     */
+    private String email;
+
+    /**
+     * 备注
+     */
+    private String remark;
+
+    /**
+     * 创建者用户ID
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private Long createUserId;
+
+    /**
+     * 负责人id
+     */
+    private Long ownerUserId;
 
     /**
      * 成交状态 0 未成交 1 已成交
@@ -43,55 +78,6 @@ public class CustomerEntity extends BaseEntity {
      */
     private Date dealTime;
 
-    /**
-     * 首要联系人 id
-     */
-    private Integer contactsId;
-
-    /**
-     * 首要联系人ID
-     */
-    private String mobile;
-
-    /**
-     * 手机
-     */
-    private String telephone;
-
-    /**
-     * 行业
-     */
-    private Integer industry;
-
-    /**
-     * 公司首页
-     */
-    private String website;
-
-    /**
-     * 公司联系邮箱
-     */
-    private String email;
-
-    /**
-     * 备注
-     */
-    private String remark;
-
-    @TableField(fill = FieldFill.INSERT)
-    private Long createUserId;
-
-    /**
-     * 负责人id
-     */
-    private Long ownerUserId;
-
-    /**
-     * 客户公司地址 - 详细地址
-     */
-    private String address;
-
-    private String batchId;
 
     /**
      * 客户状态 1 正常 2锁定 3删除
@@ -119,20 +105,18 @@ public class CustomerEntity extends BaseEntity {
     private Date poolTime;
 
     /**
-     * 1 分配 2 领取
+     * 1 已分配 -> 正常客户
+     * 2 未分配 -> 在公海
      */
-    private Integer isReceive;
+    private Integer assigned;
 
     /**
-     * 接收到客户时间
+     * 从公海领取的时间
      */
     private Date receiveTime;
 
     /**
      * 分配前在公海的负责人的id
      */
-    private Long preOwnerUserId;
-
-    @TableField(fill = FieldFill.UPDATE)
-    private Date updateTime;
+    private Long preUserId;
 }

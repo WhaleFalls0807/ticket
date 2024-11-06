@@ -14,7 +14,7 @@ public class IndexController {
 
     @GetMapping("/")
     public Result<String> index(){
-        String tips = "你好，renren-admin已启动，请启动renren-ui，才能访问页面！";
+        String tips = "你好，crm已启动，请启动ui，才能访问页面！";
         return new Result<String>().ok(tips);
     }
 }

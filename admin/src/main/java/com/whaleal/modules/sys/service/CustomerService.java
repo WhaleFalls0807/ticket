@@ -6,6 +6,7 @@ import com.whaleal.modules.sys.entity.dto.CustomerDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -20,13 +21,29 @@ public interface CustomerService extends BaseService<CustomerEntity> {
     void saveOrUpdate(CustomerDTO customerDTO);
 
     /**
-     * 获取客户列表
+     * 管理员获取客户列表
      * @return
      */
     List<CustomerEntity> listALl();
 
-    PageData<CustomerEntity> page();
+    /**
+     *  根据查询条件获取客户分页列表
+     * @param params
+     * @return
+     */
+    PageData<CustomerEntity> page(Map<String, Object> params);
 
+    /**
+     * 删除客户
+     *
+     * @param ids
+     */
     void delete(Long[] ids);
 
+    /**
+     *  检查用户名是否可用
+     * @param customerName
+     * @return
+     */
+    boolean checkCustomer(String customerName);
 }
