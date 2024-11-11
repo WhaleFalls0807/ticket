@@ -2,6 +2,7 @@ package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
+import com.whaleal.modules.sys.entity.dto.OrderDTO;
 import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 
@@ -19,4 +20,16 @@ public interface OrderService extends BaseService<OrderEntity> {
      * @return
      */
     PageData<SysUserDTO> page(Map<String, Object> params);
+
+    /**
+     *  普通用户创建普通工单
+     * @param orderDTO
+     */
+    void createOrder(OrderDTO orderDTO);
+
+    /**
+     * 管理员创建订单
+     * @param orderEntity
+     */
+    void save(OrderEntity orderEntity);
 }

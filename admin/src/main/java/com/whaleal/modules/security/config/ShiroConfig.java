@@ -50,11 +50,15 @@ public class ShiroConfig {
         return securityManager;
     }
 
+
     @Bean("shiroFilter")
     public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
 
+        /*
+         * 这里配置无需验证的资源
+         */
         //oauth过滤
         Map<String, Filter> filters = new HashMap<>();
         filters.put("oauth2", new Oauth2Filter());
@@ -70,6 +74,7 @@ public class ShiroConfig {
         filterMap.put("/swagger-resources/**", "anon");
         filterMap.put("/captcha", "anon");
         filterMap.put("/favicon.ico", "anon");
+        filterMap.put("/order/save/byUser", "anon");
         filterMap.put("/", "anon");
         filterMap.put("/**", "oauth2");
         shiroFilter.setFilterChainDefinitionMap(filterMap);

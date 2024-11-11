@@ -28,17 +28,24 @@ public class CustomerEntity extends BaseEntity {
     private String source;
 
     /**
-     * 客户公司首页
+     * 1： 企业级用户
+     * 2： 个人用户
+     */
+    private Integer enterprise;
+
+    /**
+     * 门户网站
      */
     private String website;
 
     /**
-     * 客户公司地址
+     * 客户地址
      */
     private String address;
 
     /**
-     *  联系人
+     *  联系人名称
+     *  个人用户 与客户名保持一直
      */
     private String contactName;
 

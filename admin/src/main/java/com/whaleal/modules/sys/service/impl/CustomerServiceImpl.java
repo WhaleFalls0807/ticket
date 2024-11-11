@@ -29,7 +29,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
     @Override
     public void saveOrUpdate(CustomerDTO customerDTO) {
         CustomerEntity entity = ConvertUtils.sourceToTarget(customerDTO, CustomerEntity.class);
-        entity.setUpdateDate(new Date());
 
         if(ObjectUtils.isEmpty(customerDTO.getId())){
             // 新增
@@ -52,6 +51,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
         // 如果未传入排序字段 默认采用创建时间作为排序依据
         if(ObjectUtils.isEmpty(params.get("sortField"))){
             params.put("sortField","update_time");
+        }
+
+        if(!ObjectUtils.isEmpty(params.get("keyword"))){
+            String keyword = params.get("keyword").toString();
+            wrapper.and(query -> query.like("customer_name",keyword).or()
+                    .like("phone",keyword).or()
+                    .like("contact_name",keyword));
         }
 
         IPage<CustomerEntity> page = baseDao.selectPage(

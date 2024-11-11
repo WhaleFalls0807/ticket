@@ -34,7 +34,7 @@ public class CustomerController {
 
     private CustomerService customerService;
 
-    @Operation(summary = "保存或更新客户")
+    @Operation(summary = "保存或更新客户基本信息")
     @PostMapping("/saveOrUpdate")
     @LogOperation("保存")
     @RequiresPermissions("customer:save")

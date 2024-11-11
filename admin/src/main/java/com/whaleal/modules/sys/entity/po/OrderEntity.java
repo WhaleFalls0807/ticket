@@ -7,7 +7,6 @@ import com.whaleal.common.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.math.BigDecimal;
 
 /**
  * @author lyz
@@ -22,9 +21,33 @@ public class OrderEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 业务名称
+     * 商标名称
      */
     private String name;
+
+    /**
+     *  商标内容 可以当作备注使用
+     */
+    private String content;
+
+    /**
+     * 行业
+     */
+    private String industry;
+
+    /**
+     * 联系人手机号
+     */
+    private String phone;
+
+    /**
+     *  联系人邮件
+     */
+    private String email;
+
+    private Long fileId;
+
+    private Long priceId;
 
     /**
      *  业务类型
@@ -33,49 +56,14 @@ public class OrderEntity extends BaseEntity {
     private String  businessType;
 
     /**
-     *  是否已成交
-     */
-    private Integer deal;
-
-    /**
-     * 支付类型 这里保存的是上传的支付截图 的地址链接
-     */
-    private String payType;
-
-    /**
-     *  总费用
-     */
-    private BigDecimal totalPrice;
-
-    /**
-     * 甲方承担价格
-     */
-    private BigDecimal aPrice;
-
-    /**
-     * 乙方承担价格
-     */
-    private BigDecimal bPrice;
-
-    /**
      * 申请方式
      */
     private String applyMethod;
 
     /**
-     * 上传的合同文件路径
-     */
-    private String contract;
-
-    /**
      * 提交选项
      */
     private String commitOption;
-
-    /**
-     * 备注说明
-     */
-    private String remark;
 
     /**
      * 状态
@@ -84,24 +72,43 @@ public class OrderEntity extends BaseEntity {
     private Integer status;
 
     /**
+     * 0: 未成交
+     * 1：已成交
+     */
+    private Integer deal;
+
+    /**
      * 审核人ID
      */
     private Long reviewUserId;
 
     /**
-     *  关联客户id
+     * 审核人名称
+     */
+    @TableField(exist = false)
+    private String reviewName;
+
+    /**
+     *  客户id
      */
     private Long customerId;
 
     /**
      *  客户名称
      */
+    @TableField(exist = false)
     private String customerName;
 
     /**
      * 负责人id
      */
-    private long ownerId;
+    private Long ownerId;
+
+    /**
+     *  客户名称
+     */
+    @TableField(exist = false)
+    private String ownerName;
 
     /**
      * 更新者
@@ -109,4 +116,11 @@ public class OrderEntity extends BaseEntity {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updater;
 
+    public OrderEntity(String name,String phone, String email,String industry) {
+        this.status = 0;
+        this.phone = phone;
+        this.name = name;
+        this.email = email;
+        this.industry = industry;
+    }
 }
