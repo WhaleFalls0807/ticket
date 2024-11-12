@@ -2,13 +2,17 @@ package com.whaleal.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.whaleal.common.exception.OrderException;
+import com.whaleal.common.exception.OrderExceptionEnum;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.common.utils.ConvertUtils;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.sys.dao.CustomerDao;
 import com.whaleal.modules.sys.entity.dto.CustomerDTO;
+import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
+import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -83,11 +87,27 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
     }
 
     @Override
-    public boolean checkCustomer(String customerName) {
-        QueryWrapper<CustomerEntity> qw = new QueryWrapper<>();
-        qw.eq("customer_name",customerName);
-        CustomerEntity customerEntity = baseDao.selectOne(qw);
+    public CustomerEntity loadCustomer(OrderUpdateDTO orderEntity) {
+        CustomerEntity customerEntity = new CustomerEntity();
+        customerEntity.setCustomerName(orderEntity.getCustomerName());
+        // 默认个人用户
+        customerEntity.setEnterprise(2);
+        customerEntity.setPhone(orderEntity.getPhone());
+        customerEntity.setEmail(orderEntity.getEmail());
+        customerEntity.setCreator(SecurityUser.getUserId());
+        customerEntity.setDealStatus(0);
+        customerEntity.setStatus(1);
+        insert(customerEntity);
 
-        return ObjectUtils.isEmpty(customerEntity);
+        return customerEntity;
+    }
+
+
+    @Override
+    public boolean checkCustomer(String phone){
+        QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();
+
+        wrapper.eq("phone",phone);
+        return ObjectUtils.isEmpty(baseDao.selectOne(wrapper));
     }
 }

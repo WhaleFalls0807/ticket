@@ -1,10 +1,13 @@
 package com.whaleal.modules.sys.entity.po;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.whaleal.common.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
  * @author lyz
@@ -15,7 +18,12 @@ import lombok.NoArgsConstructor;
 @TableName("order_file")
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderFile extends BaseEntity {
+public class OrderFileEntity {
+
+    /**
+     * 所属单子id
+     */
+    private Long orderId;
 
     /**
      * 上传的合同文件路径 -- 第一次上传
@@ -57,5 +65,15 @@ public class OrderFile extends BaseEntity {
      */
     private String sealedContract;
 
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_data",fill = FieldFill.INSERT)
+    private Date updateDate;
 
+    public OrderFileEntity(Long orderId, String contract, String payType) {
+        this.orderId = orderId;
+        this.contract = contract;
+        this.payType = payType;
+    }
 }

@@ -49,6 +49,14 @@ public class RenExceptionHandler {
         return result;
     }
 
+    @ExceptionHandler(OrderException.class)
+    public Result handleOrderException(RenException ex) {
+        Result result = new Result();
+        result.error(ex.getCode(), ex.getMsg());
+
+        return result;
+    }
+
     @ExceptionHandler(DuplicateKeyException.class)
     public Result handleDuplicateKeyException(DuplicateKeyException ex) {
         Result result = new Result();

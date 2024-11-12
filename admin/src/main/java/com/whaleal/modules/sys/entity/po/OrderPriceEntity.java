@@ -1,7 +1,6 @@
 package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.whaleal.common.entity.BaseEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,7 +12,7 @@ import java.math.BigDecimal;
  **/
 @Data
 @TableName("order_price")
-public class OrderPriceEntity extends BaseEntity {
+public class OrderPriceEntity {
 
     private Long orderId;
 

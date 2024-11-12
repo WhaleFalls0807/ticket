@@ -75,3 +75,8 @@ mybatis-plus:
     prefix:
     blobType: BLOB
     boolValue: TRUE
+logging:
+  level:
+    org.mybatis: DEBUG  # 显示 MyBatis 的 SQL 日志
+    com.baomidou.mybatisplus: DEBUG  # 显示 MyBatis-Plus 的 SQL 日志
+

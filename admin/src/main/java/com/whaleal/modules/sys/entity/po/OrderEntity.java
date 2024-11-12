@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  **/
 @Data
 @EqualsAndHashCode(callSuper=false)
-@TableName("order")
+@TableName("brand_order")
 public class OrderEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -23,10 +23,10 @@ public class OrderEntity extends BaseEntity {
     /**
      * 商标名称
      */
-    private String name;
+    private String orderName;
 
     /**
-     *  商标内容 可以当作备注使用
+     *  商标内容 = 备注
      */
     private String content;
 
@@ -34,6 +34,11 @@ public class OrderEntity extends BaseEntity {
      * 行业
      */
     private String industry;
+
+    /**
+     * 客户名称
+     */
+    private String customerName;
 
     /**
      * 联系人手机号
@@ -44,10 +49,6 @@ public class OrderEntity extends BaseEntity {
      *  联系人邮件
      */
     private String email;
-
-    private Long fileId;
-
-    private Long priceId;
 
     /**
      *  业务类型
@@ -66,14 +67,14 @@ public class OrderEntity extends BaseEntity {
     private String commitOption;
 
     /**
-     * 状态
-     * 0：新建 1：已分配 2：已提交审核 3：审核中 4： 审核完成
+     * 单子状态
      */
-    private Integer status;
+    private Integer orderStatus;
 
     /**
-     * 0: 未成交
-     * 1：已成交
+     * 0: 公海
+     * 1：待成单
+     * 2：已成单
      */
     private Integer deal;
 
@@ -83,21 +84,9 @@ public class OrderEntity extends BaseEntity {
     private Long reviewUserId;
 
     /**
-     * 审核人名称
-     */
-    @TableField(exist = false)
-    private String reviewName;
-
-    /**
      *  客户id
      */
     private Long customerId;
-
-    /**
-     *  客户名称
-     */
-    @TableField(exist = false)
-    private String customerName;
 
     /**
      * 负责人id
@@ -105,22 +94,18 @@ public class OrderEntity extends BaseEntity {
     private Long ownerId;
 
     /**
-     *  客户名称
-     */
-    @TableField(exist = false)
-    private String ownerName;
-
-    /**
      * 更新者
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Long updater;
+    private String updater;
 
-    public OrderEntity(String name,String phone, String email,String industry) {
-        this.status = 0;
+    public OrderEntity(String orderName,String phone, String email,String industry,String customerName) {
+        this.orderStatus = 0;
+        this.deal = 0;
         this.phone = phone;
-        this.name = name;
+        this.orderName = orderName;
         this.email = email;
         this.industry = industry;
+        this.customerName = customerName;
     }
 }

@@ -23,15 +23,20 @@ public class CustomerEntity extends BaseEntity {
     private String customerName;
 
     /**
-     * 客户来源
-     */
-    private String source;
-
-    /**
      * 1： 企业级用户
      * 2： 个人用户
      */
     private Integer enterprise;
+
+    /**
+     * 公司名称
+     */
+    private String company;
+
+    /**
+     * 客户来源
+     */
+    private String source;
 
     /**
      * 门户网站
@@ -44,13 +49,8 @@ public class CustomerEntity extends BaseEntity {
     private String address;
 
     /**
-     *  联系人名称
-     *  个人用户 与客户名保持一直
-     */
-    private String contactName;
-
-    /**
      * 客户电话
+     * 暂时作为唯一标识区分客户
      */
     private String phone;
 
@@ -65,18 +65,12 @@ public class CustomerEntity extends BaseEntity {
     private String remark;
 
     /**
-     * 创建者用户ID
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private Long createUserId;
-
-    /**
      * 负责人id
      */
     private Long ownerUserId;
 
     /**
-     * 成交状态 0 未成交 1 已成交
+     * 成交状态 0 公海 1 待成交 1 已成交
      */
     private Integer dealStatus;
 
@@ -84,7 +78,6 @@ public class CustomerEntity extends BaseEntity {
      * 成交时间
      */
     private Date dealTime;
-
 
     /**
      * 客户状态 1 正常 2锁定 3删除
@@ -112,12 +105,6 @@ public class CustomerEntity extends BaseEntity {
     private Date poolTime;
 
     /**
-     * 1 已分配 -> 正常客户
-     * 2 未分配 -> 在公海
-     */
-    private Integer assigned;
-
-    /**
      * 从公海领取的时间
      */
     private Date receiveTime;
@@ -126,4 +113,10 @@ public class CustomerEntity extends BaseEntity {
      * 分配前在公海的负责人的id
      */
     private Long preUserId;
+
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_data",fill = FieldFill.INSERT)
+    private Date updateDate;
 }

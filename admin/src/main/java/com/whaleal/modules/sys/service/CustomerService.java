@@ -3,7 +3,9 @@ package com.whaleal.modules.sys.service;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.sys.entity.dto.CustomerDTO;
+import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
+import com.whaleal.modules.sys.entity.po.OrderEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -46,4 +48,11 @@ public interface CustomerService extends BaseService<CustomerEntity> {
      * @return
      */
     boolean checkCustomer(String customerName);
+
+    /**
+     * 根据工单信息加载客户信息（查询/创建）
+     * @param orderEntity
+     */
+    CustomerEntity loadCustomer(OrderUpdateDTO orderEntity);
+
 }
