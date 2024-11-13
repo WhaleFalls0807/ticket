@@ -8,12 +8,14 @@ import com.whaleal.common.utils.Result;
 import com.whaleal.common.validator.AssertUtils;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
+import com.whaleal.modules.sys.entity.dto.OrderCommitDTO;
 import com.whaleal.modules.sys.entity.dto.OrderDTO;
+import com.whaleal.modules.sys.entity.dto.OrderReviewDTO;
 import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
-import com.whaleal.modules.sys.enums.OrderConstant;
+import com.whaleal.modules.sys.service.ActivityService;
 import com.whaleal.modules.sys.service.CustomerService;
 import com.whaleal.modules.sys.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +44,7 @@ public class OrderController {
     private final OrderService orderService;
 
     private final CustomerService customerService;
+
 
     @GetMapping("/all/page")
     @Operation(summary = "分页获取列表")
@@ -84,7 +87,7 @@ public class OrderController {
             @Parameter(name = Constant.LIMIT, description = "每页显示记录数", in = ParameterIn.QUERY, required = true, ref = "int"),
             @Parameter(name = "keyword", description = "关键字搜索", in = ParameterIn.QUERY, ref = "String"),
             @Parameter(name = "ownerId", description = "负责人id", in = ParameterIn.QUERY, ref = "long"),
-            @Parameter(name = "reviewType", description = "审核类别 1：待审核 2：已审核", in = ParameterIn.QUERY, ref = "int"),
+            @Parameter(name = "reviewType", description = "审核类别 0：全部 1：待审核 2：已审核", in = ParameterIn.QUERY, ref = "int",required = true),
             @Parameter(name = "sortField", description = "排序字段", in = ParameterIn.QUERY, ref = "String"),
             @Parameter(name = "isAsc", description = "是否升序", in = ParameterIn.QUERY, ref = "boolean"),
             @Parameter(name = "startDate", description = "开始时间", in = ParameterIn.QUERY, ref = "Date"),
@@ -92,7 +95,6 @@ public class OrderController {
     })
     public Result<PageData<OrderVO>> pageAllReview(@Parameter(hidden = true) @RequestParam Map<String, Object> params) {
         params.put("deal",1);
-        params.put("orderStatus", OrderConstant.WAIT_REVIEW);
         PageData<OrderVO> page = orderService.page(params);
         return new Result<PageData<OrderVO>>().ok(page);
     }
@@ -106,6 +108,7 @@ public class OrderController {
     @Operation(summary = "普通用户通过门户网站新提一个商标注册申请")
     public Result<String> saveByUser(@RequestBody OrderDTO orderDTO) {
         orderService.saveSimpleOrder(orderDTO,false);
+
         return new Result<String>().ok("创建成功");
     }
 
@@ -153,6 +156,22 @@ public class OrderController {
         }
         orderService.addInformation(orderEntity,orderUpdateDTO);
         return new Result();
+    }
+
+    @PostMapping("/commit")
+    @Operation(summary = "业务员提交单子")
+    @RequiresPermissions("order:create")
+    public Result<String> commitForReview(@RequestBody OrderCommitDTO orderCommitDTO ) {
+        orderService.commit(orderCommitDTO);
+        return new Result<String>().ok("提交成功");
+    }
+
+    @PostMapping("/review")
+    @RequiresPermissions("order:review")
+    @Operation(summary = "审核员对单子进行审核")
+    public Result<String> review(@RequestBody OrderReviewDTO orderReviewDTO) {
+        orderService.review(orderReviewDTO);
+        return new Result<String>().ok("审核成功");
     }
 
     @PostMapping("/delete")

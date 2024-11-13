@@ -2,7 +2,9 @@ package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
+import com.whaleal.modules.sys.entity.dto.OrderCommitDTO;
 import com.whaleal.modules.sys.entity.dto.OrderDTO;
+import com.whaleal.modules.sys.entity.dto.OrderReviewDTO;
 import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
@@ -54,4 +56,15 @@ public interface OrderService extends BaseService<OrderEntity> {
      */
     void addInformation(OrderEntity orderEntity,OrderUpdateDTO orderUpdateDTO);
 
+    /**
+     * 业务员提交单子
+     * @param orderCommitDTO
+     */
+    void commit(OrderCommitDTO orderCommitDTO);
+
+    /**
+     * 审核员审核单子
+     * @param orderReviewDTO
+     */
+    void review(OrderReviewDTO orderReviewDTO);
 }

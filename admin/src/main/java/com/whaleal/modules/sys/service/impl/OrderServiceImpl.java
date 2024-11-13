@@ -10,21 +10,19 @@ import com.whaleal.common.utils.BeanCopyUtil;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.dao.OrderDao;
-import com.whaleal.modules.sys.entity.dto.OrderDTO;
-import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
+import com.whaleal.modules.sys.entity.dto.*;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.po.OrderFileEntity;
 import com.whaleal.modules.sys.entity.po.OrderPriceEntity;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
 import com.whaleal.modules.sys.enums.OrderConstant;
-import com.whaleal.modules.sys.service.OrderFileService;
-import com.whaleal.modules.sys.service.OrderPriceService;
-import com.whaleal.modules.sys.service.OrderService;
+import com.whaleal.modules.sys.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -43,11 +41,19 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
     private final OrderPriceService orderPriceService;
 
+    private final ActivityService activityService;
+
+    private final SysUserService sysUserService;
+
 
     public OrderServiceImpl(OrderFileService orderFileService,
-                            OrderPriceService orderPriceService) {
+                            OrderPriceService orderPriceService,
+                            ActivityService activityService,
+                            SysUserService sysUserService) {
         this.orderFileService = orderFileService;
         this.orderPriceService = orderPriceService;
+        this.activityService = activityService;
+        this.sysUserService = sysUserService;
     }
 
     @Override
@@ -57,6 +63,19 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         wrapper.eq("deal",deal);
         if(!ObjectUtils.isEmpty(params.get("orderStatus"))){
             wrapper.eq("order_status",Integer.parseInt(params.get("orderStatus").toString()));
+        }
+
+        if(!ObjectUtils.isEmpty(params.get("reviewType"))){
+            // 处理审核类型
+            int reviewType = Integer.parseInt(params.get("reviewType").toString());
+            if(0 == reviewType){
+                wrapper.ge("order_status",2)
+                        .le("order_status",7);
+            }else if(1 == reviewType){
+                wrapper.in("order_status",2,5);
+            }else if(2 == reviewType){
+                wrapper.in("order_status",3,4,5,6,7);
+            }
         }
 
         if(!ObjectUtils.isEmpty(params.get("ownerId"))){
@@ -115,6 +134,14 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
         }
         insert(orderEntity);
+
+        String creator ;
+        if(isInner){
+            creator =  SecurityUser.getUser().getUsername();
+        }else {
+            creator = orderDTO.getCustomerName();
+        }
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),creator + "创建了单子","",4,creator));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -144,6 +171,14 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         orderEntity.setOrderStatus(OrderConstant.DISTRIBUTED);
         orderEntity.setDeal(1);
         updateById(orderEntity);
+
+        String content;
+        if(Objects.equals(userId, SecurityUser.getUserId())){
+            content = SecurityUser.getUser().getUsername() + "领取了这个单子";
+        }else {
+            content = SecurityUser.getUser().getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
+        }
+        activityService.createActivity(new ActivityDTO(orderId,content + "创建了单子","",4,SecurityUser.getUser().getUsername()));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -223,8 +258,80 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         }
         BeanUtils.copyProperties(orderUpdateDTO,orderEntity, BeanCopyUtil.getNullPropertyNames(orderUpdateDTO));
         // 信息提交完成处于待提交审核状态
-        orderEntity.setOrderStatus(OrderConstant.WAIT_COMMIT);
         orderEntity.setUpdater(SecurityUser.getUser().getUsername());
         updateById(orderEntity);
+
+        String username = user.getUsername();
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),username + "补充了订单信息","",4,username));
+
+    }
+
+    @Override
+    public void commit(OrderCommitDTO orderCommitDTO) {
+        OrderEntity orderEntity = selectById(orderCommitDTO.getOrderId());
+        if(ObjectUtils.isEmpty(orderEntity)){
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
+        }
+        String username = SecurityUser.getUser().getUsername();
+        if(1 == orderCommitDTO.getCommitType()){
+            // 首次提交
+            if(orderEntity.getOrderStatus() == OrderConstant.DISTRIBUTED||  orderEntity.getOrderStatus() == OrderConstant.REVIEW_REJECT){
+                orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW);
+            }else {
+                throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+            }
+        }else if(2 == orderCommitDTO.getCommitType()){
+            // 二次提交
+            if(orderEntity.getOrderStatus() == OrderConstant.WAIT_COMMIT_TWICE||  orderEntity.getOrderStatus() == OrderConstant.TWICE_REVIEW_REJECT){
+                orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW_TWICE);
+            }else {
+                throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+            }
+        }
+
+        String content = username + "提交了单子。";
+        if(StringUtils.hasText(orderCommitDTO.getRemark())){
+            content += orderCommitDTO.getRemark();
+        }
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",4,username));
+    }
+
+    @Override
+    public void review(OrderReviewDTO orderReviewDTO) {
+        OrderEntity orderEntity = selectById(orderReviewDTO.getOrderId());
+        if(ObjectUtils.isEmpty(orderEntity)){
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
+        }
+
+        String username = SecurityUser.getUser().getUsername();
+        if(orderReviewDTO.getPass() == 3){
+            Long[] ids = {orderEntity.getId()};
+            delete(ids);
+            log.info("{}删除了一个order：{}",username,orderEntity);
+        }
+
+        boolean isPass = orderReviewDTO.getPass() == 1;
+        if(OrderConstant.WAIT_REVIEW == orderEntity.getOrderStatus()){
+            if(isPass){
+                orderEntity.setOrderStatus(OrderConstant.WAIT_COMMIT_TWICE);
+            }else {
+                orderEntity.setOrderStatus(OrderConstant.REVIEW_REJECT);
+            }
+        }else if(OrderConstant.WAIT_REVIEW_TWICE == orderEntity.getOrderStatus()){
+            if(isPass){
+                orderEntity.setOrderStatus(OrderConstant.COMPLETE);
+            }else {
+                orderEntity.setOrderStatus(OrderConstant.TWICE_REVIEW_REJECT);
+            }
+        }else {
+            throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+        }
+
+        String content = "审核了单子，审核结果：" + (isPass ?  "通过" : "拒绝") + "。";
+        if(StringUtils.hasText(orderReviewDTO.getRemark())){
+            content += orderReviewDTO.getRemark();
+        }
+
+        activityService.createActivity(new ActivityDTO(orderReviewDTO.getOrderId(), content,"",4,username));
     }
 }

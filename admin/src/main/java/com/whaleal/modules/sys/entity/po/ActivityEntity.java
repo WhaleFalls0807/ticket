@@ -2,6 +2,7 @@ package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.whaleal.common.entity.BaseEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,18 +19,17 @@ public class ActivityEntity extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     /**
-     * 跟进类型
-     * 1：工单跟进
-     * 2：客户跟进
+     * 关联业务id
      */
-    private Integer type;
+    private Long associationId;
+
 
     /**
      * 跟进种类
-     * 1：文字跟进
+     * 1： 普通跟进
      * 2： 打电话
      * 3： 微信
-     *
+     * 4: 系统
      */
     private Integer activityType;
 
@@ -39,17 +39,9 @@ public class ActivityEntity extends BaseEntity {
     private String content;
 
     /**
-     * 关联业务id
+     * 如果上传 上传的文件
      */
-    private Long associationId;
+    private String filePath;
 
-    /**
-     *
-     */
-    private Long contactId;
 
-    /**
-     * 是否已删除
-     */
-    private Integer status;
 }

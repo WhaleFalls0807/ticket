@@ -12,7 +12,7 @@ public enum OrderExceptionEnum {
 
     ONLY_DISTRIBUTE_CAN_OPERATE(1002,"只有已分配的订单才支持操作"),
     NO_PERMISSION_OPERATE(1003,"没有权限操作非本人的订单"),
-    ORDER_NOT_EXISTS(1004,"没有权限操作非本人的订单"),
+    ORDER_NOT_EXISTS(1004,"订单不存在"),
 
 
     NO_PERMISSION_UPDATE_CUSTOMER(2003,"没有权限操作非本人的客户"),

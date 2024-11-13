@@ -26,6 +26,8 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
     public PageData<ActivityEntity> listAllById(Map<String, Object> params) {
         QueryWrapper<ActivityEntity> qw = new QueryWrapper<>();
 
+
+        qw.eq("association_id",Long.parseLong(params.get("associationId").toString()));
         IPage<ActivityEntity> data = baseDao.selectPage(getPage(params, "create_time", false),
                 qw);
 
@@ -40,6 +42,6 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
 
     @Override
     public void updateActivity(ActivityEntity activityEntity) {
-
+        updateById(activityEntity);
     }
 }

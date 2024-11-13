@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.whaleal.common.entity.BaseEntity;
+import com.whaleal.modules.sys.enums.OrderConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -100,7 +101,7 @@ public class OrderEntity extends BaseEntity {
     private String updater;
 
     public OrderEntity(String orderName,String phone, String email,String industry,String customerName) {
-        this.orderStatus = 0;
+        this.orderStatus = OrderConstant.CREATED;
         this.deal = 0;
         this.phone = phone;
         this.orderName = orderName;

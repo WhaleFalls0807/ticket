@@ -20,6 +20,10 @@ public interface ActivityService extends BaseService<ActivityEntity> {
      */
     PageData<ActivityEntity> listAllById(Map<String, Object> params);
 
+    /**
+     * 创建一个跟进
+     * @param activityDTO
+     */
     void createActivity(ActivityDTO activityDTO);
 
     void updateActivity(ActivityEntity activityEntity);
