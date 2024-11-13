@@ -6,6 +6,7 @@ import com.whaleal.modules.sys.entity.dto.CustomerDTO;
 import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
+import com.whaleal.modules.sys.entity.vo.CustomerVO;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public interface CustomerService extends BaseService<CustomerEntity> {
      * @param params
      * @return
      */
-    PageData<CustomerEntity> page(Map<String, Object> params);
+    PageData<CustomerVO> page(Map<String, Object> params);
 
     /**
      * 删除客户
@@ -50,7 +51,7 @@ public interface CustomerService extends BaseService<CustomerEntity> {
     boolean checkCustomer(String customerName);
 
     /**
-     * 根据工单信息加载客户信息（查询/创建）
+     * 根据工单信息加载客户信息（创建）
      * @param orderEntity
      */
     CustomerEntity loadCustomer(OrderUpdateDTO orderEntity);

@@ -2,7 +2,6 @@ package com.whaleal.modules.sys.controller;
 
 import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.constant.Constant;
-import com.whaleal.common.exception.OrderException;
 import com.whaleal.common.exception.OrderExceptionEnum;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
@@ -11,10 +10,10 @@ import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.entity.dto.OrderDTO;
 import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
-import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
+import com.whaleal.modules.sys.enums.OrderConstant;
 import com.whaleal.modules.sys.service.CustomerService;
 import com.whaleal.modules.sys.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,13 +52,15 @@ public class OrderController {
             @Parameter(name = "ownerId", description = "负责人id", in = ParameterIn.QUERY, ref = "long"),
             @Parameter(name = "orderStatus", description = "order状态", in = ParameterIn.QUERY, ref = "int"),
             @Parameter(name = "deal", description = "0：公海 1：待成单 2：已成单", in = ParameterIn.QUERY, ref = "int",required = true),
-            @Parameter(name = "sortField", description = "排序字段", in = ParameterIn.QUERY, ref = "long"),
+            @Parameter(name = "sortField", description = "排序字段", in = ParameterIn.QUERY, ref = "String"),
             @Parameter(name = "isAsc", description = "是否升序", in = ParameterIn.QUERY, ref = "boolean"),
-            @Parameter(name = "startDate", description = "开始时间", in = ParameterIn.QUERY, ref = "boolean"),
-            @Parameter(name = "endDate", description = "结束时间", in = ParameterIn.QUERY, ref = "boolean"),
+            @Parameter(name = "startDate", description = "开始时间", in = ParameterIn.QUERY, ref = "Date"),
+            @Parameter(name = "endDate", description = "结束时间", in = ParameterIn.QUERY, ref = "Date"),
     })
     public Result<PageData<OrderVO>> pageAll(@Parameter(hidden = true) @RequestParam Map<String, Object> params) {
-        if(!ObjectUtils.isEmpty(params.get("distribute")) && !(Boolean)params.get("distribute")){
+        int deal = Integer.parseInt(params.get("deal").toString());
+
+        if(deal == 0){
             //判断是否是查询公海order，公海查询不限制权限
             params.remove("ownerId");
         }else {
@@ -70,6 +71,28 @@ public class OrderController {
             }
         }
 
+        PageData<OrderVO> page = orderService.page(params);
+        return new Result<PageData<OrderVO>>().ok(page);
+    }
+
+
+    @GetMapping("/review/all/page")
+    @Operation(summary = "分页获取审核列表")
+    @RequiresPermissions("order:review")
+    @Parameters({
+            @Parameter(name = Constant.PAGE, description = "当前页码，从1开始", in = ParameterIn.QUERY, required = true, ref = "int"),
+            @Parameter(name = Constant.LIMIT, description = "每页显示记录数", in = ParameterIn.QUERY, required = true, ref = "int"),
+            @Parameter(name = "keyword", description = "关键字搜索", in = ParameterIn.QUERY, ref = "String"),
+            @Parameter(name = "ownerId", description = "负责人id", in = ParameterIn.QUERY, ref = "long"),
+            @Parameter(name = "reviewType", description = "审核类别 1：待审核 2：已审核", in = ParameterIn.QUERY, ref = "int"),
+            @Parameter(name = "sortField", description = "排序字段", in = ParameterIn.QUERY, ref = "String"),
+            @Parameter(name = "isAsc", description = "是否升序", in = ParameterIn.QUERY, ref = "boolean"),
+            @Parameter(name = "startDate", description = "开始时间", in = ParameterIn.QUERY, ref = "Date"),
+            @Parameter(name = "endDate", description = "结束时间", in = ParameterIn.QUERY, ref = "Date"),
+    })
+    public Result<PageData<OrderVO>> pageAllReview(@Parameter(hidden = true) @RequestParam Map<String, Object> params) {
+        params.put("deal",1);
+        params.put("orderStatus", OrderConstant.WAIT_REVIEW);
         PageData<OrderVO> page = orderService.page(params);
         return new Result<PageData<OrderVO>>().ok(page);
     }
@@ -128,11 +151,8 @@ public class OrderController {
             CustomerEntity customerEntity = customerService.loadCustomer(orderUpdateDTO);
             orderUpdateDTO.setCustomerId(customerEntity.getId());
         }
-
         orderService.addInformation(orderEntity,orderUpdateDTO);
-
         return new Result();
-
     }
 
     @PostMapping("/delete")

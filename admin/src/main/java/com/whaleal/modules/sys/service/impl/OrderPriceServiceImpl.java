@@ -2,10 +2,9 @@ package com.whaleal.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.whaleal.common.service.impl.BaseServiceImpl;
-import com.whaleal.modules.sys.dao.OrderFileDao;
-import com.whaleal.modules.sys.entity.po.OrderFileEntity;
+import com.whaleal.modules.sys.dao.OrderPriceDao;
 import com.whaleal.modules.sys.entity.po.OrderPriceEntity;
-import com.whaleal.modules.sys.service.OrderFileService;
+import com.whaleal.modules.sys.service.OrderPriceService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,20 +15,21 @@ import java.util.List;
  * @create: 2024-11-12 23:51
  **/
 @Service
-public class OrderFileServiceImpl extends BaseServiceImpl<OrderFileDao, OrderFileEntity> implements OrderFileService{
+public class OrderPriceServiceImpl extends BaseServiceImpl<OrderPriceDao, OrderPriceEntity> implements OrderPriceService{
 
 
     @Override
-    public OrderFileEntity findByOrderId(Long id) {
-        QueryWrapper<OrderFileEntity> queryWrapper = new QueryWrapper<>();
+    public OrderPriceEntity findByOrderId(Long id) {
+        QueryWrapper<OrderPriceEntity> queryWrapper = new QueryWrapper<>();
 
         queryWrapper.eq("order_id",id);
+
         return baseDao.selectOne(queryWrapper);
     }
 
     @Override
     public void deleteByOrderId(Long[] orderIds) {
-        QueryWrapper<OrderFileEntity> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<OrderPriceEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("order_id", List.of( orderIds));
         baseDao.delete(queryWrapper);
     }

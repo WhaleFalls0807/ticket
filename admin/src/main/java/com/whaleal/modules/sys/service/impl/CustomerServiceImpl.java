@@ -8,11 +8,13 @@ import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.common.utils.ConvertUtils;
 import com.whaleal.modules.security.user.SecurityUser;
+import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.dao.CustomerDao;
 import com.whaleal.modules.sys.entity.dto.CustomerDTO;
 import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
+import com.whaleal.modules.sys.entity.vo.CustomerVO;
 import com.whaleal.modules.sys.service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,13 +37,29 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
         CustomerEntity entity = ConvertUtils.sourceToTarget(customerDTO, CustomerEntity.class);
 
         if(ObjectUtils.isEmpty(customerDTO.getId())){
+            if(!checkCustomer(customerDTO.getPhone())){
+                throw new OrderException(OrderExceptionEnum.CUSTOMER_EXISTS);
+            }
             // 新增
             if(ObjectUtils.isEmpty(entity.getOwnerUserId())){
                 entity.setOwnerUserId(SecurityUser.getUserId());
             }
+            if(ObjectUtils.isEmpty(customerDTO.getOwnerUserId())){
+                entity.setDealStatus(0);
+            }else {
+                entity.setDealStatus(1);
+            }
             insert(entity);
             log.info("新增一条客户信息");
         }else {
+            Long id = customerDTO.getId();
+            CustomerEntity customerEntity = selectById(id);
+            UserDetail user = SecurityUser.getUser();
+            if(user.getSuperAdmin() != 1){
+                if(!Objects.equals(user.getId(), customerEntity.getOwnerUserId())){
+                    throw new OrderException(OrderExceptionEnum.NO_PERMISSION_UPDATE_CUSTOMER);
+                }
+            }
             // 更新
             updateById(entity);
             log.info("修改了一条客户信息");
@@ -49,27 +67,32 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
     }
 
     @Override
-    public PageData<CustomerEntity> page(Map<String, Object> params) {
+    public PageData<CustomerVO> page(Map<String, Object> params) {
+//        long page = Long.parseLong(params.get("page").toString());
+//        long limit = Long.parseLong(params.get("limit").toString());
+//        Long offset = (page -1) * limit;
+//
+//        return baseDao.selectPageByParam(params,offset,limit);
         QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();
 
         // 如果未传入排序字段 默认采用创建时间作为排序依据
         if(ObjectUtils.isEmpty(params.get("sortField"))){
-            params.put("sortField","update_time");
+            params.put("sortField","create_date");
         }
 
         if(!ObjectUtils.isEmpty(params.get("keyword"))){
             String keyword = params.get("keyword").toString();
             wrapper.and(query -> query.like("customer_name",keyword).or()
                     .like("phone",keyword).or()
-                    .like("contact_name",keyword));
+                    .like("company",keyword));
         }
 
         IPage<CustomerEntity> page = baseDao.selectPage(
-                getPage(params, "sort", (Boolean) params.getOrDefault("isAsc",true)),
+                getPage(params, params.get("sortField").toString(), (Boolean) params.getOrDefault("isAsc",true)),
                 wrapper
         );
+        return getPageData(page, CustomerVO.class);
 
-        return getPageData(page, CustomerEntity.class);
     }
 
     @Override
@@ -96,7 +119,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
         customerEntity.setEmail(orderEntity.getEmail());
         customerEntity.setCreator(SecurityUser.getUserId());
         customerEntity.setDealStatus(0);
-        customerEntity.setStatus(1);
         insert(customerEntity);
 
         return customerEntity;

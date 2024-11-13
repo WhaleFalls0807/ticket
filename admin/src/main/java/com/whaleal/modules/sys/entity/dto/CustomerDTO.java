@@ -18,8 +18,14 @@ public class CustomerDTO {
     @Schema(title = "客户名称",requiredMode = Schema.RequiredMode.REQUIRED)
     private String customerName;
 
+    @Schema(title = "公司名称")
+    private String company;
+
+    @Schema(title = "公司名称",description = "1： 企业级用户,2： 个人用户")
+    private Integer enterprise;
+
     @Schema(title = "客户来源",requiredMode = Schema.RequiredMode.REQUIRED)
-    private Integer source;
+    private String source;
 
     @Schema(title = "客户网站首页")
     private String website;
@@ -27,14 +33,17 @@ public class CustomerDTO {
     @Schema(title = "客户公司地址")
     private String address;
 
-    @Schema(title = "联系人")
-    private String contactName;
-
-    @Schema(title = "客户电话")
+    @Schema(title = "客户电话",requiredMode = Schema.RequiredMode.REQUIRED)
     private String phone;
 
     @Schema(title = "客户联系邮箱")
     private String email;
+
+    @Schema(title = "是否已微信建联")
+    private Integer wechat;
+
+    @Schema(title = "客户行业")
+    private String industry;
 
     @Schema(title = "备注")
     private String remark;

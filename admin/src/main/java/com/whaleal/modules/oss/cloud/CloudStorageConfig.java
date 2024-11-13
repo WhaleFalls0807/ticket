@@ -30,7 +30,7 @@ import java.io.Serializable;
 public class CloudStorageConfig implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Schema(title = "类型 1：七牛  2：阿里云  3：腾讯云 ")
+    @Schema(title = "类型 1：七牛  2：阿里云  3：腾讯云 4：本地")
     @Range(min = 1, max = 6, message = "{oss.type.range}")
     private Integer type;
 
@@ -105,5 +105,13 @@ public class CloudStorageConfig implements Serializable {
     @Schema(title = "腾讯云COS所属地区")
     @NotBlank(message = "{qcloud.region.require}", groups = QcloudGroup.class)
     private String qcloudRegion;
+
+    @Schema(title = "本地存储时文件存放路径")
+    @NotBlank(message = "{qcloud.region.require}", groups = QcloudGroup.class)
+    private String path;
+
+    @Schema(title = "是否定时清除临时文件 0：不清除 1：清除")
+    @NotBlank(message = "{qcloud.region.require}", groups = QcloudGroup.class)
+    private Integer isDel;
 
 }

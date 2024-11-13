@@ -15,8 +15,11 @@ public enum OrderExceptionEnum {
     ORDER_NOT_EXISTS(1004,"没有权限操作非本人的订单"),
 
 
-    CUSTOMER_EXISTS(2005,"客户信息已存在，无法重复创建");
+    NO_PERMISSION_UPDATE_CUSTOMER(2003,"没有权限操作非本人的客户"),
+    CUSTOMER_EXISTS(2005,"客户信息已存在，无法重复创建"),
 
+
+    UPLOAD_FILE_ERROR(5001,"上传文件时出现错误");
 
 
     OrderExceptionEnum(int code, String msg) {

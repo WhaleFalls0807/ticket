@@ -25,3 +25,5 @@ spring:
         url-pattern: /druid/*
         #login-username: admin
         #login-password: admin
+oss:
+  path: /Users/whalefalls/Desktop/

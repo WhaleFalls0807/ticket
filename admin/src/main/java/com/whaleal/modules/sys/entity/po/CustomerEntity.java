@@ -34,6 +34,11 @@ public class CustomerEntity extends BaseEntity {
     private String company;
 
     /**
+     * 客户行业
+     */
+    private String industry;
+
+    /**
      * 客户来源
      */
     private String source;
@@ -60,6 +65,13 @@ public class CustomerEntity extends BaseEntity {
     private String email;
 
     /**
+     * 是否已建联微信
+     * 0: 未建联
+     * 1：已建联
+     */
+    private Integer wechat;
+
+    /**
      * 备注
      */
     private String remark;
@@ -79,10 +91,11 @@ public class CustomerEntity extends BaseEntity {
      */
     private Date dealTime;
 
-    /**
-     * 客户状态 1 正常 2锁定 3删除
-     */
-    private Integer status;
+    // 先不要逻辑删除
+//    /**
+//     * 客户状态 1 正常 2锁定 3删除
+//     */
+//    private Integer status;
 
     /**
      * 下次联系时间
@@ -117,6 +130,6 @@ public class CustomerEntity extends BaseEntity {
     /**
      * 更新时间
      */
-    @TableField(value = "update_data",fill = FieldFill.INSERT)
+    @TableField(value = "update_date",fill = FieldFill.INSERT)
     private Date updateDate;
 }

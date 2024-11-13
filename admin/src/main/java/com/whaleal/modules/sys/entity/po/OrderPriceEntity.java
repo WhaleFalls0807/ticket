@@ -1,7 +1,9 @@
 package com.whaleal.modules.sys.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -11,6 +13,8 @@ import java.math.BigDecimal;
  * @create: 2024-11-11 22:33
  **/
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("order_price")
 public class OrderPriceEntity {
 

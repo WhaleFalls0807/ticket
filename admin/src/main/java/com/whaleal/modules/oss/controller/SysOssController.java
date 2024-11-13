@@ -15,6 +15,7 @@ import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.JsonUtils;
 import com.whaleal.common.utils.Result;
 import com.whaleal.modules.oss.cloud.CloudStorageConfig;
+import com.whaleal.modules.oss.cloud.LocalStorageService;
 import com.whaleal.modules.oss.cloud.OSSFactory;
 import com.whaleal.modules.oss.entity.SysOssEntity;
 import com.whaleal.modules.oss.service.SysOssService;
@@ -49,6 +50,8 @@ import java.util.Map;
 public class SysOssController {
     private final SysOssService sysOssService;
     private final SysParamsService sysParamsService;
+
+    private final LocalStorageService localStorageService;
 
     private final static String KEY = Constant.CLOUD_STORAGE_CONFIG_KEY;
 
@@ -116,6 +119,22 @@ public class SysOssController {
         data.put("src", url);
 
         return new Result<Map<String, Object>>().ok(data);
+    }
+
+    /**
+     * 自定义文件上传
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/upload/{associationId}")
+    @Operation(summary = "上传文件")
+    public Result<String> uploadLocal(@PathVariable("associationId") Long associationId,
+                                                    @RequestParam("file") MultipartFile file)  {
+        if (file.isEmpty()) {
+            return new Result<String>().error(ErrorCode.UPLOAD_FILE_EMPTY);
+        }
+        return new Result<String>().ok(localStorageService.uploadFile(associationId, file));
     }
 
     @DeleteMapping

@@ -68,7 +68,7 @@ public class OrderFileEntity {
     /**
      * 更新时间
      */
-    @TableField(value = "update_data",fill = FieldFill.INSERT)
+    @TableField(value = "update_date",fill = FieldFill.INSERT)
     private Date updateDate;
 
     public OrderFileEntity(Long orderId, String contract, String payType) {

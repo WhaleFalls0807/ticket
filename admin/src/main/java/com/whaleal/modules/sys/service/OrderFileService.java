@@ -17,4 +17,5 @@ public interface OrderFileService extends BaseService<OrderFileEntity> {
      */
     OrderFileEntity findByOrderId(Long id);
 
+    void deleteByOrderId(Long[] orderIds);
 }

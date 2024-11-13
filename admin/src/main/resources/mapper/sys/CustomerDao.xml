@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.whaleal.modules.sys.dao.CustomerDao">
+
+    <select id="selectPageByParam" parameterType="map"  resultType="com.whaleal.modules.sys.entity.vo.CustomerVO">
+        SELECT
+        c.customer_name,
+        c.company,
+        c.phone,
+        u.username,
+        CASE
+        WHEN c.deal_status = 0 THEN '公海'
+        WHEN c.deal_status = 1 THEN '待成交'
+        WHEN c.deal_status = 2 THEN '已成交'
+        ELSE '未知状态'
+        END AS deal_status,
+        c.industry
+        FROM customer c
+        LEFT JOIN sys_user u ON c.owner_user_id = u.id
+        WHERE c.deal_status = #{map.dealStatus}
+        <if test="map.sortField == null or map.sortField == ''">
+            ORDER BY c.create_date   <!-- 默认使用 create_date 排序 -->
+        </if>
+        <if test="map.sortField != null and map.sortField != ''">
+            ORDER BY #{map.sortField}   <!-- 使用传入的 sortField -->
+        </if>
+
+        <!-- 排序方向 -->
+        <if test="map.isAsc != null">
+            <if test="map.isAsc == true">
+                ASC
+            </if>
+            <if test="map.isAsc == false">
+                DESC
+            </if>
+        </if>
+        LIMIT #{offset}, #{limit}
+    </select>
+</mapper>

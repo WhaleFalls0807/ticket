@@ -5,9 +5,14 @@ import com.whaleal.common.constant.Constant;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
 import com.whaleal.common.validator.AssertUtils;
+import com.whaleal.modules.security.user.SecurityUser;
+import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.entity.dto.CustomerDTO;
+import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
+import com.whaleal.modules.sys.entity.vo.CustomerVO;
 import com.whaleal.modules.sys.service.CustomerService;
+import com.whaleal.modules.sys.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -34,10 +39,11 @@ public class CustomerController {
 
     private CustomerService customerService;
 
+    private SysUserService sysUserService;
+
     @Operation(summary = "保存或更新客户基本信息")
     @PostMapping("/saveOrUpdate")
     @LogOperation("保存")
-    @RequiresPermissions("customer:save")
     public Result saveCustomer(@RequestBody CustomerDTO customerDTO){
         customerService.saveOrUpdate(customerDTO);
         return new Result().ok("操作成功");
@@ -48,15 +54,28 @@ public class CustomerController {
             @Parameter(name = Constant.LIMIT, description = "每页显示记录数", in = ParameterIn.QUERY, required = true, ref = "int"),
             @Parameter(name = "keyword", description = "关键字搜索", in = ParameterIn.QUERY, ref = "String"),
             @Parameter(name = "ownerId", description = "负责人id", in = ParameterIn.QUERY, ref = "long"),
+            @Parameter(name = "dealStatus", description = "成交状态", in = ParameterIn.QUERY, ref = "long"),
             @Parameter(name = "sortField", description = "排序字段", in = ParameterIn.QUERY, ref = "long"),
             @Parameter(name = "isAsc", description = "是否升序", in = ParameterIn.QUERY, ref = "boolean"),
     })
     @GetMapping("/page")
     @Operation(summary = "分页展示客户列表")
-    @RequiresPermissions("customer:list")
-    public Result<PageData<CustomerEntity>> page(@Parameter(hidden = true) @RequestParam Map<String, Object> params){
-        PageData<CustomerEntity> page = customerService.page(params);
-        return new Result<PageData<CustomerEntity>>().ok(page);
+    public Result<PageData<CustomerVO>> page(@Parameter(hidden = true) @RequestParam Map<String, Object> params){
+        if(0 != Integer.parseInt(params.get("dealStatus").toString()) ){
+            UserDetail user = SecurityUser.getUser();
+            if(1 != user.getSuperAdmin()){
+                params.put("ownerId",user.getId());
+            }
+        }else {
+            params.remove("ownerId");
+        }
+        PageData<CustomerVO> page = customerService.page(params);
+        page.getList().forEach(s ->{
+            SysUserDTO sysUserDTO = sysUserService.get(s.getOwnerUserId());
+            s.setOwnerUserName(sysUserDTO.getUsername());
+        });
+
+        return new Result<PageData<CustomerVO>>().ok(page);
     }
 
     @Operation(summary = "客户列表",description = "提供给管理员角色筛选客户列表使用")
