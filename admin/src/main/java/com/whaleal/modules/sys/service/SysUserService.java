@@ -12,6 +12,7 @@ import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.entity.po.SysUserEntity;
+import com.whaleal.modules.sys.entity.vo.SysUserVO;
 
 import java.util.List;
 import java.util.Map;
@@ -55,4 +56,10 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 	 */
 	List<Long> getUserIdListByDeptId(List<Long> deptIdList);
 
+	/**
+	 *
+	 * @param permission
+	 * @return
+	 */
+    List<SysUserVO> listUserByPermission(String permission);
 }

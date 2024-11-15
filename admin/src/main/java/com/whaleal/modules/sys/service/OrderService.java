@@ -2,13 +2,11 @@ package com.whaleal.modules.sys.service;
 
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
-import com.whaleal.modules.sys.entity.dto.OrderCommitDTO;
-import com.whaleal.modules.sys.entity.dto.OrderDTO;
-import com.whaleal.modules.sys.entity.dto.OrderReviewDTO;
-import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
+import com.whaleal.modules.sys.entity.dto.order.*;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +40,7 @@ public interface OrderService extends BaseService<OrderEntity> {
      * @param userId
      * @return
      */
-    void distributeOrder(Long orderId, Long userId);
+    void distributeOrder(List<Long> orderIds, Long userId);
 
     /**
      * 批量删除order
@@ -67,4 +65,11 @@ public interface OrderService extends BaseService<OrderEntity> {
      * @param orderReviewDTO
      */
     void review(OrderReviewDTO orderReviewDTO);
+
+    /**
+     * 更改工单状态
+     * @param orderEditDTO
+     */
+    void editStatus(OrderEditDTO orderEditDTO);
+
 }

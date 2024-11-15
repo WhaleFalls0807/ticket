@@ -1,6 +1,7 @@
 package com.whaleal.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.whaleal.common.exception.OrderException;
 import com.whaleal.common.exception.OrderExceptionEnum;
@@ -11,6 +12,7 @@ import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.dao.OrderDao;
 import com.whaleal.modules.sys.entity.dto.*;
+import com.whaleal.modules.sys.entity.dto.order.*;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.po.OrderFileEntity;
 import com.whaleal.modules.sys.entity.po.OrderPriceEntity;
@@ -25,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -120,7 +123,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     }
 
     @Override
-    public void saveSimpleOrder(OrderDTO orderDTO,boolean isInner) {
+    public void saveSimpleOrder(OrderDTO orderDTO, boolean isInner) {
         OrderEntity orderEntity = new OrderEntity(orderDTO.getOrderName(),orderDTO.getPhone(),orderDTO.getEmail(),orderDTO.getIndustry(),orderDTO.getCustomerName());
 
         if(isInner){
@@ -141,7 +144,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         }else {
             creator = orderDTO.getCustomerName();
         }
-        activityService.createActivity(new ActivityDTO(orderEntity.getId(),creator + "创建了单子","",4,creator));
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),"创建了单子","",4,creator));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -162,23 +165,25 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     }
 
     @Override
-    public void distributeOrder(Long orderId, Long userId) {
-        OrderEntity orderEntity = selectById(orderId);
-        if(ObjectUtils.isEmpty(orderEntity)){
-            throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
-        }
-        orderEntity.setOwnerId(userId);
-        orderEntity.setOrderStatus(OrderConstant.DISTRIBUTED);
-        orderEntity.setDeal(1);
-        updateById(orderEntity);
+    public void distributeOrder(List<Long> orderIds, Long userId) {
+        for (Long orderId : orderIds) {
+            OrderEntity orderEntity = selectById(orderId);
+            if (ObjectUtils.isEmpty(orderEntity)) {
+                throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
+            }
+            orderEntity.setOwnerId(userId);
+            orderEntity.setOrderStatus(OrderConstant.DISTRIBUTED);
+            orderEntity.setDeal(1);
+            updateById(orderEntity);
 
-        String content;
-        if(Objects.equals(userId, SecurityUser.getUserId())){
-            content = SecurityUser.getUser().getUsername() + "领取了这个单子";
-        }else {
-            content = SecurityUser.getUser().getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
+            String content;
+            if (Objects.equals(userId, SecurityUser.getUserId())) {
+                content = SecurityUser.getUser().getUsername() + "领取了这个单子";
+            } else {
+                content = SecurityUser.getUser().getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
+            }
+            activityService.createActivity(new ActivityDTO(orderId, content + "创建了单子", "", 4, SecurityUser.getUser().getUsername()));
         }
-        activityService.createActivity(new ActivityDTO(orderId,content + "创建了单子","",4,SecurityUser.getUser().getUsername()));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -198,7 +203,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addInformation(OrderEntity orderEntity,OrderUpdateDTO orderUpdateDTO) {
+    public void addInformation(OrderEntity orderEntity, OrderUpdateDTO orderUpdateDTO) {
         if(orderEntity.getOrderStatus() != OrderConstant.DISTRIBUTED){
             // 只有已分配的单子才能补充信息
             throw new OrderException(OrderExceptionEnum.ONLY_DISTRIBUTE_CAN_OPERATE);
@@ -268,70 +273,103 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
     @Override
     public void commit(OrderCommitDTO orderCommitDTO) {
-        OrderEntity orderEntity = selectById(orderCommitDTO.getOrderId());
-        if(ObjectUtils.isEmpty(orderEntity)){
-            throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
-        }
-        String username = SecurityUser.getUser().getUsername();
-        if(1 == orderCommitDTO.getCommitType()){
-            // 首次提交
-            if(orderEntity.getOrderStatus() == OrderConstant.DISTRIBUTED||  orderEntity.getOrderStatus() == OrderConstant.REVIEW_REJECT){
-                orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW);
-            }else {
-                throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+        for (Long orderId : orderCommitDTO.getOrderId() ) {
+            OrderEntity orderEntity = selectById(orderId);
+            if (ObjectUtils.isEmpty(orderEntity)) {
+                throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
             }
-        }else if(2 == orderCommitDTO.getCommitType()){
-            // 二次提交
-            if(orderEntity.getOrderStatus() == OrderConstant.WAIT_COMMIT_TWICE||  orderEntity.getOrderStatus() == OrderConstant.TWICE_REVIEW_REJECT){
-                orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW_TWICE);
-            }else {
-                throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+            String username = SecurityUser.getUser().getUsername();
+            if (1 == orderCommitDTO.getCommitType()) {
+                // 首次提交
+                if (orderEntity.getOrderStatus() == OrderConstant.DISTRIBUTED || orderEntity.getOrderStatus() == OrderConstant.REVIEW_REJECT) {
+                    orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW);
+                } else {
+                    throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+                }
+            } else if (2 == orderCommitDTO.getCommitType()) {
+                // 二次提交
+                if (orderEntity.getOrderStatus() == OrderConstant.WAIT_COMMIT_TWICE || orderEntity.getOrderStatus() == OrderConstant.TWICE_REVIEW_REJECT) {
+                    orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW_TWICE);
+                } else {
+                    throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+                }
             }
-        }
 
-        String content = username + "提交了单子。";
-        if(StringUtils.hasText(orderCommitDTO.getRemark())){
-            content += orderCommitDTO.getRemark();
+            String content = username + "提交了单子。";
+            if (StringUtils.hasText(orderCommitDTO.getRemark())) {
+                content += orderCommitDTO.getRemark();
+            }
+            activityService.createActivity(new ActivityDTO(orderEntity.getId(), content, "", 4, username));
         }
-        activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",4,username));
     }
 
     @Override
     public void review(OrderReviewDTO orderReviewDTO) {
-        OrderEntity orderEntity = selectById(orderReviewDTO.getOrderId());
+        for(Long orderId : orderReviewDTO.getOrderId()) {
+            OrderEntity orderEntity = selectById(orderId);
+            if (ObjectUtils.isEmpty(orderEntity)) {
+                throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
+            }
+
+            String username = SecurityUser.getUser().getUsername();
+            if (orderReviewDTO.getPass() == 3) {
+                Long[] ids = {orderEntity.getId()};
+                delete(ids);
+                log.info("{}删除了一个order：{}", username, orderEntity);
+            }
+
+            boolean isPass = orderReviewDTO.getPass() == 1;
+            if (OrderConstant.WAIT_REVIEW == orderEntity.getOrderStatus()) {
+                if (isPass) {
+                    orderEntity.setOrderStatus(OrderConstant.WAIT_COMMIT_TWICE);
+                } else {
+                    orderEntity.setOrderStatus(OrderConstant.REVIEW_REJECT);
+                }
+            } else if (OrderConstant.WAIT_REVIEW_TWICE == orderEntity.getOrderStatus()) {
+                if (isPass) {
+                    orderEntity.setOrderStatus(OrderConstant.COMPLETE);
+                } else {
+                    orderEntity.setOrderStatus(OrderConstant.TWICE_REVIEW_REJECT);
+                }
+            } else {
+                throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
+            }
+
+            String content = "审核了单子，审核结果：" + (isPass ? "通过" : "拒绝") + "。";
+            if (StringUtils.hasText(orderReviewDTO.getRemark())) {
+                content += orderReviewDTO.getRemark();
+            }
+
+            activityService.createActivity(new ActivityDTO(orderEntity.getId(), content, "", 4, username));
+        }
+    }
+
+    @Override
+    public void editStatus(OrderEditDTO orderEditDTO) {
+        Long orderId = orderEditDTO.getOrderId();
+
+        OrderEntity orderEntity = selectById(orderId);
         if(ObjectUtils.isEmpty(orderEntity)){
             throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
         }
 
-        String username = SecurityUser.getUser().getUsername();
-        if(orderReviewDTO.getPass() == 3){
-            Long[] ids = {orderEntity.getId()};
-            delete(ids);
-            log.info("{}删除了一个order：{}",username,orderEntity);
+        UserDetail user = SecurityUser.getUser();
+        if(1 != user.getSuperAdmin() && !Objects.equals(user.getId(), orderEntity.getOwnerId())){
+            throw new OrderException(OrderExceptionEnum.NO_PERMISSION_OPERATE);
         }
+        LambdaUpdateWrapper<OrderEntity> update = new LambdaUpdateWrapper<>();
 
-        boolean isPass = orderReviewDTO.getPass() == 1;
-        if(OrderConstant.WAIT_REVIEW == orderEntity.getOrderStatus()){
-            if(isPass){
-                orderEntity.setOrderStatus(OrderConstant.WAIT_COMMIT_TWICE);
-            }else {
-                orderEntity.setOrderStatus(OrderConstant.REVIEW_REJECT);
-            }
-        }else if(OrderConstant.WAIT_REVIEW_TWICE == orderEntity.getOrderStatus()){
-            if(isPass){
-                orderEntity.setOrderStatus(OrderConstant.COMPLETE);
-            }else {
-                orderEntity.setOrderStatus(OrderConstant.TWICE_REVIEW_REJECT);
-            }
+        String content = "";
+        if(1 == orderEditDTO.getOperateType()){
+            update.set(OrderEntity::getOrderStatus,OrderConstant.CREATED);
+            update.set(OrderEntity::getOwnerId,null);
+            content = "把单子放回了公海。" + orderEditDTO.getRemark();
         }else {
-            throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
-        }
+            update.set(OrderEntity::getOwnerId,orderEditDTO.getNewOwnerId());
 
-        String content = "审核了单子，审核结果：" + (isPass ?  "通过" : "拒绝") + "。";
-        if(StringUtils.hasText(orderReviewDTO.getRemark())){
-            content += orderReviewDTO.getRemark();
+            content = "把单子转给了" + orderEditDTO.getUsername() + "。"  + orderEditDTO.getRemark();
         }
-
-        activityService.createActivity(new ActivityDTO(orderReviewDTO.getOrderId(), content,"",4,username));
+        baseDao.update(update);
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",4,SecurityUser.getUser().getUsername()));
     }
 }

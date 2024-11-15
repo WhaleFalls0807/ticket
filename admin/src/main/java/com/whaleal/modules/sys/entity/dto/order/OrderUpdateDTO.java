@@ -1,4 +1,4 @@
-package com.whaleal.modules.sys.entity.dto;
+package com.whaleal.modules.sys.entity.dto.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -67,5 +67,27 @@ public class OrderUpdateDTO {
 
     @Schema(title = "提交选项")
     private String commitOption;
+
+    /**
+     * 二次补充内容
+     */
+    @Schema(title = "logo")
+    private String logo;
+
+    @Schema(title = "身份证")
+    private String IDCard;
+
+    @Schema(title = "申请书")
+    private String applyBook;
+
+    @Schema(title = "委托书")
+    private String commission;
+
+    @Schema(title = "营业执照")
+    private String businessLicense;
+
+    @Schema(title = "盖章合同")
+    private String sealedContract;
+
 
 }

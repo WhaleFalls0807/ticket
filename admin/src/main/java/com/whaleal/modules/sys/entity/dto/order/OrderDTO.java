@@ -1,4 +1,4 @@
-package com.whaleal.modules.sys.entity.dto;
+package com.whaleal.modules.sys.entity.dto.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

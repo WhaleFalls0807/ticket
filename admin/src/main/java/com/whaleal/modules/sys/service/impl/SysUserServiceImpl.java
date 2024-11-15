@@ -18,6 +18,7 @@ import com.whaleal.modules.security.password.PasswordUtils;
 import com.whaleal.modules.sys.dao.SysUserDao;
 import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.entity.po.SysUserEntity;
+import com.whaleal.modules.sys.entity.vo.SysUserVO;
 import com.whaleal.modules.sys.enums.SuperAdminEnum;
 import com.whaleal.modules.sys.service.SysDeptService;
 import com.whaleal.modules.sys.service.SysRoleUserService;
@@ -152,6 +153,11 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     @Override
     public List<Long> getUserIdListByDeptId(List<Long> deptIdList) {
         return baseDao.getUserIdListByDeptId(deptIdList);
+    }
+
+    @Override
+    public List<SysUserVO> listUserByPermission(String permission) {
+        return baseDao.listUserByPermission(permission);
     }
 
 }

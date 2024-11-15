@@ -3,9 +3,8 @@ package com.whaleal.modules.sys.service;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.sys.entity.dto.CustomerDTO;
-import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
+import com.whaleal.modules.sys.entity.dto.order.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
-import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.CustomerVO;
 
 import java.util.List;

@@ -11,9 +11,8 @@ import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.dao.CustomerDao;
 import com.whaleal.modules.sys.entity.dto.CustomerDTO;
-import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
+import com.whaleal.modules.sys.entity.dto.order.OrderUpdateDTO;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
-import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.CustomerVO;
 import com.whaleal.modules.sys.service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
         CustomerEntity entity = ConvertUtils.sourceToTarget(customerDTO, CustomerEntity.class);
 
         if(ObjectUtils.isEmpty(customerDTO.getId())){
-            if(!checkCustomer(customerDTO.getPhone())){
+            if(!checkPhone(customerDTO.getPhone())){
                 throw new OrderException(OrderExceptionEnum.CUSTOMER_EXISTS);
             }
             // 新增
@@ -68,11 +67,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
 
     @Override
     public PageData<CustomerVO> page(Map<String, Object> params) {
-//        long page = Long.parseLong(params.get("page").toString());
-//        long limit = Long.parseLong(params.get("limit").toString());
-//        Long offset = (page -1) * limit;
-//
-//        return baseDao.selectPageByParam(params,offset,limit);
         QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();
 
         // 如果未传入排序字段 默认采用创建时间作为排序依据
@@ -125,11 +119,18 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
     }
 
 
-    @Override
-    public boolean checkCustomer(String phone){
+    public boolean checkPhone(String phone){
         QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();
 
         wrapper.eq("phone",phone);
+        return ObjectUtils.isEmpty(baseDao.selectOne(wrapper));
+    }
+
+    @Override
+    public boolean checkCustomer(String customer){
+        QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();
+
+        wrapper.eq("customer_name",customer);
         return ObjectUtils.isEmpty(baseDao.selectOne(wrapper));
     }
 }

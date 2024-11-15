@@ -8,14 +8,10 @@ import com.whaleal.common.utils.Result;
 import com.whaleal.common.validator.AssertUtils;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
-import com.whaleal.modules.sys.entity.dto.OrderCommitDTO;
-import com.whaleal.modules.sys.entity.dto.OrderDTO;
-import com.whaleal.modules.sys.entity.dto.OrderReviewDTO;
-import com.whaleal.modules.sys.entity.dto.OrderUpdateDTO;
+import com.whaleal.modules.sys.entity.dto.order.*;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
-import com.whaleal.modules.sys.service.ActivityService;
 import com.whaleal.modules.sys.service.CustomerService;
 import com.whaleal.modules.sys.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,7 +78,7 @@ public class OrderController {
 
     @GetMapping("/review/all/page")
     @Operation(summary = "分页获取审核列表")
-    @RequiresPermissions("order:review")
+    @RequiresPermissions("approve:list")
     @Parameters({
             @Parameter(name = Constant.PAGE, description = "当前页码，从1开始", in = ParameterIn.QUERY, required = true, ref = "int"),
             @Parameter(name = Constant.LIMIT, description = "每页显示记录数", in = ParameterIn.QUERY, required = true, ref = "int"),
@@ -97,6 +94,14 @@ public class OrderController {
         params.put("deal",1);
         PageData<OrderVO> page = orderService.page(params);
         return new Result<PageData<OrderVO>>().ok(page);
+    }
+
+    @Operation(summary = "查询订单详情")
+    @RequiresPermissions("order:info")
+    @GetMapping("/queryById/{id}")
+    public Result<OrderEntity> queryById(@PathVariable Long id){
+        OrderEntity orderEntity = orderService.selectById(id);
+        return new Result<OrderEntity>().ok(orderEntity);
     }
 
     /**
@@ -120,22 +125,28 @@ public class OrderController {
         return new Result<String>().ok("创建成功");
     }
 
-    @PostMapping("/distribute/{orderId}")
+    @PostMapping("/distribute")
     @Operation(summary = "管理员分配单子")
-    @RequiresPermissions("order:distribute")
-    public Result<String> distributeOrder(@PathVariable Long orderId,
-                                          @RequestBody Map<String,Long> data) {
-        Long userId = data.get("userId");
-        orderService.distributeOrder(orderId,userId);
+    @RequiresPermissions("order:assign")
+    public Result<String> distributeOrder(@RequestBody OrderDistributeDTO orderDistributeDTO) {
+        List<Long> orderIds = orderDistributeDTO.getOrderIds();
+        if(orderIds.isEmpty()){
+            return new Result<String>().ok("分配成功");
+        }
+        if(ObjectUtils.isEmpty(orderDistributeDTO.getUserId())){
+            orderDistributeDTO.setUserId(SecurityUser.getUserId());
+        }
+        orderService.distributeOrder(orderDistributeDTO.getOrderIds(),orderDistributeDTO.getUserId());
         return new Result<String>().ok("分配成功");
     }
 
-    @PostMapping("/choose/{orderId}")
+    @PostMapping("/choose")
     @Operation(summary = "业务员抢单子")
     @RequiresPermissions("order:choose")
-    public Result chooseOrder(@PathVariable Long orderId) {
+    public Result chooseOrder(@RequestBody OrderDistributeDTO orderDistributeDTO) {
         Long userId = SecurityUser.getUserId();
-        orderService.distributeOrder(orderId,userId);
+        orderDistributeDTO.setUserId(userId);
+        orderService.distributeOrder(orderDistributeDTO.getOrderIds(),userId);
         return new Result();
     }
 
@@ -166,8 +177,16 @@ public class OrderController {
         return new Result<String>().ok("提交成功");
     }
 
+    @PostMapping("/status/change")
+    @Operation(summary = "修改工单状态",description = "放回公海 指派给其他人 ")
+    @RequiresPermissions("order:create")
+    public Result<String> editOrderStatus(@RequestBody OrderEditDTO orderEditDTO ) {
+        orderService.editStatus(orderEditDTO);
+        return new Result<String>().ok("提交成功");
+    }
+
     @PostMapping("/review")
-    @RequiresPermissions("order:review")
+    @RequiresPermissions("approve:approve")
     @Operation(summary = "审核员对单子进行审核")
     public Result<String> review(@RequestBody OrderReviewDTO orderReviewDTO) {
         orderService.review(orderReviewDTO);

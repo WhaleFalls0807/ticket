@@ -10,6 +10,7 @@ package com.whaleal.modules.sys.dao;
 
 import com.whaleal.modules.sys.entity.po.SysUserEntity;
 import com.whaleal.common.dao.BaseDao;
+import com.whaleal.modules.sys.entity.vo.SysUserVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -41,4 +42,11 @@ public interface SysUserDao extends BaseDao<SysUserEntity> {
 	 * 根据部门ID,查询用户ID列表
 	 */
 	List<Long> getUserIdListByDeptId(List<Long> deptIdList);
+
+	/**
+	 * 获取具有指定权限的用户列表
+	 * @param permission
+	 * @return
+	 */
+    List<SysUserVO> listUserByPermission(@Param("permission") String permission);
 }

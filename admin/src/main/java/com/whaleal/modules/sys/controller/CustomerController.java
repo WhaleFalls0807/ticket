@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -71,8 +72,12 @@ public class CustomerController {
         }
         PageData<CustomerVO> page = customerService.page(params);
         page.getList().forEach(s ->{
-            SysUserDTO sysUserDTO = sysUserService.get(s.getOwnerUserId());
-            s.setOwnerUserName(sysUserDTO.getUsername());
+            if(!ObjectUtils.isEmpty(s.getOwnerUserId()) && 0 != s.getOwnerUserId()){
+                SysUserDTO sysUserDTO = sysUserService.get(s.getOwnerUserId());
+                if(!ObjectUtils.isEmpty(sysUserDTO)){
+                    s.setOwnerUserName(sysUserDTO.getUsername());
+                }
+            }
         });
 
         return new Result<PageData<CustomerVO>>().ok(page);

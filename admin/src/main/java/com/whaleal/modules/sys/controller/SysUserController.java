@@ -17,6 +17,7 @@ import com.whaleal.common.utils.ExcelUtils;
 import com.whaleal.common.utils.Result;
 import com.whaleal.modules.sys.entity.dto.PasswordDTO;
 import com.whaleal.modules.sys.entity.dto.SysUserDTO;
+import com.whaleal.modules.sys.entity.vo.SysUserVO;
 import com.whaleal.modules.sys.excel.SysUserExcel;
 import com.whaleal.modules.sys.service.SysRoleUserService;
 import com.whaleal.modules.sys.service.SysUserService;
@@ -71,6 +72,14 @@ public class SysUserController {
         PageData<SysUserDTO> page = sysUserService.page(params);
 
         return new Result<PageData<SysUserDTO>>().ok(page);
+    }
+
+    @GetMapping("/list/byPerm")
+    @Operation(summary = "获取具有权限的用户信息")
+    @RequiresPermissions("sys:user:page")
+    public Result<List<SysUserVO>> getUserByRole(@RequestParam String permission) {
+        List<SysUserVO> list = sysUserService.listUserByPermission(permission);
+        return new Result<List<SysUserVO>>().ok(list);
     }
 
     @GetMapping("{id}")
@@ -161,4 +170,6 @@ public class SysUserController {
 
         ExcelUtils.exportExcelToTarget(response, null, "用户管理", list, SysUserExcel.class);
     }
+
+
 }

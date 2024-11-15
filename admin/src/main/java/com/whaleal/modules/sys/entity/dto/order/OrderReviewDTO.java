@@ -1,7 +1,9 @@
-package com.whaleal.modules.sys.entity.dto;
+package com.whaleal.modules.sys.entity.dto.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author lyz
@@ -13,7 +15,7 @@ import lombok.Data;
 public class OrderReviewDTO {
 
     @Schema(title = "order id")
-    private Long orderId;
+    private List<Long> orderId;
 
     @Schema(title = "审核结果",description = "1 通过 2 驳回 3 删除")
     private Integer pass;

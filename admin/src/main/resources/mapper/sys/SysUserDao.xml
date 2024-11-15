@@ -47,4 +47,14 @@
 			</foreach>
 	</select>
 
+	<select id="listUserByPermission" resultType="com.whaleal.modules.sys.entity.vo.SysUserVO">
+        select id,username from sys_user
+    	where id in (
+            select user_id from sys_role_user
+            where role_id in (
+                select role_id from sys_role_menu where menu_id in(select id from sys_menu where permissions like CONCAT('%', #{permission}, '%'))
+                             )
+           		 );
+	</select>
+
 </mapper>

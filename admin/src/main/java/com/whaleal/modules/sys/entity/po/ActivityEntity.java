@@ -43,5 +43,9 @@ public class ActivityEntity extends BaseEntity {
      */
     private String filePath;
 
+    /**
+     * 创建者用户名
+     */
+    private String createName;
 
 }

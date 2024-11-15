@@ -27,14 +27,27 @@ public class ActivityDTO {
     @Schema(title = "跟进类型")
     private Integer activityType;
 
-    @Schema(title = "创建人")
-    private String creator;
+    @Schema(title = "创建人id",description = "外部人员 为888")
+    private Long creator;
 
-    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType, String creator) {
+    @Schema(title = "创建人")
+    private String createName;
+
+    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,String createName) {
+        this.associationId = associationId;
+        this.content = content;
+        this.filePath = filePath;
+        this.activityType = activityType;
+        this.creator = 999L;
+        this.createName = createName;
+    }
+
+    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType, long creator,String createName) {
         this.associationId = associationId;
         this.content = content;
         this.filePath = filePath;
         this.activityType = activityType;
         this.creator = creator;
+        this.createName = createName;
     }
 }
