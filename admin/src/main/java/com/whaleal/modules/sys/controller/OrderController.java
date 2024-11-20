@@ -2,6 +2,7 @@ package com.whaleal.modules.sys.controller;
 
 import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.constant.Constant;
+import com.whaleal.common.exception.OrderException;
 import com.whaleal.common.exception.OrderExceptionEnum;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author lyz
@@ -51,7 +53,7 @@ public class OrderController {
             @Parameter(name = "keyword", description = "关键字搜索", in = ParameterIn.QUERY, ref = "String"),
             @Parameter(name = "ownerId", description = "负责人id", in = ParameterIn.QUERY, ref = "long"),
             @Parameter(name = "orderStatus", description = "order状态", in = ParameterIn.QUERY, ref = "int"),
-            @Parameter(name = "deal", description = "0：公海 1：待成单 2：已成单", in = ParameterIn.QUERY, ref = "int",required = true),
+            @Parameter(name = "deal", description = "0：新建 1：待成单 2：已成单 3：公海", in = ParameterIn.QUERY, ref = "int",required = true),
             @Parameter(name = "sortField", description = "排序字段", in = ParameterIn.QUERY, ref = "String"),
             @Parameter(name = "isAsc", description = "是否升序", in = ParameterIn.QUERY, ref = "boolean"),
             @Parameter(name = "startDate", description = "开始时间", in = ParameterIn.QUERY, ref = "Date"),
@@ -59,7 +61,7 @@ public class OrderController {
     })
     public Result<PageData<OrderVO>> pageAll(@Parameter(hidden = true) @RequestParam Map<String, Object> params) {
         int deal = Integer.parseInt(params.get("deal").toString());
-        if(deal == 0){
+        if(deal == 3){
             //判断是否是查询公海order，公海查询不限制权限
             params.remove("ownerId");
         }else {
@@ -97,9 +99,9 @@ public class OrderController {
     @Operation(summary = "查询订单详情")
 //    @RequiresPermissions("grab:info")
     @GetMapping("/queryById/{id}")
-    public Result<OrderEntity> queryById(@PathVariable Long id){
-        OrderEntity orderEntity = orderService.selectById(id);
-        return new Result<OrderEntity>().ok(orderEntity);
+    public Result<OrderVO> queryById(@PathVariable Long id){
+        OrderVO OrderVO = orderService.findById(id);
+        return new Result<OrderVO>().ok(OrderVO);
     }
 
     /**
@@ -152,8 +154,7 @@ public class OrderController {
     @RequiresPermissions("grab:grab")
     public Result grabOrder() {
         Long userId = SecurityUser.getUserId();
-        orderService.electOrder(userId);
-        return new Result();
+        return new Result().ok(orderService.electOrder(userId));
     }
 
     @PostMapping("/info/add")
@@ -163,6 +164,14 @@ public class OrderController {
         OrderEntity orderEntity = orderService.selectById(orderUpdateDTO.getId());
         if(null == orderEntity){
             return new Result().error(OrderExceptionEnum.ORDER_NOT_EXISTS.getCode(),OrderExceptionEnum.ORDER_NOT_EXISTS.getMsg());
+        }
+
+        Long ownerId = orderEntity.getOwnerId();
+        UserDetail user = SecurityUser.getUser();
+        if(user.getSuperAdmin() != 1){
+            if(!Objects.equals(user.getId(), ownerId)){
+                return new Result().error(OrderExceptionEnum.NO_PERMISSION_OPERATE.getCode(),OrderExceptionEnum.NO_PERMISSION_OPERATE.getMsg());
+            }
         }
 
         if(ObjectUtils.isEmpty(orderUpdateDTO.getCustomerId())){

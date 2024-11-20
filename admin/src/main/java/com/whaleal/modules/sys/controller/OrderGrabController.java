@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/orderGrab")
 public class OrderGrabController {
 
-    private UserGrabService userGrabService;
+    private final UserGrabService userGrabService;
 
     public OrderGrabController(UserGrabService userGrabService) {
         this.userGrabService = userGrabService;
@@ -43,10 +43,16 @@ public class OrderGrabController {
         return new Result<UserGrabConfigEntity>().ok(userGrabService.findByUserId(userId));
     }
 
-    @GetMapping("/count")
+    @GetMapping("/user/count")
     @Operation(summary = "获取抢单数/总数")
     public Result<OrderGrabVO> queryCount() {
         Long userId = SecurityUser.getUserId();
         return new Result<OrderGrabVO>().ok(userGrabService.findCountByUserId(userId));
+    }
+
+    @GetMapping("/count")
+    @Operation(summary = "获取抢单数/总数")
+    public Result<OrderGrabVO> queryPoolCount() {
+        return new Result<OrderGrabVO>().ok(userGrabService.findOrderCount());
     }
 }

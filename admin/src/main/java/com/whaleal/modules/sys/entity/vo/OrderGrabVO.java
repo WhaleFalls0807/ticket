@@ -23,10 +23,17 @@ public class OrderGrabVO implements Serializable {
     /**
      * 已抢单总数
      */
-    private Long count;
+    private Long grapedCount;
+
+    /**
+     * 剩余单子数
+     */
+    private Long RemainCount;
 
     /**
      * 总抢单总数
      */
     private Long totalCount;
+
+
 }

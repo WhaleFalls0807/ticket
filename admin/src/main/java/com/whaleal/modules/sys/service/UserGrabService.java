@@ -31,4 +31,6 @@ public interface UserGrabService extends BaseService<UserGrabConfigEntity> {
      * @return
      */
     OrderGrabVO findCountByUserId(Long userId);
+
+    OrderGrabVO findOrderCount();
 }

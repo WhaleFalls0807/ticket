@@ -73,9 +73,10 @@ public class OrderEntity extends BaseEntity {
     private Integer orderStatus;
 
     /**
-     * 0: 公海
+     * 0: 新建
      * 1：待成单
      * 2：已成单
+     * 3：公海
      */
     private Integer deal;
 

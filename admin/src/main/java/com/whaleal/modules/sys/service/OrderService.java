@@ -78,6 +78,18 @@ public interface OrderService extends BaseService<OrderEntity> {
      * 当前的算法： 拿第一条新建的
      * @param userId
      */
-    void electOrder(Long userId);
+    OrderEntity electOrder(Long userId);
 
+    /**
+     * 获取工单中的计数情况
+     * @return
+     */
+    Map<String, Long> countByType();
+
+    /**
+     * 查看order详情
+     * @param id
+     * @return
+     */
+    OrderVO findById(Long id);
 }

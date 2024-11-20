@@ -19,7 +19,9 @@ public enum OrderExceptionEnum {
     CUSTOMER_EXISTS(2005,"客户信息已存在，无法重复创建"),
 
 
-    UPLOAD_FILE_ERROR(5001,"上传文件时出现错误");
+    UPLOAD_FILE_ERROR(5001,"上传文件时出现错误"),
+    FILENAME_IS_EMPTY(5002,"文件名不能为空"),
+    FILE_NOT_EXISTS(5004,"文件不存在");
 
 
     OrderExceptionEnum(int code, String msg) {

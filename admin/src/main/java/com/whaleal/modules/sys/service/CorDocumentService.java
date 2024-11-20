@@ -36,6 +36,6 @@ public interface CorDocumentService extends BaseService<CorDocumentsEntity> {
      * @param ids
      * @param response
      */
-    void download(List<Long> ids, HttpServletResponse response);
+    void download(long id, HttpServletResponse response);
 
 }

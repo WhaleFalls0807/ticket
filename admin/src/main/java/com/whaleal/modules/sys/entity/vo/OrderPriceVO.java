@@ -1,8 +1,6 @@
-package com.whaleal.modules.sys.entity.po;
+package com.whaleal.modules.sys.entity.vo;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.whaleal.common.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,13 +13,7 @@ import java.math.BigDecimal;
  * @create: 2024-11-11 22:33
  **/
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@TableName("order_price")
-public class OrderPriceEntity extends BaseEntity {
-
-
-    private Long orderId;
+public class OrderPriceVO {
 
     /**
      * 官费

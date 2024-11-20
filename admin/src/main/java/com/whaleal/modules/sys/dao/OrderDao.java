@@ -4,6 +4,9 @@ import com.whaleal.common.dao.BaseDao;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author lyz
  * @desc
@@ -19,4 +22,5 @@ public interface OrderDao extends BaseDao<OrderEntity> {
      */
     OrderEntity electOneOrder();
 
+    Map<String,Long> countByType();
 }

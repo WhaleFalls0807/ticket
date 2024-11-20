@@ -32,8 +32,14 @@ public class OrderUpdateDTO {
     @Schema(title = "上传的合同文件路径")
     private String contract;
 
+//    @Schema(title = "上传的合同文件名")
+//    private String contractName;
+
     @Schema(title = "支付类型")
     private String payType;
+
+//    @Schema(title = "支付类型文件名")
+//    private String payTypeName;
 
     @Schema(title = "官费")
     private BigDecimal officialPrice;
@@ -73,9 +79,15 @@ public class OrderUpdateDTO {
      */
     @Schema(title = "logo")
     private String logo;
+//
+//    @Schema(title = "logo")
+//    private String logoName;
 
     @Schema(title = "身份证")
     private String IDCard;
+
+//    @Schema(title = "身份证")
+//    private String IDCardName;
 
     @Schema(title = "申请书")
     private String applyBook;

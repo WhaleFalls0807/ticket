@@ -7,14 +7,14 @@ import com.whaleal.modules.sys.dao.UserGrabDao;
 import com.whaleal.modules.sys.entity.po.UserGrabConfigEntity;
 import com.whaleal.modules.sys.entity.vo.OrderGrabVO;
 import com.whaleal.modules.sys.redis.RedisConstant;
-import com.whaleal.modules.sys.redis.SysParamsRedis;
 import com.whaleal.modules.sys.service.ActivityService;
+import com.whaleal.modules.sys.service.OrderService;
 import com.whaleal.modules.sys.service.UserGrabService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -28,9 +28,12 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
 
     private final ActivityService activityService;
 
-    public UserGrabServiceImpl(RedisUtils redisUtils, ActivityService activityService) {
+    private final OrderService orderService;
+
+    public UserGrabServiceImpl(RedisUtils redisUtils, ActivityService activityService, OrderService orderService) {
         this.redisUtils = redisUtils;
         this.activityService = activityService;
+        this.orderService = orderService;
     }
 
 
@@ -60,7 +63,7 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
         Object totalCount = redisUtils.get(RedisConstant.USER_GRAB_TOTAL_COUNT + userId);
 
         if(!ObjectUtils.isEmpty(count) && !ObjectUtils.isEmpty(totalCount)){
-            orderGrabVO.setCount(Long.parseLong(count.toString()));
+            orderGrabVO.setGrapedCount(Long.parseLong(count.toString()));
             orderGrabVO.setTotalCount(Long.parseLong(totalCount.toString()));
         }else {
             //不存在就从数据库查询 并更新redis的缓存
@@ -74,9 +77,25 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
             }
 
             getGrabCount(orderGrabVO,userGrabConfigEntity);
-            redisUtils.set(RedisConstant.USER_GRAB_COUNT + userId,orderGrabVO.getCount().toString());
+            redisUtils.set(RedisConstant.USER_GRAB_COUNT + userId,orderGrabVO.getGrapedCount().toString());
             redisUtils.set(RedisConstant.USER_GRAB_COUNT + userId,orderGrabVO.getTotalCount().toString());
         }
+        return orderGrabVO;
+    }
+
+    @Override
+    public OrderGrabVO findOrderCount() {
+        OrderGrabVO orderGrabVO = new OrderGrabVO();
+
+        Map<String, Long> map = orderService.countByType();
+        Long remainCount = map.get("remainCount");
+        Long grapedCount = map.get("grapedCount");
+
+        orderGrabVO.setGrapedCount(grapedCount);
+        orderGrabVO.setRemainCount(remainCount);
+
+        long totalCount = remainCount + grapedCount;
+        orderGrabVO.setTotalCount(totalCount);
         return orderGrabVO;
     }
 
@@ -109,7 +128,7 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
         }
 
         long count = activityService.countBetween(orderGrabVO.getUserId(),startDate,now);
-        orderGrabVO.setCount(count);
+        orderGrabVO.setGrapedCount(count);
         return orderGrabVO;
     }
 }

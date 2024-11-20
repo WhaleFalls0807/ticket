@@ -36,21 +36,18 @@ public class ActivityDTO {
     @Schema(title = "创建人")
     private String createName;
 
-    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,String createName) {
+    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,Integer operateType,String createName) {
         this.associationId = associationId;
         this.content = content;
         this.filePath = filePath;
         this.activityType = activityType;
+        this.operateType = operateType;
         this.creator = 999L;
         this.createName = createName;
     }
 
-    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType, long creator,String createName) {
-        this.associationId = associationId;
-        this.content = content;
-        this.filePath = filePath;
-        this.activityType = activityType;
-        this.creator = creator;
-        this.createName = createName;
+    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,Integer operateType, long creator,String createName) {
+        ActivityDTO activityDTO = new ActivityDTO(associationId, content, filePath, activityType, operateType, createName);
+        activityDTO.setCreator(creator);
     }
 }

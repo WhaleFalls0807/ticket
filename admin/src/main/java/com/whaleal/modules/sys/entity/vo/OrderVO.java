@@ -1,5 +1,8 @@
 package com.whaleal.modules.sys.entity.vo;
 
+import com.whaleal.common.utils.ConvertUtils;
+import com.whaleal.modules.sys.entity.po.OrderFileEntity;
+import com.whaleal.modules.sys.entity.po.OrderPriceEntity;
 import lombok.Data;
 
 import java.util.Date;
@@ -28,4 +31,15 @@ public class OrderVO {
 
     private Date createDate;
 
+    private OrderFileVO orderFileVO;
+
+    private OrderPriceVO orderPriceVO;
+
+    public void setOrderFileVO(OrderFileEntity orderFileEntity) {
+        this.orderFileVO = ConvertUtils.sourceToTarget(orderFileEntity, OrderFileVO.class);
+    }
+
+    public void setOrderPriceVO(OrderPriceEntity orderPriceEntity) {
+        this.orderPriceVO = ConvertUtils.sourceToTarget(orderPriceEntity, OrderPriceVO.class);
+    }
 }

@@ -1,5 +1,7 @@
 package com.whaleal.modules.sys.entity.po;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -22,9 +24,9 @@ public class DownloadRecord implements Serializable {
     private Long id;
 
     /**
-     * 关联文书id
+     * 关联业务id
      */
-    private Long documentId;
+    private Long associationId;
 
     /**
      * 下载者用户名
@@ -38,6 +40,7 @@ public class DownloadRecord implements Serializable {
 
     /**
      * 自动生成的，合同编号
+     * 企业文书处用到
      */
     private String contractNum;
 
@@ -49,7 +52,13 @@ public class DownloadRecord implements Serializable {
     private Integer success;
 
     /**
+     * 失败原因
+     */
+    private String failedReason;
+
+    /**
      * 下载时间
      */
+    @TableField(value = "create_date",fill = FieldFill.INSERT)
     private Date downloadDate;
 }

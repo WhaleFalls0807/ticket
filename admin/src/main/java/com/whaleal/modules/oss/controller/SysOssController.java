@@ -19,6 +19,7 @@ import com.whaleal.modules.oss.cloud.LocalStorageService;
 import com.whaleal.modules.oss.cloud.OSSFactory;
 import com.whaleal.modules.oss.entity.SysOssEntity;
 import com.whaleal.modules.oss.service.SysOssService;
+import com.whaleal.modules.sys.entity.vo.FileUploadVO;
 import com.whaleal.modules.sys.service.SysParamsService;
 import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.validator.ValidatorUtils;
@@ -128,13 +129,13 @@ public class SysOssController {
      * @throws Exception
      */
     @PostMapping("/upload/{associationId}")
-    @Operation(summary = "上传文件")
-    public Result<String> uploadLocal(@PathVariable("associationId") Long associationId,
-                                                    @RequestParam("file") MultipartFile file)  {
+    @Operation(summary = "上传文件 - 本次开发使用上传接口")
+    public Result<FileUploadVO> uploadLocal(@PathVariable("associationId") Long associationId,
+                                            @RequestParam("file") MultipartFile file)  {
         if (file.isEmpty()) {
-            return new Result<String>().error(ErrorCode.UPLOAD_FILE_EMPTY);
+            return new Result().error(ErrorCode.UPLOAD_FILE_EMPTY);
         }
-        return new Result<String>().ok(localStorageService.uploadFile(associationId, file));
+        return new Result<FileUploadVO>().ok(localStorageService.uploadFile(associationId, file));
     }
 
     @DeleteMapping
@@ -143,7 +144,6 @@ public class SysOssController {
     @RequiresPermissions("sys:oss:all")
     public Result delete(@RequestBody Long[] ids) {
         sysOssService.deleteBatchIds(Arrays.asList(ids));
-
         return new Result();
     }
 

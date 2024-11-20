@@ -7,11 +7,11 @@ import com.whaleal.modules.sys.entity.dto.CorDocumentDTO;
 import com.whaleal.modules.sys.entity.po.CorDocumentsEntity;
 import com.whaleal.modules.sys.service.CorDocumentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,12 +46,11 @@ public class CorDocumentController {
     }
 
 
-    @PostMapping("/download")
+    @GetMapping("/download/{fileId}")
     @Operation(summary = "下载企业文书")
-    public Result download(@RequestBody Map<String, List<Long>> data,
-                                                         HttpServletResponse response){
-        List<Long> ids = data.get("ids");
-        corDocumentService.download(ids,response);
+    public Result download(@PathVariable("fileId") Long fileId,
+                           HttpServletResponse response){
+        corDocumentService.download(fileId,response);
         return new Result();
     }
 

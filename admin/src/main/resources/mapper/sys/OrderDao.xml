@@ -11,4 +11,12 @@
         limit 1
     </select>
 
+    <select id="countByType" resultType="java.util.Map">
+        SELECT
+            COUNT(CASE WHEN deal = 0 THEN 1 END) AS remainCount,
+            COUNT(CASE WHEN deal = 1 THEN 1 END) AS grapedCount
+        FROM brand_order;
+
+    </select>
+
 </mapper>

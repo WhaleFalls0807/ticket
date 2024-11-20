@@ -1,5 +1,6 @@
 package com.whaleal.modules.oss.cloud;
 
+import com.whaleal.modules.sys.entity.vo.FileUploadVO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -15,5 +16,5 @@ public interface LocalStorageService {
      * @param file
      * @return
      */
-    String uploadFile(Long associationId, MultipartFile file);
+    FileUploadVO uploadFile(Long associationId, MultipartFile file);
 }

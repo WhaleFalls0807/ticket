@@ -1,6 +1,5 @@
 package com.whaleal.modules.sys.service.impl;
 
-import cn.hutool.db.sql.Order;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -10,6 +9,7 @@ import com.whaleal.common.exception.OrderExceptionEnum;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.common.utils.BeanCopyUtil;
+import com.whaleal.common.utils.ConvertUtils;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.dao.OrderDao;
@@ -147,7 +147,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         }else {
             creator = orderDTO.getCustomerName();
         }
-        activityService.createActivity(new ActivityDTO(orderEntity.getId(),"创建了单子","",4,creator));
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),"创建了单子","",1,10,creator));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -180,12 +180,15 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             updateById(orderEntity);
 
             String content;
+            int type;
             if (Objects.equals(userId, SecurityUser.getUserId())) {
                 content = SecurityUser.getUser().getUsername() + "抢到了这个单子";
+                type = 11;
             } else {
                 content = SecurityUser.getUser().getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
+                type = 12;
             }
-            activityService.createActivity(new ActivityDTO(orderId, content, "", 4, SecurityUser.getUser().getUsername()));
+            activityService.createActivity(new ActivityDTO(orderId, content, "", 1, type,SecurityUser.getUser().getUsername()));
         }
     }
 
@@ -206,28 +209,19 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void addInformation(OrderEntity orderEntity, OrderUpdateDTO orderUpdateDTO) {
+    public void addInformation(OrderEntity orderEntity,OrderUpdateDTO orderUpdateDTO) {
         if(orderEntity.getOrderStatus() != OrderConstant.DISTRIBUTED){
             // 只有已分配的单子才能补充信息
             throw new OrderException(OrderExceptionEnum.ONLY_DISTRIBUTE_CAN_OPERATE);
         }
 
         // 补充单子信息
-        Long ownerId = orderEntity.getOwnerId();
-        UserDetail user = SecurityUser.getUser();
-
-        if(user.getSuperAdmin() != 1){
-            if(!Objects.equals(user.getId(), ownerId)){
-                throw new OrderException(OrderExceptionEnum.NO_PERMISSION_OPERATE);
-            }
-        }
-
-        if(!ObjectUtils.isEmpty(orderUpdateDTO.getContract()) || !ObjectUtils.isEmpty(orderUpdateDTO.getPayType())){
+        if(StringUtils.hasText(orderUpdateDTO.getContract()) || StringUtils.hasText(orderUpdateDTO.getPayType())){
             // 加载orderFile信息
             // todo 可能会出现重复更新的问题
-            OrderFileEntity orderFileEntity = orderFileService.findByOrderId(orderEntity.getId());
+            OrderFileEntity orderFileEntity = orderFileService.findByOrderId(orderUpdateDTO.getId());
             if(ObjectUtils.isEmpty(orderFileEntity)){
-                orderFileEntity = new OrderFileEntity(orderEntity.getId(), orderUpdateDTO.getContract(), orderUpdateDTO.getPayType());
+                orderFileEntity = new OrderFileEntity(orderUpdateDTO.getId(), orderUpdateDTO.getContract(), orderUpdateDTO.getPayType());
                 orderFileService.insert(orderFileEntity);
             }else {
                 if(!ObjectUtils.isEmpty(orderUpdateDTO.getContract()) ){
@@ -240,12 +234,39 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             }
         }
 
+        if(StringUtils.hasText(orderUpdateDTO.getLogo()) || StringUtils.hasText(orderUpdateDTO.getIDCard()) ||
+            StringUtils.hasText(orderUpdateDTO.getApplyBook()) || StringUtils.hasText(orderUpdateDTO.getCommission()) ||
+            StringUtils.hasText(orderUpdateDTO.getBusinessLicense()) || StringUtils.hasText(orderUpdateDTO.getSealedContract())){
+            // 加载orderFile信息
+            //第二次提交内容 记录一定不为空
+            OrderFileEntity orderFile = orderFileService.findByOrderId(orderUpdateDTO.getId());
+            if(StringUtils.hasText(orderUpdateDTO.getLogo())){
+                orderFile.setLogo(orderUpdateDTO.getLogo());
+            }
+            if(StringUtils.hasText(orderUpdateDTO.getIDCard())){
+                orderFile.setIDCard(orderUpdateDTO.getIDCard());
+            }
+            if(StringUtils.hasText(orderUpdateDTO.getApplyBook())){
+                orderFile.setApplyBook(orderUpdateDTO.getApplyBook());
+            }
+            if(StringUtils.hasText(orderUpdateDTO.getCommission())){
+                orderFile.setCommission(orderUpdateDTO.getCommission());
+            }
+            if(StringUtils.hasText(orderUpdateDTO.getBusinessLicense())){
+                orderFile.setBusinessLicense(orderUpdateDTO.getBusinessLicense());
+            }
+            if(StringUtils.hasText(orderUpdateDTO.getSealedContract())){
+                orderFile.setSealedContract(orderUpdateDTO.getSealedContract());
+            }
+            orderFileService.updateById(orderFile);
+        }
+
         if(!ObjectUtils.isEmpty(orderUpdateDTO.getTotalPrice())){
             // 加载order price信息
             // todo 可能会出现重复更新的问题
-            OrderPriceEntity orderPriceEntity = orderPriceService.findByOrderId(orderEntity.getId());
+            OrderPriceEntity orderPriceEntity = orderPriceService.findByOrderId(orderUpdateDTO.getId());
             if(ObjectUtils.isEmpty(orderPriceEntity)){
-                orderPriceEntity = new OrderPriceEntity(orderEntity.getId(), orderPriceEntity.getOfficialPrice(),orderPriceEntity.getAgencyPrice(),orderPriceEntity.getTotalPrice(),orderPriceEntity.getAPrice(),orderPriceEntity.getBPrice());
+                orderPriceEntity = new OrderPriceEntity(orderUpdateDTO.getId(), orderPriceEntity.getOfficialPrice(),orderPriceEntity.getAgencyPrice(),orderPriceEntity.getTotalPrice(),orderPriceEntity.getAPrice(),orderPriceEntity.getBPrice());
                 orderPriceService.insert(orderPriceEntity);
             }else {
 
@@ -269,9 +290,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         orderEntity.setUpdater(SecurityUser.getUser().getUsername());
         updateById(orderEntity);
 
-        String username = user.getUsername();
-        activityService.createActivity(new ActivityDTO(orderEntity.getId(),username + "补充了订单信息","",4,username));
-
+        String username = SecurityUser.getUser().getUsername();
+        activityService.createActivity(new ActivityDTO(orderUpdateDTO.getId(),username + "补充了订单信息","",1,13,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
     }
 
     @Override
@@ -302,7 +322,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             if (StringUtils.hasText(orderCommitDTO.getRemark())) {
                 content += orderCommitDTO.getRemark();
             }
-            activityService.createActivity(new ActivityDTO(orderEntity.getId(), content, "", 4, username));
+            activityService.createActivity(new ActivityDTO(orderEntity.getId(), content, "", 1,14, SecurityUser.getUserId(),username));
         }
     }
 
@@ -343,7 +363,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 content += orderReviewDTO.getRemark();
             }
 
-            activityService.createActivity(new ActivityDTO(orderEntity.getId(), content, "", 4, username));
+            activityService.createActivity(new ActivityDTO(orderEntity.getId(), content, "", 1,15,SecurityUser.getUserId(), username));
         }
     }
 
@@ -363,21 +383,21 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         LambdaUpdateWrapper<OrderEntity> update = new LambdaUpdateWrapper<>();
 
         String content = "";
+        int type;
         if(1 == orderEditDTO.getOperateType()){
             update.set(OrderEntity::getOrderStatus,OrderConstant.CREATED);
             update.set(OrderEntity::getOwnerId,null);
             content = "把单子放回了公海。" + orderEditDTO.getRemark();
         }else {
             update.set(OrderEntity::getOwnerId,orderEditDTO.getNewOwnerId());
-
             content = "把单子转给了" + orderEditDTO.getUsername() + "。"  + orderEditDTO.getRemark();
         }
         baseDao.update(update);
-        activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",4,SecurityUser.getUser().getUsername()));
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",1,16,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
     }
 
     @Override
-    public void electOrder(Long userId) {
+    public OrderEntity electOrder(Long userId) {
         OrderEntity orderEntity = baseDao.electOneOrder();
         if(ObjectUtils.isEmpty(orderEntity)){
             throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
@@ -386,14 +406,40 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         // 检查用户当前是否可以抢单 ，次数是否已经超了限制
 
         // 更新抢到的这个单子的状态
-        LambdaUpdateWrapper<OrderEntity> update = new LambdaUpdateWrapper<>();
+        orderEntity.setDeal(1);
+        orderEntity.setOrderStatus(OrderConstant.DISTRIBUTED);
+        orderEntity.setOwnerId(SecurityUser.getUserId());
+        updateById(orderEntity);
 
-        update.eq(OrderEntity::getId,orderEntity.getId());
-        update.set(OrderEntity::getDeal,1);
-        update.set(OrderEntity::getOrderStatus,OrderConstant.DISTRIBUTED);
-        update.set(OrderEntity::getOwnerId,SecurityUser.getUserId());
-        update(orderEntity,update);
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),SecurityUser.getUser().getUsername()+"抢到了单子","",1,11,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
 
-        activityService.createActivity(new ActivityDTO(orderEntity.getId(),SecurityUser.getUser().getUsername()+"抢到了单子","",4,SecurityUser.getUser().getUsername()));
+        return orderEntity;
+    }
+
+    @Override
+    public Map<String, Long> countByType() {
+        return baseDao.countByType();
+    }
+
+    @Override
+    public OrderVO findById(Long id) {
+        OrderEntity orderEntity = selectById(id);
+        if(ObjectUtils.isEmpty(orderEntity)){
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
+        }
+        Long ownerId = orderEntity.getOwnerId();
+        Integer superAdmin = SecurityUser.getUser().getSuperAdmin();
+        if(1 != superAdmin){
+            if(!Objects.equals(SecurityUser.getUserId(), ownerId)){
+                throw new OrderException(OrderExceptionEnum.NO_PERMISSION_OPERATE);
+            }
+        }
+
+        OrderVO orderVO = ConvertUtils.sourceToTarget(orderEntity, OrderVO.class);
+        orderVO.setOrderPriceVO(orderPriceService.findByOrderId(id));
+
+        orderVO.setOrderFileVO(orderFileService.findByOrderId(id));
+
+        return orderVO;
     }
 }
