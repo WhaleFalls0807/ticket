@@ -3,4 +3,12 @@
 
 <mapper namespace="com.whaleal.modules.sys.dao.OrderDao">
 
+    <select id="electOneOrder" resultType="com.whaleal.modules.sys.entity.po.OrderEntity">
+
+        select * from brand_order
+                 where order_status = 0
+                 and deal = 0
+        limit 1
+    </select>
+
 </mapper>

@@ -33,7 +33,7 @@ public class ActivityController {
 
     @GetMapping("/list")
     @Operation(summary = "查看某个业务的跟机列表")
-    @RequiresPermissions("activity:list")
+//    @RequiresPermissions("activity:list")
     @Parameters({
             @Parameter(name = Constant.PAGE, description = "当前页码，从1开始", in = ParameterIn.QUERY, required = true, ref = "int"),
             @Parameter(name = Constant.LIMIT, description = "每页显示记录数", in = ParameterIn.QUERY, required = true, ref = "int"),

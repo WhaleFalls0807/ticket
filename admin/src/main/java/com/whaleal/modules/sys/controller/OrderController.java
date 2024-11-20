@@ -59,7 +59,6 @@ public class OrderController {
     })
     public Result<PageData<OrderVO>> pageAll(@Parameter(hidden = true) @RequestParam Map<String, Object> params) {
         int deal = Integer.parseInt(params.get("deal").toString());
-
         if(deal == 0){
             //判断是否是查询公海order，公海查询不限制权限
             params.remove("ownerId");
@@ -70,7 +69,6 @@ public class OrderController {
                 params.put("ownerId",user.getId());
             }
         }
-
         PageData<OrderVO> page = orderService.page(params);
         return new Result<PageData<OrderVO>>().ok(page);
     }
@@ -97,7 +95,7 @@ public class OrderController {
     }
 
     @Operation(summary = "查询订单详情")
-    @RequiresPermissions("order:info")
+//    @RequiresPermissions("grab:info")
     @GetMapping("/queryById/{id}")
     public Result<OrderEntity> queryById(@PathVariable Long id){
         OrderEntity orderEntity = orderService.selectById(id);
@@ -113,7 +111,6 @@ public class OrderController {
     @Operation(summary = "普通用户通过门户网站新提一个商标注册申请")
     public Result<String> saveByUser(@RequestBody OrderDTO orderDTO) {
         orderService.saveSimpleOrder(orderDTO,false);
-
         return new Result<String>().ok("创建成功");
     }
 
@@ -141,12 +138,21 @@ public class OrderController {
     }
 
     @PostMapping("/choose")
-    @Operation(summary = "业务员抢单子")
-    @RequiresPermissions("order:choose")
+    @Operation(summary = "业务员领取单子")
+    @RequiresPermissions("grab:grab")
     public Result chooseOrder(@RequestBody OrderDistributeDTO orderDistributeDTO) {
         Long userId = SecurityUser.getUserId();
         orderDistributeDTO.setUserId(userId);
         orderService.distributeOrder(orderDistributeDTO.getOrderIds(),userId);
+        return new Result();
+    }
+
+    @GetMapping("/grab")
+    @Operation(summary = "业务员抢单子-系统随机分配一个单子")
+    @RequiresPermissions("grab:grab")
+    public Result grabOrder() {
+        Long userId = SecurityUser.getUserId();
+        orderService.electOrder(userId);
         return new Result();
     }
 
@@ -193,7 +199,7 @@ public class OrderController {
         return new Result<String>().ok("审核成功");
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions("order:delete")

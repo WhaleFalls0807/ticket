@@ -131,6 +131,6 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
         QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();
 
         wrapper.eq("customer_name",customer);
-        return ObjectUtils.isEmpty(baseDao.selectOne(wrapper));
+        return !ObjectUtils.isEmpty(baseDao.selectOne(wrapper));
     }
 }

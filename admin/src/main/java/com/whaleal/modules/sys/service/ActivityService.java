@@ -5,6 +5,7 @@ import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.sys.entity.dto.ActivityDTO;
 import com.whaleal.modules.sys.entity.po.ActivityEntity;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -28,4 +29,6 @@ public interface ActivityService extends BaseService<ActivityEntity> {
 
     void updateActivity(ActivityEntity activityEntity);
 
+
+    long countBetween(Long userId, LocalDateTime startDate, LocalDateTime now);
 }

@@ -18,6 +18,7 @@ import com.whaleal.common.utils.HttpContextUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,6 +46,14 @@ public class RenExceptionHandler {
     public Result handleRenException(RenException ex) {
         Result result = new Result();
         result.error(ex.getCode(), ex.getMsg());
+
+        return result;
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public Result handleUnAuthException(UnauthorizedException ex) {
+        Result result = new Result();
+        result.error(403, ex.getMessage());
 
         return result;
     }

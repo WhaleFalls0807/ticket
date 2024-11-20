@@ -9,7 +9,7 @@
 package com.whaleal;
 
 import cn.hutool.core.util.StrUtil;
-import com.whaleal.common.redis.RedisUtils;
+import com.whaleal.common.rredis.RedisUtils;
 import com.whaleal.modules.sys.entity.po.SysUserEntity;
 import jakarta.annotation.Resource;
 import org.junit.Test;

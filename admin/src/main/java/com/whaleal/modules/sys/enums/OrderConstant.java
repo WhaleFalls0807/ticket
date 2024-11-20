@@ -18,7 +18,7 @@ public interface OrderConstant {
      *  6: 二次审核被驳回 待重新提交
      *  7：审核通过 已完成
      *
-     *  8：异常
+     *  8：公海中的单子
      *  9：已删除
      */
     int CREATED = 0;
@@ -33,8 +33,19 @@ public interface OrderConstant {
 
     int COMPLETE = 7;
 
-    int EXCEPTION = 8;
-    int DELETED = 9;
+    int IN_POOL = 8;
 
+    int EXCEPTION = 10;
+    int DELETED = 99;
+
+
+    /**
+     *     activity 常量
+     */
+    int SYSTEM_GENERATE = 1;
+//    int SYSTEM_GENERATE = 1;
+//    int SYSTEM_GENERATE = 1;
+//    int SYSTEM_GENERATE = 1;
+//    int SYSTEM_GENERATE = 1;
 
 }

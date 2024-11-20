@@ -1,5 +1,7 @@
 package com.whaleal.modules.sys.service.impl;
 
+import cn.hutool.db.sql.Order;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -63,6 +65,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     public PageData<OrderVO> page(Map<String,Object> params) {
         QueryWrapper<OrderEntity> wrapper = new QueryWrapper<>();
         int deal = Integer.parseInt(params.get("deal").toString());
+
         wrapper.eq("deal",deal);
         if(!ObjectUtils.isEmpty(params.get("orderStatus"))){
             wrapper.eq("order_status",Integer.parseInt(params.get("orderStatus").toString()));
@@ -178,11 +181,11 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
             String content;
             if (Objects.equals(userId, SecurityUser.getUserId())) {
-                content = SecurityUser.getUser().getUsername() + "领取了这个单子";
+                content = SecurityUser.getUser().getUsername() + "抢到了这个单子";
             } else {
                 content = SecurityUser.getUser().getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
             }
-            activityService.createActivity(new ActivityDTO(orderId, content + "创建了单子", "", 4, SecurityUser.getUser().getUsername()));
+            activityService.createActivity(new ActivityDTO(orderId, content, "", 4, SecurityUser.getUser().getUsername()));
         }
     }
 
@@ -371,5 +374,26 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         }
         baseDao.update(update);
         activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",4,SecurityUser.getUser().getUsername()));
+    }
+
+    @Override
+    public void electOrder(Long userId) {
+        OrderEntity orderEntity = baseDao.electOneOrder();
+        if(ObjectUtils.isEmpty(orderEntity)){
+            throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
+        }
+
+        // 检查用户当前是否可以抢单 ，次数是否已经超了限制
+
+        // 更新抢到的这个单子的状态
+        LambdaUpdateWrapper<OrderEntity> update = new LambdaUpdateWrapper<>();
+
+        update.eq(OrderEntity::getId,orderEntity.getId());
+        update.set(OrderEntity::getDeal,1);
+        update.set(OrderEntity::getOrderStatus,OrderConstant.DISTRIBUTED);
+        update.set(OrderEntity::getOwnerId,SecurityUser.getUserId());
+        update(orderEntity,update);
+
+        activityService.createActivity(new ActivityDTO(orderEntity.getId(),SecurityUser.getUser().getUsername()+"抢到了单子","",4,SecurityUser.getUser().getUsername()));
     }
 }

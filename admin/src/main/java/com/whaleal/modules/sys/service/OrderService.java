@@ -72,4 +72,12 @@ public interface OrderService extends BaseService<OrderEntity> {
      */
     void editStatus(OrderEditDTO orderEditDTO);
 
+    /**
+     * 业务员抢单子 - 系统随机分配
+     *
+     * 当前的算法： 拿第一条新建的
+     * @param userId
+     */
+    void electOrder(Long userId);
+
 }

@@ -25,13 +25,19 @@ public class ActivityEntity extends BaseEntity {
 
 
     /**
-     * 跟进种类
-     * 1： 普通跟进
-     * 2： 打电话
-     * 3： 微信
-     * 4: 系统
+     * 跟进类型
+     * 1： 工单操作
+     * 2： 电话联系
+     * 3： 微信联系
+     * 4:  工单操作
+     * 5:
      */
     private Integer activityType;
+
+    /**
+     * 11：抢单(抢+领) 12：分配单子
+     */
+    private Integer operateType;
 
     /**
      * 跟进内容

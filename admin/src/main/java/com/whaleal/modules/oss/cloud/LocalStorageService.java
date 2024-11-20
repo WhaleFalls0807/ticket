@@ -9,5 +9,11 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 public interface LocalStorageService {
 
+    /**
+     * 上传自定义文件到服务器
+     * @param associationId
+     * @param file
+     * @return
+     */
     String uploadFile(Long associationId, MultipartFile file);
 }

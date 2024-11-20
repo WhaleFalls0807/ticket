@@ -2,6 +2,8 @@ package com.whaleal.modules.sys.entity.vo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author lyz
  * @desc
@@ -12,7 +14,7 @@ public class OrderVO {
 
     private Long id;
 
-    private String name;
+    private String orderName;
 
     private Long customerId;
 
@@ -23,5 +25,7 @@ public class OrderVO {
     private String phone;
 
     private Integer orderStatus;
+
+    private Date createDate;
 
 }

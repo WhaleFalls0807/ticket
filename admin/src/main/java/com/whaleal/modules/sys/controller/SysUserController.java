@@ -17,6 +17,7 @@ import com.whaleal.common.utils.ExcelUtils;
 import com.whaleal.common.utils.Result;
 import com.whaleal.modules.sys.entity.dto.PasswordDTO;
 import com.whaleal.modules.sys.entity.dto.SysUserDTO;
+import com.whaleal.modules.sys.entity.po.UserGrabConfigEntity;
 import com.whaleal.modules.sys.entity.vo.SysUserVO;
 import com.whaleal.modules.sys.excel.SysUserExcel;
 import com.whaleal.modules.sys.service.SysRoleUserService;
@@ -29,6 +30,7 @@ import com.whaleal.common.validator.group.UpdateGroup;
 import com.whaleal.modules.security.password.PasswordUtils;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.security.user.UserDetail;
+import com.whaleal.modules.sys.service.UserGrabService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -55,6 +57,8 @@ import java.util.Map;
 public class SysUserController {
     private final SysUserService sysUserService;
     private final SysRoleUserService sysRoleUserService;
+
+    private final UserGrabService userGrabService;
 
     @GetMapping("page")
     @Operation(summary = "分页")
@@ -170,6 +174,5 @@ public class SysUserController {
 
         ExcelUtils.exportExcelToTarget(response, null, "用户管理", list, SysUserExcel.class);
     }
-
 
 }

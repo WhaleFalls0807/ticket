@@ -92,7 +92,7 @@ public class CustomerController {
     }
 
     @Operation(summary = "查看客户详情")
-    @RequiresPermissions("customer:list")
+    @RequiresPermissions("customer:info")
     @GetMapping("/queryById/{id}")
     public Result<CustomerEntity> queryById(@PathVariable Long id){
         CustomerEntity customerEntity = customerService.selectById(id);
@@ -100,7 +100,6 @@ public class CustomerController {
     }
 
     @Operation(summary = "客户名是否可用")
-    @RequiresPermissions("customer:list")
     @GetMapping("/name/check")
     public Result<Boolean> checkCustomer(@Parameter(description = "客户名") @RequestParam String customerName){
         boolean exist = customerService.checkCustomer(customerName);

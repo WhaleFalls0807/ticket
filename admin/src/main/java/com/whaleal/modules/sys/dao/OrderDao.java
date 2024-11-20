@@ -12,4 +12,11 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface OrderDao extends BaseDao<OrderEntity> {
     void findByPage();
+
+    /**
+     * 选举一个order出来
+     * @return
+     */
+    OrderEntity electOneOrder();
+
 }

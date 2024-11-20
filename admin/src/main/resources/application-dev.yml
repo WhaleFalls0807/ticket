@@ -5,7 +5,7 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://8.155.29.214:3306/support?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
       username: root
-      password: QjsZCk+(W4*8
+      password: xxmfY3jteR0RzcVPJt3w
       #达梦8
       initial-size: 10
       max-active: 100

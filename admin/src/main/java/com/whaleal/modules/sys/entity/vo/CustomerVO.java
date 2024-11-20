@@ -2,6 +2,8 @@ package com.whaleal.modules.sys.entity.vo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author lyz
  * @desc
@@ -14,6 +16,10 @@ public class CustomerVO {
 
     private String customerName;
 
+    private String source;
+
+    private Integer enterprise;
+
     private String company;
 
     private String phone;
@@ -25,4 +31,6 @@ public class CustomerVO {
     private Integer dealStatus;
 
     private String industry;
+
+    private Date createDate;
 }

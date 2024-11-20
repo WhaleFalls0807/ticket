@@ -1,5 +1,6 @@
 package com.whaleal.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.whaleal.common.page.PageData;
@@ -11,6 +12,7 @@ import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import com.whaleal.modules.sys.service.ActivityService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -43,5 +45,18 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
     @Override
     public void updateActivity(ActivityEntity activityEntity) {
         updateById(activityEntity);
+    }
+
+    @Override
+    public long countBetween(Long userId, LocalDateTime startDate, LocalDateTime now) {
+        LambdaQueryWrapper<ActivityEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        lambdaQueryWrapper.eq(ActivityEntity::getActivityType,1)
+                .eq(ActivityEntity::getOperateType,11)
+                .eq(ActivityEntity::getCreator,userId)
+                .ge(ActivityEntity::getCreateDate,startDate)
+                .le(ActivityEntity::getCreateDate,now);
+
+        return baseDao.selectCount(lambdaQueryWrapper);
     }
 }

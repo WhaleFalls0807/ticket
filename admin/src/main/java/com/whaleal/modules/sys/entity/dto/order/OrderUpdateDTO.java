@@ -20,7 +20,7 @@ public class OrderUpdateDTO {
     @Schema(title = "客户id")
     private Long customerId;
 
-    @Schema(title = "客户名称名称")
+    @Schema(title = "客户名称")
     private String customerName;
 
     @Schema(title = "名称")
