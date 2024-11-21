@@ -37,7 +37,6 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
         this.downloadService = downloadService;
     }
 
-
     @Override
     public void uploadFile(CorDocumentDTO corDocumentDTO) {
         CorDocumentsEntity corDocumentsEntity = ConvertUtils.sourceToTarget(corDocumentDTO, CorDocumentsEntity.class);
@@ -50,7 +49,7 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
     public PageData<CorDocumentsEntity> page(Map<String,Object> params) {
         IPage<CorDocumentsEntity> page = baseDao.selectPage(
                 getPage(params, "sort", true),
-                new LambdaUpdateWrapper<CorDocumentsEntity>()
+                new LambdaUpdateWrapper<>()
         );
 
         return getPageData(page, CorDocumentsEntity.class);

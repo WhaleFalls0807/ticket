@@ -49,4 +49,6 @@ public interface SysUserDao extends BaseDao<SysUserEntity> {
 	 * @return
 	 */
     List<SysUserVO> listUserByPermission(@Param("permission") String permission);
+
+    List<String> listAllAuth(@Param("userId") Long id);
 }

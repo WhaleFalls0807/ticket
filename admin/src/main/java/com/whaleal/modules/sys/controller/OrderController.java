@@ -2,7 +2,6 @@ package com.whaleal.modules.sys.controller;
 
 import com.whaleal.common.annotation.LogOperation;
 import com.whaleal.common.constant.Constant;
-import com.whaleal.common.exception.OrderException;
 import com.whaleal.common.exception.OrderExceptionEnum;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
@@ -97,7 +96,6 @@ public class OrderController {
     }
 
     @Operation(summary = "查询订单详情")
-//    @RequiresPermissions("grab:info")
     @GetMapping("/queryById/{id}")
     public Result<OrderVO> queryById(@PathVariable Long id){
         OrderVO OrderVO = orderService.findById(id);
@@ -159,7 +157,7 @@ public class OrderController {
 
     @PostMapping("/info/add")
     @Operation(summary = "补充单子信息")
-    @RequiresPermissions("order:edit")
+    @RequiresPermissions("todo:update")
     public Result addInformation(@RequestBody OrderUpdateDTO orderUpdateDTO) {
         OrderEntity orderEntity = orderService.selectById(orderUpdateDTO.getId());
         if(null == orderEntity){
@@ -174,11 +172,14 @@ public class OrderController {
             }
         }
 
-        if(ObjectUtils.isEmpty(orderUpdateDTO.getCustomerId())){
-            // 如果客户不存在，就根据客户信息创建一个客户
-            // todo 是否更改客户状态
-            CustomerEntity customerEntity = customerService.loadCustomer(orderUpdateDTO);
-            orderUpdateDTO.setCustomerId(customerEntity.getId());
+        if(!ObjectUtils.isEmpty(orderUpdateDTO.getCustomerId())){
+            CustomerEntity customerEntity = customerService.selectById(orderUpdateDTO.getCustomerId());
+            if(!ObjectUtils.isEmpty(customerEntity)){
+                orderUpdateDTO.setCustomerName(customerEntity.getCustomerName());
+                orderUpdateDTO.setPhone(customerEntity.getPhone());
+                orderUpdateDTO.setEmail(customerEntity.getEmail());
+                orderUpdateDTO.setIndustry(customerEntity.getIndustry());
+            }
         }
         orderService.addInformation(orderEntity,orderUpdateDTO);
         return new Result();
@@ -186,7 +187,7 @@ public class OrderController {
 
     @PostMapping("/commit")
     @Operation(summary = "业务员提交单子")
-    @RequiresPermissions("order:create")
+    @RequiresPermissions("todo:commit")
     public Result<String> commitForReview(@RequestBody OrderCommitDTO orderCommitDTO ) {
         orderService.commit(orderCommitDTO);
         return new Result<String>().ok("提交成功");

@@ -27,8 +27,8 @@ public class ActivityEntity extends BaseEntity {
     /**
      * 跟进类型
      * 1： 工单操作
-     * 2： 电话联系
-     * 3： 微信联系
+     * 2： 客户跟进
+     * 3： 工单跟进
      * 5:
      */
     private Integer activityType;
@@ -36,7 +36,7 @@ public class ActivityEntity extends BaseEntity {
     /**
      * 10: 创建单子 11：抢单(抢+领) 12：分配单子 13：补充客户信息 14：提交客户信息 15：审核了客户信息 16: 修改单子信息
      *
-     *
+     * 31：微信沟通 32：电话沟通 33：线下沟通
      *
      */
     private Integer operateType;

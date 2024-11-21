@@ -30,7 +30,7 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
 
 
         qw.eq("association_id",Long.parseLong(params.get("associationId").toString()));
-        IPage<ActivityEntity> data = baseDao.selectPage(getPage(params, "create_time", false),
+        IPage<ActivityEntity> data = baseDao.selectPage(getPage(params, "create_date", false),
                 qw);
 
         return getPageData(data,ActivityEntity.class);

@@ -50,6 +50,7 @@ public class OrderFileEntity extends BaseEntity {
     /**
      * 身份证
      */
+    @TableField(value = "IDCard")
     private String IDCard;
 
 //    private String IDCardName;

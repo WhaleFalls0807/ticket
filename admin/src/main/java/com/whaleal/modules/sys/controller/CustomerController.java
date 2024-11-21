@@ -62,14 +62,13 @@ public class CustomerController {
     @GetMapping("/page")
     @Operation(summary = "分页展示客户列表")
     public Result<PageData<CustomerVO>> page(@Parameter(hidden = true) @RequestParam Map<String, Object> params){
-        if(0 != Integer.parseInt(params.get("dealStatus").toString()) ){
-            UserDetail user = SecurityUser.getUser();
-            if(1 != user.getSuperAdmin()){
-                params.put("ownerId",user.getId());
-            }
-        }else {
-            params.remove("ownerId");
+        UserDetail user = SecurityUser.getUser();
+        boolean isUser = sysUserService.checkAuth(user.getId(),"customer:list:all");
+        if(!isUser){
+            // todo 当前只有超级管理员能看到所有的客户 后续应该更新为根据具体的权限去判断是否给看所有用户的客户
+            params.put("ownerId",user.getId());
         }
+
         PageData<CustomerVO> page = customerService.page(params);
         page.getList().forEach(s ->{
             if(!ObjectUtils.isEmpty(s.getOwnerUserId()) && 0 != s.getOwnerUserId()){

@@ -80,7 +80,7 @@ public class SysUserController {
 
     @GetMapping("/list/byPerm")
     @Operation(summary = "获取具有权限的用户信息")
-    @RequiresPermissions("sys:user:page")
+//    @RequiresPermissions("sys:user:page")
     public Result<List<SysUserVO>> getUserByRole(@RequestParam String permission) {
         List<SysUserVO> list = sysUserService.listUserByPermission(permission);
         return new Result<List<SysUserVO>>().ok(list);

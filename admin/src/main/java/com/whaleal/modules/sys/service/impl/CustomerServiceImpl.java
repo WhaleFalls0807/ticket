@@ -74,6 +74,11 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
             params.put("sortField","create_date");
         }
 
+        if(!ObjectUtils.isEmpty(params.get("ownerId"))){
+            wrapper.eq("owner_user_id",Long.parseLong(params.get("ownerId").toString()));
+        }
+
+
         if(!ObjectUtils.isEmpty(params.get("keyword"))){
             String keyword = params.get("keyword").toString();
             wrapper.and(query -> query.like("customer_name",keyword).or()

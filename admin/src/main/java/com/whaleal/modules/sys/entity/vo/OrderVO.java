@@ -19,17 +19,33 @@ public class OrderVO {
 
     private String orderName;
 
+    private String content;
+
     private Long customerId;
 
     private String customerName;
+
+    private String  businessType;
+
+    private String applyMethod;
+
+    private String commitOption;
+
+    private String payType;
 
     private String industry;
 
     private String phone;
 
+    private String email;
+
     private Integer orderStatus;
 
     private Date createDate;
+
+    private Long reviewUserId;
+
+    private Long ownerId;
 
     private OrderFileVO orderFileVO;
 

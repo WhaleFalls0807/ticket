@@ -31,7 +31,7 @@ public class LocalStorageServiceImpl implements LocalStorageService{
     private String prefix = "/file";
 
     @Override
-    public FileUploadVO uploadFile(Long associationId, MultipartFile file) {
+    public String uploadFile(Long associationId, MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isEmpty()) {
             throw new OrderException(OrderExceptionEnum.FILENAME_IS_EMPTY);
@@ -40,7 +40,7 @@ public class LocalStorageServiceImpl implements LocalStorageService{
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = sdf.format(new Date());
 
-        Path dirPath = Paths.get(path,formattedDate, String.valueOf(associationId));
+        Path dirPath = Paths.get(path, String.valueOf(associationId),formattedDate);
         Path filePath = dirPath.resolve(originalFilename);
 
         try {
@@ -57,11 +57,8 @@ public class LocalStorageServiceImpl implements LocalStorageService{
             // 保存文件
             file.transferTo(filePath.toFile());
 
-            FileUploadVO fileUploadVO = new FileUploadVO();
-            fileUploadVO.setFilePath(prefix + "/" + associationId + "/" + formattedDate + "/" + originalFilename);
-            fileUploadVO.setFilename(originalFilename);
             // 返回相对路径
-            return fileUploadVO;
+            return prefix + "/" + associationId + "/" + formattedDate + "/" + originalFilename;
         } catch (IOException e) {
             log.error("文件上传时出现异常：{}", e.getMessage());
             throw new OrderException(5001, "上传文件时出现错误：" + e.getMessage());

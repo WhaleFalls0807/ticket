@@ -1,7 +1,9 @@
 package com.whaleal.modules.sys.entity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -11,6 +13,7 @@ import java.util.Date;
  * @desc
  * @create: 2024-11-05 15:57
  **/
+@NoArgsConstructor
 @Data
 @Schema(title = "跟进")
 public class ActivityDTO {
@@ -24,7 +27,7 @@ public class ActivityDTO {
     @Schema(title = "上传的文件路径")
     private String filePath;
 
-    @Schema(title = "跟进类型")
+    @Schema(title = "跟进类型",description = "1: 工单操作；2: 客户跟进；3: 工单跟进（操作工单时与客户联系）")
     private Integer activityType;
 
     @Schema(title = "操作类型")

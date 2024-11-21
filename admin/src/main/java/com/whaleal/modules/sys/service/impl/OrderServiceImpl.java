@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -215,6 +216,9 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             throw new OrderException(OrderExceptionEnum.ONLY_DISTRIBUTE_CAN_OPERATE);
         }
 
+        BeanUtils.copyProperties(orderUpdateDTO,orderEntity, BeanCopyUtil.getNullPropertyNames(orderUpdateDTO));
+
+
         // 补充单子信息
         if(StringUtils.hasText(orderUpdateDTO.getContract()) || StringUtils.hasText(orderUpdateDTO.getPayType())){
             // 加载orderFile信息
@@ -261,12 +265,12 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             orderFileService.updateById(orderFile);
         }
 
-        if(!ObjectUtils.isEmpty(orderUpdateDTO.getTotalPrice())){
+        if(!ObjectUtils.isEmpty(orderUpdateDTO.getTotalPrice()) && orderUpdateDTO.getTotalPrice().compareTo(BigDecimal.ZERO) > 0){
             // 加载order price信息
             // todo 可能会出现重复更新的问题
             OrderPriceEntity orderPriceEntity = orderPriceService.findByOrderId(orderUpdateDTO.getId());
             if(ObjectUtils.isEmpty(orderPriceEntity)){
-                orderPriceEntity = new OrderPriceEntity(orderUpdateDTO.getId(), orderPriceEntity.getOfficialPrice(),orderPriceEntity.getAgencyPrice(),orderPriceEntity.getTotalPrice(),orderPriceEntity.getAPrice(),orderPriceEntity.getBPrice());
+                orderPriceEntity = new OrderPriceEntity(orderUpdateDTO.getId(), orderUpdateDTO.getOfficialPrice(),orderUpdateDTO.getAgencyPrice(),orderUpdateDTO.getTotalPrice(),orderUpdateDTO.getAPrice(),orderUpdateDTO.getBPrice());
                 orderPriceService.insert(orderPriceEntity);
             }else {
 
@@ -285,7 +289,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 orderPriceService.updateById(orderPriceEntity);
             }
         }
-        BeanUtils.copyProperties(orderUpdateDTO,orderEntity, BeanCopyUtil.getNullPropertyNames(orderUpdateDTO));
         // 信息提交完成处于待提交审核状态
         orderEntity.setUpdater(SecurityUser.getUser().getUsername());
         updateById(orderEntity);
@@ -318,6 +321,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 }
             }
 
+            updateById(orderEntity);
             String content = username + "提交了单子。";
             if (StringUtils.hasText(orderCommitDTO.getRemark())) {
                 content += orderCommitDTO.getRemark();

@@ -46,7 +46,7 @@ public class ActivityController {
 
     @PostMapping("/create")
     @Operation(summary = "创建一条跟进记录")
-    @RequiresPermissions("activity:create")
+//    @RequiresPermissions("activity:create")
     public Result createActivity(@RequestBody ActivityDTO activityDTO){
         activityService.createActivity(activityDTO);
         return new Result().ok("创建成功");
@@ -54,7 +54,7 @@ public class ActivityController {
 
     @PostMapping("/update")
     @Operation(summary = "更新跟进记录")
-    @RequiresPermissions("activity:update")
+//    @RequiresPermissions("activity:update")
     public Result updateActivity(@RequestBody ActivityEntity activityEntity){
         activityService.updateActivity(activityEntity);
         return new Result().ok("创建成功");
@@ -62,7 +62,7 @@ public class ActivityController {
 
     @PostMapping("/delete/{activityId}")
     @Operation(summary = "删除一条跟进记录")
-    @RequiresPermissions("activity:create")
+//    @RequiresPermissions("activity:create")
     public Result deleteActivity(@PathVariable("activityId") String activityId){
         activityService.deleteById(activityId);
         return new Result().ok("删除成功");

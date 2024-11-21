@@ -130,12 +130,12 @@ public class SysOssController {
      */
     @PostMapping("/upload/{associationId}")
     @Operation(summary = "上传文件 - 本次开发使用上传接口")
-    public Result<FileUploadVO> uploadLocal(@PathVariable("associationId") Long associationId,
+    public Result<String> uploadLocal(@PathVariable("associationId") Long associationId,
                                             @RequestParam("file") MultipartFile file)  {
         if (file.isEmpty()) {
-            return new Result().error(ErrorCode.UPLOAD_FILE_EMPTY);
+            return new Result<String>().error(ErrorCode.UPLOAD_FILE_EMPTY);
         }
-        return new Result<FileUploadVO>().ok(localStorageService.uploadFile(associationId, file));
+        return new Result<String>().ok(localStorageService.uploadFile(associationId, file));
     }
 
     @DeleteMapping

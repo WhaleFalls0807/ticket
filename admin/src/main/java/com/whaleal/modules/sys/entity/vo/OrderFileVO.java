@@ -2,6 +2,7 @@ package com.whaleal.modules.sys.entity.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author lyz
@@ -9,6 +10,7 @@ import lombok.Data;
  * @create: 2024-11-20 20:49
  **/
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class OrderFileVO {
 

@@ -28,10 +28,9 @@ import com.whaleal.modules.security.user.UserDetail;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -158,6 +157,19 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     @Override
     public List<SysUserVO> listUserByPermission(String permission) {
         return baseDao.listUserByPermission(permission);
+    }
+
+    @Override
+    public boolean checkAuth(Long id,String auth) {
+        List<String> auths =  baseDao.listAllAuth(id);
+        Set<String> authList = new HashSet<>();
+
+        auths.forEach(s -> {
+            if(StringUtils.hasText(s)){
+                authList.addAll(Arrays.asList(s.split(",")));
+            }
+        });
+        return authList.contains(auth);
     }
 
 }

@@ -16,5 +16,5 @@ public interface LocalStorageService {
      * @param file
      * @return
      */
-    FileUploadVO uploadFile(Long associationId, MultipartFile file);
+    String uploadFile(Long associationId, MultipartFile file);
 }
