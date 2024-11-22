@@ -37,7 +37,8 @@ public class ActivityController {
     @Parameters({
             @Parameter(name = Constant.PAGE, description = "当前页码，从1开始", in = ParameterIn.QUERY, required = true, ref = "int"),
             @Parameter(name = Constant.LIMIT, description = "每页显示记录数", in = ParameterIn.QUERY, required = true, ref = "int"),
-            @Parameter(name = "associationId", description = "关联Id", in = ParameterIn.QUERY, ref = "String")
+            @Parameter(name = "associationId", description = "关联Id", in = ParameterIn.QUERY, ref = "long"),
+            @Parameter(name = "activityType", description = "操作类型", in = ParameterIn.QUERY, ref = "int")
     })
     public Result<PageData<ActivityEntity>> list(@Parameter(hidden = true) @RequestParam Map<String, Object> params) {
         PageData<ActivityEntity> list = activityService.listAllById(params);

@@ -38,4 +38,10 @@ public interface CorDocumentService extends BaseService<CorDocumentsEntity> {
      */
     void download(long id, HttpServletResponse response);
 
+    /**
+     * 删除文书
+     * @param ids
+     */
+    void delete(Long[] ids);
+
 }

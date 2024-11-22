@@ -11,6 +11,7 @@ import com.whaleal.modules.sys.entity.dto.ActivityDTO;
 import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import com.whaleal.modules.sys.service.ActivityService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -28,8 +29,10 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
     public PageData<ActivityEntity> listAllById(Map<String, Object> params) {
         QueryWrapper<ActivityEntity> qw = new QueryWrapper<>();
 
-
         qw.eq("association_id",Long.parseLong(params.get("associationId").toString()));
+        if(!ObjectUtils.isEmpty(params.get("activityType"))){
+            qw.eq("activity_type",Integer.parseInt(params.get("activityType").toString()));
+        }
         IPage<ActivityEntity> data = baseDao.selectPage(getPage(params, "create_date", false),
                 qw);
 

@@ -20,6 +20,8 @@ public enum OrderExceptionEnum {
 
 
     UPLOAD_FILE_ERROR(5001,"上传文件时出现错误"),
+
+    DOWNLOAD_FILE_ERROR(5002,"下载文件时出现错误"),
     FILENAME_IS_EMPTY(5002,"文件名不能为空"),
     FILE_NOT_EXISTS(5004,"文件不存在");
 

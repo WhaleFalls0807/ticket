@@ -50,7 +50,7 @@ public class ActivityDTO {
     }
 
     public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,Integer operateType, long creator,String createName) {
-        ActivityDTO activityDTO = new ActivityDTO(associationId, content, filePath, activityType, operateType, createName);
-        activityDTO.setCreator(creator);
+        this(associationId, content, filePath, activityType, operateType, createName);
+        this.creator = creator;
     }
 }

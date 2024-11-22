@@ -1,10 +1,8 @@
 package com.whaleal.modules.sys.service.impl;
 
-import cn.hutool.core.lang.ObjectId;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.whaleal.common.exception.OrderException;
-import com.whaleal.common.exception.OrderExceptionEnum;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.common.utils.ConvertUtils;
@@ -17,19 +15,28 @@ import com.whaleal.modules.sys.service.CorDocumentService;
 import com.whaleal.modules.sys.service.DownloadService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author lyz
  * @desc
  * @create: 2024-11-19 17:08
  **/
+@Slf4j
 @Service
 public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorDocumentsEntity> implements CorDocumentService {
+
+    @Value("${oss.path}")
+    private String basePath ;
 
     private final DownloadService downloadService;
 
@@ -48,7 +55,7 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
     @Override
     public PageData<CorDocumentsEntity> page(Map<String,Object> params) {
         IPage<CorDocumentsEntity> page = baseDao.selectPage(
-                getPage(params, "sort", true),
+                getPage(params, "create_date", false),
                 new LambdaUpdateWrapper<>()
         );
 
@@ -60,19 +67,21 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
         CorDocumentsEntity corDocumentsEntity = selectById(id);
 
         DownloadRecord downloadRecord = new DownloadRecord();
+        downloadRecord.setAssociationId(id);
         downloadRecord.setUsername(SecurityUser.getUser().getUsername());
         downloadRecord.setUserId(SecurityUser.getUserId());
         downloadRecord.setContractNum(corDocumentsEntity.getFileName());
 
         String filePath = corDocumentsEntity.getFilePath();
-        File file = new File(filePath);
+        File file = new File(basePath + filePath);
         if(!file.exists()){
-            throw new OrderException(OrderExceptionEnum.FILE_NOT_EXISTS);
+            log.error("文件不存在");
+            throw new RuntimeException("文件不存在");
         }
 
         response.reset();
         response.setContentType("application/octet-stream");
-        String filename = corDocumentsEntity.getFileName() + "_" + new ObjectId();
+        String filename = UUID.randomUUID().toString().replace("-", "") + "_" + corDocumentsEntity.getFileName();
         try {
             InputStream inputStream = new FileInputStream(file);
             response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, "UTF-8"));
@@ -84,17 +93,39 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
             while ((len = inputStream.read(b)) > 0) {
                 outputStream.write(b, 0, len);
             }
-            inputStream.close();
 
+            inputStream.close();
             downloadRecord.setSuccess(1);
             downloadService.insert(downloadRecord);
         } catch (Exception e) {
             downloadRecord.setSuccess(2);
-            downloadRecord.setFailedReason(e.getMessage());
+            downloadRecord.setFailedReason("系统异常");
             downloadService.insert(downloadRecord);
-            throw new RuntimeException(e);
+            handleError(response,e.getMessage(),5002);
         }
-
-
     }
+
+    @Override
+    public void delete(Long[] ids) {
+        deleteBatchIds(Arrays.asList(ids));
+    }
+
+    private void handleError(HttpServletResponse response, String message, int statusCode) {
+        try {
+//            response.reset();
+            response.setContentType("application/json;charset=UTF-8");
+            response.setStatus(statusCode);
+
+            // 构建错误响应对象
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", statusCode);
+            errorResponse.put("message", message);
+
+            // 返回错误响应
+            response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
+        } catch (IOException e) {
+            log.error("响应错误时异常: {}", e.getMessage());
+        }
+    }
+
 }

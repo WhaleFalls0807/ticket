@@ -1,5 +1,6 @@
 package com.whaleal.modules.sys.entity.po;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.whaleal.common.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,7 @@ public class CorDocumentsEntity extends BaseEntity {
     /**
      * 下载数
      */
+    @TableField(exist = false)
     private Long count;
 
     /**

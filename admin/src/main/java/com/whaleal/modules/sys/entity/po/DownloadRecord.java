@@ -60,5 +60,5 @@ public class DownloadRecord implements Serializable {
      * 下载时间
      */
     @TableField(value = "create_date",fill = FieldFill.INSERT)
-    private Date downloadDate;
+    private Date createDate;
 }

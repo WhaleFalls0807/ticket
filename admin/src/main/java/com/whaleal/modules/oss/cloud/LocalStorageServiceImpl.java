@@ -40,7 +40,7 @@ public class LocalStorageServiceImpl implements LocalStorageService{
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = sdf.format(new Date());
 
-        Path dirPath = Paths.get(path, String.valueOf(associationId),formattedDate);
+        Path dirPath = Paths.get(path, prefix,String.valueOf(associationId),formattedDate);
         Path filePath = dirPath.resolve(originalFilename);
 
         try {

@@ -152,7 +152,12 @@ public class OrderController {
     @RequiresPermissions("grab:grab")
     public Result grabOrder() {
         Long userId = SecurityUser.getUserId();
-        return new Result().ok(orderService.electOrder(userId));
+        OrderEntity orderEntity = orderService.electOrder(userId);
+
+        if(ObjectUtils.isEmpty(orderEntity)){
+            return new Result().ok("没有可以抢的单子");
+        }
+        return new Result().ok(orderEntity);
     }
 
     @PostMapping("/info/add")
@@ -194,7 +199,7 @@ public class OrderController {
     }
 
     @PostMapping("/status/change")
-    @Operation(summary = "修改工单状态",description = "放回公海 指派给其他人 ")
+    @Operation(summary = "修改工单状态",description = "1: 放回公海  2: 指派给其他人 3: 成单")
     @RequiresPermissions("order:create")
     public Result<String> editOrderStatus(@RequestBody OrderEditDTO orderEditDTO ) {
         orderService.editStatus(orderEditDTO);

@@ -64,7 +64,7 @@ public interface SysUserService extends BaseService<SysUserEntity> {
     List<SysUserVO> listUserByPermission(String permission);
 
 	/**
-	 * 检查用户是否具有某个全新 比起shiro框架更细粒度
+	 * 检查用户是否具有某个权限 比起shiro框架更细粒度
 	 * @param id
 	 * @param auth
 	 * @return

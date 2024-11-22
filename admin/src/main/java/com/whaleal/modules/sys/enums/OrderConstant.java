@@ -16,7 +16,8 @@ public interface OrderConstant {
      *  4: 审核被驳回 待重新提交
      *  5: 二次提交待审核
      *  6: 二次审核被驳回 待重新提交
-     *  7：审核通过 已完成
+     *  7：审核通过
+     *  8: 已成单
      *
      *  8：公海中的单子
      *  9：已删除
@@ -31,9 +32,10 @@ public interface OrderConstant {
     int WAIT_REVIEW_TWICE = 5;
     int TWICE_REVIEW_REJECT = 6;
 
-    int COMPLETE = 7;
+    int REVIEW_COMPLETE = 7;
 
-    int IN_POOL = 8;
+    int SUCCESS = 8;
+    int IN_POOL = 9;
 
     int EXCEPTION = 10;
     int DELETED = 99;

@@ -28,4 +28,4 @@ spring:
           config:
             multi-statement-allow: true
 oss:
-  path: /home/file
+  path: /home

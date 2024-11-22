@@ -26,4 +26,4 @@ spring:
         #login-username: admin
         #login-password: admin
 oss:
-  path: /Users/whalefalls/Desktop/
+  path: /Users/whalefalls/Desktop

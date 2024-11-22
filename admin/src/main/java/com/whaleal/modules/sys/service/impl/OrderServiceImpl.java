@@ -130,6 +130,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     public void saveSimpleOrder(OrderDTO orderDTO, boolean isInner) {
         OrderEntity orderEntity = new OrderEntity(orderDTO.getOrderName(),orderDTO.getPhone(),orderDTO.getEmail(),orderDTO.getIndustry(),orderDTO.getCustomerName());
 
+        orderEntity.setContent(orderDTO.getRemark());
+
         if(isInner){
             // 内部人员创建的订单直接默认自己是负责人
             UserDetail user = SecurityUser.getUser();
@@ -138,7 +140,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             orderEntity.setDeal(1);
             orderEntity.setCreator(user.getId());
             orderEntity.setOwnerId(user.getId());
-
         }
         insert(orderEntity);
 
@@ -217,8 +218,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         }
 
         BeanUtils.copyProperties(orderUpdateDTO,orderEntity, BeanCopyUtil.getNullPropertyNames(orderUpdateDTO));
-
-
         // 补充单子信息
         if(StringUtils.hasText(orderUpdateDTO.getContract()) || StringUtils.hasText(orderUpdateDTO.getPayType())){
             // 加载orderFile信息
@@ -305,20 +304,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
             }
             String username = SecurityUser.getUser().getUsername();
-            if (1 == orderCommitDTO.getCommitType()) {
-                // 首次提交
-                if (orderEntity.getOrderStatus() == OrderConstant.DISTRIBUTED || orderEntity.getOrderStatus() == OrderConstant.REVIEW_REJECT) {
-                    orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW);
-                } else {
-                    throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
-                }
-            } else if (2 == orderCommitDTO.getCommitType()) {
-                // 二次提交
-                if (orderEntity.getOrderStatus() == OrderConstant.WAIT_COMMIT_TWICE || orderEntity.getOrderStatus() == OrderConstant.TWICE_REVIEW_REJECT) {
-                    orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW_TWICE);
-                } else {
-                    throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
-                }
+            if(orderEntity.getOrderStatus() == OrderConstant.DISTRIBUTED || orderEntity.getOrderStatus() == OrderConstant.REVIEW_REJECT){
+                // 首次提交 / 首次重新提交
+                orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW);
+            }else if (orderEntity.getOrderStatus() == OrderConstant.WAIT_COMMIT_TWICE || orderEntity.getOrderStatus() == OrderConstant.TWICE_REVIEW_REJECT) {
+                orderEntity.setOrderStatus(OrderConstant.WAIT_REVIEW_TWICE);
+            }else {
+                throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
             }
 
             updateById(orderEntity);
@@ -354,7 +346,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 }
             } else if (OrderConstant.WAIT_REVIEW_TWICE == orderEntity.getOrderStatus()) {
                 if (isPass) {
-                    orderEntity.setOrderStatus(OrderConstant.COMPLETE);
+                    orderEntity.setOrderStatus(OrderConstant.REVIEW_COMPLETE);
                 } else {
                     orderEntity.setOrderStatus(OrderConstant.TWICE_REVIEW_REJECT);
                 }
@@ -362,11 +354,12 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
             }
 
+            updateById(orderEntity);
+
             String content = "审核了单子，审核结果：" + (isPass ? "通过" : "拒绝") + "。";
             if (StringUtils.hasText(orderReviewDTO.getRemark())) {
                 content += orderReviewDTO.getRemark();
             }
-
             activityService.createActivity(new ActivityDTO(orderEntity.getId(), content, "", 1,15,SecurityUser.getUserId(), username));
         }
     }
@@ -392,11 +385,16 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             update.set(OrderEntity::getOrderStatus,OrderConstant.CREATED);
             update.set(OrderEntity::getOwnerId,null);
             content = "把单子放回了公海。" + orderEditDTO.getRemark();
-        }else {
+        }else if(2 == orderEditDTO.getOperateType()){
             update.set(OrderEntity::getOwnerId,orderEditDTO.getNewOwnerId());
             content = "把单子转给了" + orderEditDTO.getUsername() + "。"  + orderEditDTO.getRemark();
+        }else if(3 == orderEditDTO.getOperateType()){
+            // 成单
+            update.set(OrderEntity::getDeal,2);
+            update.set(OrderEntity::getOrderStatus,OrderConstant.SUCCESS);
         }
         baseDao.update(update);
+
         activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",1,16,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
     }
 
@@ -404,10 +402,11 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     public OrderEntity electOrder(Long userId) {
         OrderEntity orderEntity = baseDao.electOneOrder();
         if(ObjectUtils.isEmpty(orderEntity)){
-            throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
+            return null;
         }
 
         // 检查用户当前是否可以抢单 ，次数是否已经超了限制
+
 
         // 更新抢到的这个单子的状态
         orderEntity.setDeal(1);
@@ -431,13 +430,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         if(ObjectUtils.isEmpty(orderEntity)){
             throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
         }
-        Long ownerId = orderEntity.getOwnerId();
-        Integer superAdmin = SecurityUser.getUser().getSuperAdmin();
-        if(1 != superAdmin){
-            if(!Objects.equals(SecurityUser.getUserId(), ownerId)){
-                throw new OrderException(OrderExceptionEnum.NO_PERMISSION_OPERATE);
-            }
-        }
+//        Long ownerId = orderEntity.getOwnerId();
+//        Integer superAdmin = SecurityUser.getUser().getSuperAdmin();
+//        if(1 != superAdmin){
+//            if(!Objects.equals(SecurityUser.getUserId(), ownerId)){
+//                throw new OrderException(OrderExceptionEnum.NO_PERMISSION_OPERATE);
+//            }
+//        }
 
         OrderVO orderVO = ConvertUtils.sourceToTarget(orderEntity, OrderVO.class);
         orderVO.setOrderPriceVO(orderPriceService.findByOrderId(id));
