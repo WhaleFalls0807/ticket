@@ -19,8 +19,9 @@ public interface OrderConstant {
      *  7：审核通过
      *  8: 已成单
      *
-     *  8：公海中的单子
-     *  9：已删除
+     *  9：公海中的单子
+     *  10：异常
+     *  99：已删除
      */
     int CREATED = 0;
     int DISTRIBUTED = 1;

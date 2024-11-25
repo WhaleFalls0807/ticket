@@ -1,6 +1,6 @@
 package com.whaleal.modules.sys.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.hutool.db.sql.Order;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -92,7 +92,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         if(!ObjectUtils.isEmpty(params.get("keyword"))){
             String keyword = params.get("keyword").toString();
             wrapper.and(wrapper1 -> {
-                wrapper1.like("name",keyword).or()
+                wrapper1.like("order_name",keyword).or()
                         .like("customer_name",keyword).or()
                         .like("phone",keyword).or()
                         .like("email",keyword);
@@ -109,13 +109,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             params.put("sortField","create_date");
         }
         if(ObjectUtils.isEmpty(params.get("isAsc"))){
-            params.put("isAsc",true);
+            params.put("isAsc",false);
         }
 
         IPage<OrderEntity> orderEntityIPage = baseDao.selectPage(getPage(params, params.get("sortField").toString(), (boolean) params.get("isAsc")),
                 wrapper);
 
-        if(deal == 0){
+        if(deal == 0 || deal == 3){
             // 公海客户不展示客户信息
             orderEntityIPage.getRecords().forEach(s ->{
                 s.setCustomerId(null);
@@ -212,7 +212,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void addInformation(OrderEntity orderEntity,OrderUpdateDTO orderUpdateDTO) {
-        if(orderEntity.getOrderStatus() != OrderConstant.DISTRIBUTED){
+        if(orderEntity.getOrderStatus() != OrderConstant.DISTRIBUTED && orderEntity.getOrderStatus() != OrderConstant.WAIT_COMMIT_TWICE &&
+            orderEntity.getOrderStatus() != OrderConstant.REVIEW_REJECT && orderEntity.getOrderStatus() != OrderConstant.TWICE_REVIEW_REJECT){
             // 只有已分配的单子才能补充信息
             throw new OrderException(OrderExceptionEnum.ONLY_DISTRIBUTE_CAN_OPERATE);
         }
@@ -353,7 +354,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             } else {
                 throw new OrderException(OrderExceptionEnum.ORDER_STATUS_NOT_SUPPORT);
             }
-
+            orderEntity.setReviewUserId(SecurityUser.getUserId());
             updateById(orderEntity);
 
             String content = "审核了单子，审核结果：" + (isPass ? "通过" : "拒绝") + "。";
@@ -378,6 +379,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             throw new OrderException(OrderExceptionEnum.NO_PERMISSION_OPERATE);
         }
         LambdaUpdateWrapper<OrderEntity> update = new LambdaUpdateWrapper<>();
+        update.eq(OrderEntity::getId,orderId);
 
         String content = "";
         int type;

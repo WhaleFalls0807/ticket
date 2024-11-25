@@ -14,7 +14,6 @@ public class OrderGrabVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     /**
      * 关联用户id
      */
@@ -28,12 +27,26 @@ public class OrderGrabVO implements Serializable {
     /**
      * 剩余单子数
      */
-    private Long RemainCount;
+    private Long remainCount;
 
     /**
      * 总抢单总数
      */
     private Long totalCount;
 
+    /**
+     * 当前用户已抢单数
+     */
+    private Long userGrapedCount;
+
+    /**
+     * 当前用户剩余可抢单子数
+     */
+    private Long userRemainCount;
+
+    /**
+     * 当前用户此 时间间隔内 可以总抢单总数
+     */
+    private Long userTotalCount;
 
 }

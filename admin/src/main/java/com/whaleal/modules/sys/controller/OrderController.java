@@ -200,7 +200,7 @@ public class OrderController {
 
     @PostMapping("/status/change")
     @Operation(summary = "修改工单状态",description = "1: 放回公海  2: 指派给其他人 3: 成单")
-    @RequiresPermissions("order:create")
+//    @RequiresPermissions("order:create")
     public Result<String> editOrderStatus(@RequestBody OrderEditDTO orderEditDTO ) {
         orderService.editStatus(orderEditDTO);
         return new Result<String>().ok("提交成功");

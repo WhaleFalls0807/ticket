@@ -9,6 +9,7 @@ import com.whaleal.modules.sys.entity.po.CorDocumentsEntity;
 import com.whaleal.modules.sys.entity.po.DownloadRecord;
 import com.whaleal.modules.sys.service.DownloadService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Map;
 
@@ -33,10 +34,15 @@ public class DownloadServiceImpl extends BaseServiceImpl<DownloadDao, DownloadRe
 
     @Override
     public PageData<DownloadRecord> page(Map<String, Object> params) {
+        LambdaUpdateWrapper<DownloadRecord> lambdaUpdateWrapper =  new LambdaUpdateWrapper<>();
+
+        if(!ObjectUtils.isEmpty(params.get("associationId"))){
+            lambdaUpdateWrapper.eq(DownloadRecord::getAssociationId,Long.parseLong(params.get("associationId").toString()));
+        }
 
         IPage<DownloadRecord> page = baseDao.selectPage(
                 getPage(params, "create_date", false),
-                new LambdaUpdateWrapper<>()
+                lambdaUpdateWrapper
         );
 
         return getPageData(page, DownloadRecord.class);

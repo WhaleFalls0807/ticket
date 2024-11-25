@@ -45,6 +45,12 @@ public class CorDocumentsEntity extends BaseEntity {
     private Long count;
 
     /**
+     * 创建者用户名
+     */
+    @TableField(exist = false)
+    private String createName;
+
+    /**
      * 更新者
      */
     private String updater;

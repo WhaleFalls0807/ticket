@@ -5,14 +5,15 @@ import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
 import com.whaleal.common.validator.AssertUtils;
 import com.whaleal.modules.sys.entity.dto.CorDocumentDTO;
+import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.entity.po.CorDocumentsEntity;
 import com.whaleal.modules.sys.entity.po.DownloadRecord;
 import com.whaleal.modules.sys.service.CorDocumentService;
 import com.whaleal.modules.sys.service.DownloadService;
+import com.whaleal.modules.sys.service.SysUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,12 @@ public class CorDocumentController {
 
     private final DownloadService downloadService;
 
-    public CorDocumentController(CorDocumentService corDocumentService, DownloadService downloadService) {
+    private final SysUserService sysUserService;
+
+    public CorDocumentController(CorDocumentService corDocumentService, DownloadService downloadService, SysUserService sysUserService) {
         this.corDocumentService = corDocumentService;
         this.downloadService = downloadService;
+        this.sysUserService = sysUserService;
     }
 
     @PostMapping("/upload")
@@ -56,8 +60,11 @@ public class CorDocumentController {
         page.getList().forEach(s -> {
             Long id = s.getId();
             long count = downloadService.countById(id);
-
             s.setCount(count);
+
+            Long creator = s.getCreator();
+            SysUserDTO sysUserDTO = sysUserService.get(creator);
+            s.setCreateName(sysUserDTO.getUsername());
         });
 
         return new Result<PageData<CorDocumentsEntity>>().ok(page);
@@ -80,10 +87,10 @@ public class CorDocumentController {
         corDocumentService.download(fileId,response);
     }
 
-    @RequiresPermissions("customer:delete")
+//    @RequiresPermissions("customer:delete")
     @Operation(summary = "删除企业文书")
     @ResponseBody
-    @PostMapping("/del")
+    @DeleteMapping("/del")
     public Result deleteByIds(@RequestBody Long[] ids){
         AssertUtils.isArrayEmpty(ids, "id");
 

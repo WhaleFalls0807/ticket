@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.*;
 import java.net.URLEncoder;
@@ -47,9 +48,17 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
     @Override
     public void uploadFile(CorDocumentDTO corDocumentDTO) {
         CorDocumentsEntity corDocumentsEntity = ConvertUtils.sourceToTarget(corDocumentDTO, CorDocumentsEntity.class);
+        if(ObjectUtils.isEmpty(corDocumentDTO.getId())){
+            corDocumentsEntity.setCreator(SecurityUser.getUserId());
+            baseDao.insert(corDocumentsEntity);
+        }else {
+            corDocumentsEntity.setUpdater(SecurityUser.getUser().getUsername());
+            System.out.println(corDocumentDTO.getId());
 
-        corDocumentsEntity.setCreator(SecurityUser.getUserId());
-        baseDao.insert(corDocumentsEntity);
+            int i = baseDao.updateById(corDocumentsEntity);
+            System.out.println(i);
+        }
+
     }
 
     @Override
@@ -70,7 +79,6 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
         downloadRecord.setAssociationId(id);
         downloadRecord.setUsername(SecurityUser.getUser().getUsername());
         downloadRecord.setUserId(SecurityUser.getUserId());
-        downloadRecord.setContractNum(corDocumentsEntity.getFileName());
 
         String filePath = corDocumentsEntity.getFilePath();
         File file = new File(basePath + filePath);
@@ -79,9 +87,12 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
             throw new RuntimeException("文件不存在");
         }
 
-        response.reset();
+//        response.reset();
         response.setContentType("application/octet-stream");
-        String filename = UUID.randomUUID().toString().replace("-", "") + "_" + corDocumentsEntity.getFileName();
+
+        String contractId = UUID.randomUUID().toString().replace("-", "") + "_";
+        downloadRecord.setContractNum(contractId);
+        String filename = contractId + corDocumentsEntity.getFileName();
         try {
             InputStream inputStream = new FileInputStream(file);
             response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, "UTF-8"));
