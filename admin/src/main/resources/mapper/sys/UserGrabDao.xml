@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.whaleal.modules.sys.dao.UserGrabDao">
+    <select id="countByType" resultType="java.util.Map">
+        SELECT
+            COUNT(CASE WHEN deal = 0 THEN 1 END) AS remainCount,
+            COUNT(CASE WHEN deal = 1 THEN 1 END) AS grapedCount
+        FROM brand_order;
+    </select>
+</mapper>

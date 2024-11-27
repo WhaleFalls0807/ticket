@@ -4,6 +4,8 @@ import com.whaleal.common.dao.BaseDao;
 import com.whaleal.modules.sys.entity.po.UserGrabConfigEntity;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Map;
+
 /**
  * @author lyz
  * @desc
@@ -11,4 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
  **/
 @Mapper
 public interface UserGrabDao extends BaseDao<UserGrabConfigEntity> {
+
+
+    Map<String,Long> countByType();
 }

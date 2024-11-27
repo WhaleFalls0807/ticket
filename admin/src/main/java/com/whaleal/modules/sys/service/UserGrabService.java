@@ -25,12 +25,33 @@ public interface UserGrabService extends BaseService<UserGrabConfigEntity> {
      */
     UserGrabConfigEntity findByUserId(Long userId);
 
+
+    /**
+     * 获取所有相关的抢单计数
+     * @return
+     */
+    OrderGrabVO findOrderCount();
+
     /**
      * 获取业务员当前count计数
      * @param userId
      * @return
      */
-    OrderGrabVO findCountByUserId(Long userId);
+    OrderGrabVO findCountByUserId(long userId);
 
-    OrderGrabVO findOrderCount();
+    /**
+     * 池子中新增一个order
+     */
+    void addGraped(long count);
+
+    void addRemain(long count);
+
+    /**
+     * 减少了一个单子
+     *
+     * 抢单 / 分配单子
+     */
+    void grapeOrder(long userId,long count);
+
+
 }

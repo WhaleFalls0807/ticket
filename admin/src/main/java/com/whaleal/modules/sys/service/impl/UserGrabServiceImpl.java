@@ -3,17 +3,19 @@ package com.whaleal.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.whaleal.common.redis.RedisUtils;
 import com.whaleal.common.service.impl.BaseServiceImpl;
+import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.sys.dao.UserGrabDao;
 import com.whaleal.modules.sys.entity.po.UserGrabConfigEntity;
 import com.whaleal.modules.sys.entity.vo.OrderGrabVO;
 import com.whaleal.modules.sys.redis.RedisConstant;
 import com.whaleal.modules.sys.service.ActivityService;
-import com.whaleal.modules.sys.service.OrderService;
 import com.whaleal.modules.sys.service.UserGrabService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,12 +30,10 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
 
     private final ActivityService activityService;
 
-    private final OrderService orderService;
 
-    public UserGrabServiceImpl(RedisUtils redisUtils, ActivityService activityService, OrderService orderService) {
+    public UserGrabServiceImpl(RedisUtils redisUtils, ActivityService activityService) {
         this.redisUtils = redisUtils;
         this.activityService = activityService;
-        this.orderService = orderService;
     }
 
 
@@ -55,80 +55,185 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
     }
 
     @Override
-    public OrderGrabVO findCountByUserId(Long userId) {
-        OrderGrabVO orderGrabVO = new OrderGrabVO();
-        orderGrabVO.setUserId(userId);
-
-        Object count = redisUtils.get(RedisConstant.USER_GRAB_COUNT + userId);
-        Object totalCount = redisUtils.get(RedisConstant.USER_GRAB_TOTAL_COUNT + userId);
-
-        if(!ObjectUtils.isEmpty(count) && !ObjectUtils.isEmpty(totalCount)){
-            orderGrabVO.setGrapedCount(Long.parseLong(count.toString()));
-            orderGrabVO.setTotalCount(Long.parseLong(totalCount.toString()));
-        }else {
-            //不存在就从数据库查询 并更新redis的缓存
-            LambdaQueryWrapper<UserGrabConfigEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.eq(UserGrabConfigEntity::getUserId,userId);
-
-            UserGrabConfigEntity userGrabConfigEntity = baseDao.selectOne(lambdaQueryWrapper);
-            if(ObjectUtils.isEmpty(userGrabConfigEntity)){
-                lambdaQueryWrapper.eq(UserGrabConfigEntity::getUserId,null);
-                userGrabConfigEntity = baseDao.selectOne(lambdaQueryWrapper);
-            }
-
-            getGrabCount(orderGrabVO,userGrabConfigEntity);
-            redisUtils.set(RedisConstant.USER_GRAB_COUNT + userId,orderGrabVO.getGrapedCount().toString());
-            redisUtils.set(RedisConstant.USER_GRAB_COUNT + userId,orderGrabVO.getTotalCount().toString());
-        }
-        return orderGrabVO;
-    }
-
-    @Override
     public OrderGrabVO findOrderCount() {
         OrderGrabVO orderGrabVO = new OrderGrabVO();
+        orderGrabVO.setUserId(SecurityUser.getUserId());
 
-        Map<String, Long> map = orderService.countByType();
-        Long remainCount = map.get("remainCount");
-        Long grapedCount = map.get("grapedCount");
+        // 获取单子池子中的统计情况
+        Object grapedCount = redisUtils.get(RedisConstant.GRAB_GRAPED_COUNT);
+        Object remainCount = redisUtils.get(RedisConstant.GRAB_REMAIN_COUNT);
 
-        orderGrabVO.setGrapedCount(grapedCount);
-        orderGrabVO.setRemainCount(remainCount);
+        Long graped = 0L;
+        Long remain = 0L;
+        if(!ObjectUtils.isEmpty(grapedCount) && !ObjectUtils.isEmpty(remainCount)){
+            graped = Long.parseLong(grapedCount.toString());
+            remain = Long.parseLong(remainCount.toString());
+        }else {
+            Map<String, Long> map = initPoolCount();
+            graped = map.get("grapedCount");
+            remain = map.get("remainCount");
+        }
 
-        long totalCount = remainCount + grapedCount;
+        orderGrabVO.setGrapedCount(graped);
+        orderGrabVO.setRemainCount(remain);
+        long totalCount = graped + remain;
         orderGrabVO.setTotalCount(totalCount);
         return orderGrabVO;
     }
 
+    /**
+     * 获取用户的抢单数量信息
+     * @return
+     */
+    @Override
+    public OrderGrabVO findCountByUserId(long userId) {
+        OrderGrabVO orderGrabVO = new OrderGrabVO();
 
-    private OrderGrabVO getGrabCount(OrderGrabVO orderGrabVO,UserGrabConfigEntity userGrabConfigEntity){
-        if(ObjectUtils.isEmpty(userGrabConfigEntity)){
-            userGrabConfigEntity = new UserGrabConfigEntity();
-            userGrabConfigEntity.setGap(3);
-            orderGrabVO.setTotalCount(30L);
+        Object grapedCount = redisUtils.get(RedisConstant.USER_GRAB_COUNT + userId);
+        Object totalCount = redisUtils.get(RedisConstant.USER_GRAB_TOTAL_COUNT + userId);
+
+        long graped = 0;
+        long total = 0;
+
+        if(!ObjectUtils.isEmpty(grapedCount) && !ObjectUtils.isEmpty(totalCount)){
+            graped = Long.parseLong(grapedCount.toString());
+            total = Long.parseLong(totalCount.toString());
         }else {
-            orderGrabVO.setTotalCount(userGrabConfigEntity.getTotalCount());
+            Map<String, Long> map = initUserCount(userId);
+            graped = map.get("graped");
+            total = map.get("total");
         }
 
-        Integer interval = userGrabConfigEntity.getGap();
-        LocalDateTime startDate ;
-        LocalDateTime now = LocalDateTime.now();
-        switch (interval){
-            case 1:
-                startDate = now.minusMonths(1);
-                break;
-            case 2:
-                startDate = now.minusDays(7);
-                break;
-            case 4:
-                startDate = now.minusHours(1);
-                break;
-            default:
-                startDate = now.minusDays(1);
-                break;
-        }
+        long remain = total - graped;
+        orderGrabVO.setUserGrapedCount(graped);
+        orderGrabVO.setUserTotalCount(total);
+        orderGrabVO.setUserRemainCount(remain);
 
-        long count = activityService.countBetween(orderGrabVO.getUserId(),startDate,now);
-        orderGrabVO.setGrapedCount(count);
         return orderGrabVO;
+    }
+
+    @Override
+    public void addGraped(long count) {
+        if(count < 1){
+            return;
+        }
+        Object o = redisUtils.get(RedisConstant.GRAB_REMAIN_COUNT);
+        // redis 缓存中有数据就更新 没有就不操作
+        if(!ObjectUtils.isEmpty(o)){
+            long l = Long.parseLong(o.toString()) + count;
+            redisUtils.add(RedisConstant.GRAB_REMAIN_COUNT,l);
+        }else {
+            initPoolCount();
+        }
+    }
+
+    @Override
+    public void addRemain(long count) {
+        if(count < 1){
+            return;
+        }
+        Object o = redisUtils.get(RedisConstant.GRAB_REMAIN_COUNT);
+        // redis 缓存中有数据就更新 没有就不操作
+        if(!ObjectUtils.isEmpty(o)){
+            long l = Long.parseLong(o.toString()) + count;
+            redisUtils.add(RedisConstant.GRAB_REMAIN_COUNT,l);
+        }else {
+            initPoolCount();
+        }
+    }
+
+    @Override
+    public void grapeOrder(long userId, long count) {
+        // 更新池子中的信息
+        addGraped(count);
+        addRemain(-count);
+
+        // 更新用户已抢的数量
+        Object userCount = redisUtils.get(RedisConstant.USER_GRAB_COUNT + userId);
+        if(!ObjectUtils.isEmpty(userCount)){
+            long l = Long.parseLong(userCount.toString()) + count;
+            if(l < 0){
+                return;
+            }
+            redisUtils.add(RedisConstant.USER_GRAB_COUNT,l);
+        }else {
+            initUserCount(userId);
+        }
+    }
+
+    private Map<String ,Long> initUserCount(long userId){
+        Map<String, Long> map = new HashMap<>();
+
+        //不存在就从数据库查询 并更新redis的缓存
+        LambdaQueryWrapper<UserGrabConfigEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(UserGrabConfigEntity::getUserId,userId);
+
+        UserGrabConfigEntity userGrabConfigEntity = baseDao.selectOne(lambdaQueryWrapper);
+        if(ObjectUtils.isEmpty(userGrabConfigEntity)){
+            lambdaQueryWrapper.eq(UserGrabConfigEntity::getUserId,null);
+            userGrabConfigEntity = baseDao.selectOne(lambdaQueryWrapper);
+            if(ObjectUtils.isEmpty(userGrabConfigEntity)){
+                // 如果所有配置均没有就采用默认配置
+                userGrabConfigEntity = new UserGrabConfigEntity();
+                userGrabConfigEntity.setGap(3);
+                userGrabConfigEntity.setTotalCount(30L);
+            }
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime endOfDay = now.with(LocalTime.MAX);
+        LocalDateTime startDate;
+        long remain;
+
+        switch (userGrabConfigEntity.getGap()) {
+            case 1: // 按月计算剩余时间
+                startDate = now.withDayOfMonth(1).with(LocalTime.MIDNIGHT); // 获取当月第一天
+                int daysInMonth = YearMonth.from(now).lengthOfMonth(); // 当月总天数
+                int remainingDays = daysInMonth - now.getDayOfMonth(); // 本月剩余天数
+                remain = ChronoUnit.SECONDS.between(now, endOfDay) + remainingDays * 24 * 3600L;
+                break;
+
+            case 2: // 按周计算剩余时间
+                int currentDayOfWeek = now.getDayOfWeek().getValue(); // 获取星期几 (1-7)
+                startDate = now.minusDays(currentDayOfWeek - 1).with(LocalTime.MIDNIGHT); // 本周开始时间
+                int remainingDaysInWeek = 7 - currentDayOfWeek; // 本周剩余天数
+                remain = ChronoUnit.SECONDS.between(now, endOfDay) + remainingDaysInWeek * 24 * 3600L;
+                break;
+
+            case 4: // 按小时计算剩余时间
+                startDate = now.truncatedTo(ChronoUnit.HOURS); // 当前小时的开始时间
+                remain = 3600 - (now.getMinute() * 60L + now.getSecond()); // 本小时剩余秒数
+                break;
+
+            default: // 按天计算剩余时间
+                startDate = now.with(LocalTime.MIDNIGHT); // 当天开始时间
+                remain = ChronoUnit.SECONDS.between(now, endOfDay); // 当天剩余秒数
+                break;
+        }
+
+        long graped = activityService.countBetween(userId,startDate,now);
+        long total = userGrabConfigEntity.getTotalCount();
+
+        redisUtils.set(RedisConstant.USER_GRAB_COUNT + userId,graped,remain);
+        redisUtils.set(RedisConstant.USER_GRAB_TOTAL_COUNT + userId,total,remain);
+
+        map.put("graped",graped);
+        map.put("total",total);
+        return map;
+
+    }
+
+    private Map<String, Long> initPoolCount(){
+        Map<String, Long> map = baseDao.countByType();
+        Long remain = map.get("remainCount");
+        Long graped = map.get("grapedCount");
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime endOfDay = now.with(LocalTime.MAX);
+        long remainSecond = ChronoUnit.SECONDS.between(now, endOfDay); // 当天剩余秒数
+
+        redisUtils.set(RedisConstant.GRAB_GRAPED_COUNT,graped,remainSecond);
+        redisUtils.set(RedisConstant.GRAB_REMAIN_COUNT,remain,remainSecond);
+        return map;
     }
 }

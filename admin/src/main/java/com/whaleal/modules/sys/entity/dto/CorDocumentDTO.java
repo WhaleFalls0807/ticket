@@ -12,7 +12,7 @@ import lombok.Data;
 @Schema(title = "企业文书实体")
 public class CorDocumentDTO {
 
-    private String id;
+    private Long id;
 
     @Schema(title = "文书名称")
     private String fileName;

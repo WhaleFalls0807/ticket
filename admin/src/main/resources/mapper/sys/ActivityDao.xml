@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.whaleal.modules.sys.dao.ActivityDao">
+
+    <select id="findLastByAssociationId" resultType="com.whaleal.modules.sys.entity.po.ActivityEntity">
+
+        select * from activity
+        where association_id = #{associationId}
+        and activity_type = 1
+        and operate_type = #{operateType}
+        order by create_date desc
+        limit 1
+    </select>
+</mapper>

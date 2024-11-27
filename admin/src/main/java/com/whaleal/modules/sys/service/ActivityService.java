@@ -27,8 +27,21 @@ public interface ActivityService extends BaseService<ActivityEntity> {
      */
     void createActivity(ActivityDTO activityDTO);
 
+    /**
+     * 更新一个跟进
+     * @param activityEntity
+     */
     void updateActivity(ActivityEntity activityEntity);
 
+    ActivityEntity findLastByAssociationId(long id,int type);
 
+
+    /**
+     * 计算两个时间段之间的跟进数量
+     * @param userId
+     * @param startDate
+     * @param now
+     * @return
+     */
     long countBetween(Long userId, LocalDateTime startDate, LocalDateTime now);
 }

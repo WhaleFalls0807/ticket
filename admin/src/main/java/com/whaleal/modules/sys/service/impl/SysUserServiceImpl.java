@@ -172,4 +172,14 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
         return authList.contains(auth);
     }
 
+    @Override
+    public String findUsernameByUserId(Long userId) {
+        Long userId1 = SecurityUser.getUserId();
+        if(Objects.equals(userId1, userId)){
+            return SecurityUser.getUser().getUsername();
+        }
+
+        return selectById(userId1).getUsername();
+    }
+
 }

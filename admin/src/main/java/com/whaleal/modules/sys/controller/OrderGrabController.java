@@ -43,16 +43,23 @@ public class OrderGrabController {
         return new Result<UserGrabConfigEntity>().ok(userGrabService.findByUserId(userId));
     }
 
-    @GetMapping("/user/count")
-    @Operation(summary = "获取抢单数/总数")
-    public Result<OrderGrabVO> queryCount() {
-        Long userId = SecurityUser.getUserId();
-        return new Result<OrderGrabVO>().ok(userGrabService.findCountByUserId(userId));
-    }
+//    @GetMapping("/user/count")
+//    @Operation(summary = "获取抢单数/总数")
+//    public Result<OrderGrabVO> queryCount() {
+//        Long userId = SecurityUser.getUserId();
+//        return new Result<OrderGrabVO>().ok(userGrabService.findCountByUserId(userId));
+//    }
 
     @GetMapping("/count")
     @Operation(summary = "获取抢单数/总数")
     public Result<OrderGrabVO> queryPoolCount() {
-        return new Result<OrderGrabVO>().ok(userGrabService.findOrderCount());
+        OrderGrabVO orderCount = userGrabService.findOrderCount();
+        OrderGrabVO countByUserId = userGrabService.findCountByUserId(SecurityUser.getUserId());
+
+        // 获取当前用户的抢单信息
+        orderCount.setUserRemainCount(countByUserId.getUserRemainCount());
+        orderCount.setUserGrapedCount(countByUserId.getUserGrapedCount());
+        orderCount.setUserTotalCount(countByUserId.getUserTotalCount());
+        return new Result<OrderGrabVO>().ok(orderCount);
     }
 }

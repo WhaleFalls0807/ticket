@@ -26,27 +26,26 @@ public interface OrderService extends BaseService<OrderEntity> {
      *  普通用户创建普通工单
      * @param orderDTO
      */
-    void saveSimpleOrder(OrderDTO orderDTO,boolean isInner);
+    boolean saveSimpleOrder(OrderDTO orderDTO,boolean isInner);
 
-    /**
-     * 管理员创建订单
-     * @param orderEntity
-     */
-    void save(OrderEntity orderEntity);
+//    /**
+//     * 管理员创建订单
+//     * @param orderEntity
+//     */
+//    void save(OrderEntity orderEntity);
 
     /**
      * 管理员简单的分配单子
-     * @param orderId
      * @param userId
      * @return
      */
-    void distributeOrder(List<Long> orderIds, Long userId);
+    long distributeOrder(List<Long> orderIds, Long userId);
 
     /**
      * 批量删除order
      * @param ids
      */
-    void delete(Long[] ids);
+    boolean delete(Long[] ids);
 
     /**
      * 补充单子信息
@@ -79,12 +78,6 @@ public interface OrderService extends BaseService<OrderEntity> {
      * @param userId
      */
     OrderEntity electOrder(Long userId);
-
-    /**
-     * 获取工单中的计数情况
-     * @return
-     */
-    Map<String, Long> countByType();
 
     /**
      * 查看order详情

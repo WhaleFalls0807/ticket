@@ -12,6 +12,7 @@ import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -57,6 +58,22 @@ public class RedisUtils {
 
     public Object get(String key) {
         return get(key, NOT_EXPIRE);
+    }
+
+    /**
+     *  给key对应的值计数加n
+     * @param key
+     * @param count
+     * @return
+     */
+    public Long add(String key,long count) {
+        Object o = redisTemplate.opsForValue().get(key);
+        if(ObjectUtils.isEmpty(o)){
+            return 0L;
+        }
+        long l = Long.parseLong(o.toString()) + count;
+        redisTemplate.opsForValue().set(key,l);
+        return l;
     }
 
     public void delete(String key) {

@@ -51,6 +51,11 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
     }
 
     @Override
+    public ActivityEntity findLastByAssociationId(long id,int type) {
+        return baseDao.findLastByAssociationId(id,type);
+    }
+
+    @Override
     public long countBetween(Long userId, LocalDateTime startDate, LocalDateTime now) {
         LambdaQueryWrapper<ActivityEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
 

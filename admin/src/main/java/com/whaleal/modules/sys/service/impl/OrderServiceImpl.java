@@ -1,6 +1,5 @@
 package com.whaleal.modules.sys.service.impl;
 
-import cn.hutool.db.sql.Order;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,9 +14,11 @@ import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.dao.OrderDao;
 import com.whaleal.modules.sys.entity.dto.*;
 import com.whaleal.modules.sys.entity.dto.order.*;
+import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.po.OrderFileEntity;
 import com.whaleal.modules.sys.entity.po.OrderPriceEntity;
+import com.whaleal.modules.sys.entity.vo.OrderGrabVO;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
 import com.whaleal.modules.sys.enums.OrderConstant;
 import com.whaleal.modules.sys.service.*;
@@ -43,6 +44,8 @@ import java.util.Objects;
 @Service
 public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> implements OrderService {
 
+
+
     private final OrderFileService orderFileService;
 
     private final OrderPriceService orderPriceService;
@@ -52,7 +55,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     private final SysUserService sysUserService;
 
 
-    public OrderServiceImpl(OrderFileService orderFileService,
+    public OrderServiceImpl(UserGrabService userGrabService, OrderFileService orderFileService,
                             OrderPriceService orderPriceService,
                             ActivityService activityService,
                             SysUserService sysUserService) {
@@ -75,13 +78,14 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         if(!ObjectUtils.isEmpty(params.get("reviewType"))){
             // 处理审核类型
             int reviewType = Integer.parseInt(params.get("reviewType").toString());
-            if(0 == reviewType){
-                wrapper.ge("order_status",2)
-                        .le("order_status",7);
-            }else if(1 == reviewType){
+
+            if(1 == reviewType){
                 wrapper.in("order_status",2,5);
             }else if(2 == reviewType){
                 wrapper.in("order_status",3,4,5,6,7);
+            }else {
+                wrapper.ge("order_status",2)
+                        .le("order_status",7);
             }
         }
 
@@ -114,20 +118,38 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
         IPage<OrderEntity> orderEntityIPage = baseDao.selectPage(getPage(params, params.get("sortField").toString(), (boolean) params.get("isAsc")),
                 wrapper);
+        PageData<OrderVO> pageData = getPageData(orderEntityIPage, OrderVO.class);
+        for (OrderVO orderVO : pageData.getList()){
+            if(deal == 0 || deal == 3){
+                orderVO.setCustomerId(null);
+                orderVO.setCustomerName(null);
+                continue;
+            }
 
-        if(deal == 0 || deal == 3){
-            // 公海客户不展示客户信息
-            orderEntityIPage.getRecords().forEach(s ->{
-                s.setCustomerId(null);
-                s.setCustomerName(null);
-            });
+            if(deal == 1 || deal == 2){
+                String username = sysUserService.findUsernameByUserId(orderVO.getOwnerId());
+                orderVO.setOwnerUsername(username);
+            }
+            Integer orderStatus = orderVO.getOrderStatus();
+            if(orderStatus > 2 && orderStatus < 9){
+                ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(orderVO.getId(), 15);
+                if(!ObjectUtils.isEmpty(lastByAssociationId)){
+                    orderVO.setReviewUserId(lastByAssociationId.getCreator());
+                    orderVO.setReviewUsername(lastByAssociationId.getCreateName());
+                    orderVO.setReviewDate(lastByAssociationId.getCreateDate());
+                }
+            }
+
+            if(orderStatus == 8){
+                ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(orderVO.getId(), 16);
+                orderVO.setDealDate(lastByAssociationId.getCreateDate());
+            }
         }
-
-        return getPageData(orderEntityIPage, OrderVO.class);
+        return pageData;
     }
 
     @Override
-    public void saveSimpleOrder(OrderDTO orderDTO, boolean isInner) {
+    public boolean saveSimpleOrder(OrderDTO orderDTO, boolean isInner) {
         OrderEntity orderEntity = new OrderEntity(orderDTO.getOrderName(),orderDTO.getPhone(),orderDTO.getEmail(),orderDTO.getIndustry(),orderDTO.getCustomerName());
 
         orderEntity.setContent(orderDTO.getRemark());
@@ -141,36 +163,41 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             orderEntity.setCreator(user.getId());
             orderEntity.setOwnerId(user.getId());
         }
-        insert(orderEntity);
 
-        String creator ;
-        if(isInner){
-            creator =  SecurityUser.getUser().getUsername();
-        }else {
-            creator = orderDTO.getCustomerName();
+        boolean insert = insert(orderEntity);
+        if(insert){
+            String creator ;
+            if(isInner){
+                creator =  SecurityUser.getUser().getUsername();
+            }else {
+                creator = orderDTO.getCustomerName();
+            }
+            activityService.createActivity(new ActivityDTO(orderEntity.getId(),"创建了单子","",1,10,SecurityUser.getUserId(),creator));
+
         }
-        activityService.createActivity(new ActivityDTO(orderEntity.getId(),"创建了单子","",1,10,creator));
+        return insert;
     }
 
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
+//    @Override
+//    public void save(OrderEntity orderEntity) {
+//        UserDetail user = SecurityUser.getUser();
+//        Long orderId = orderEntity.getId();
+//
+//        if(ObjectUtils.isEmpty(orderId)){
+//            // 新建单子
+//            orderEntity.setOrderStatus(OrderConstant.DISTRIBUTED);
+//            orderEntity.setDeal(1);
+//            // 创建者默认是负责人
+//            orderEntity.setOwnerId(user.getId());
+//
+//        }else {
+//        }
+//    }
+
     @Override
-    public void save(OrderEntity orderEntity) {
-        UserDetail user = SecurityUser.getUser();
-        Long orderId = orderEntity.getId();
-
-        if(ObjectUtils.isEmpty(orderId)){
-            // 新建单子
-            orderEntity.setOrderStatus(OrderConstant.DISTRIBUTED);
-            orderEntity.setDeal(1);
-            // 创建者默认是负责人
-            orderEntity.setOwnerId(user.getId());
-
-        }else {
-        }
-    }
-
-    @Override
-    public void distributeOrder(List<Long> orderIds, Long userId) {
+    public long distributeOrder(List<Long> orderIds, Long userId) {
+        long count = 0;
         for (Long orderId : orderIds) {
             OrderEntity orderEntity = selectById(orderId);
             if (ObjectUtils.isEmpty(orderEntity)) {
@@ -179,24 +206,30 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             orderEntity.setOwnerId(userId);
             orderEntity.setOrderStatus(OrderConstant.DISTRIBUTED);
             orderEntity.setDeal(1);
-            updateById(orderEntity);
+            boolean b = updateById(orderEntity);
 
-            String content;
-            int type;
-            if (Objects.equals(userId, SecurityUser.getUserId())) {
-                content = SecurityUser.getUser().getUsername() + "抢到了这个单子";
-                type = 11;
-            } else {
-                content = SecurityUser.getUser().getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
-                type = 12;
+            if(b){
+                String content;
+                int type;
+                UserDetail user = SecurityUser.getUser();
+                if (Objects.equals(userId, user.getId())) {
+                    content = user.getUsername() + "抢到了这个单子";
+                    type = 11;
+                } else {
+                    content = user.getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
+                    type = 12;
+                }
+                activityService.createActivity(new ActivityDTO(orderId, content, "", 1, type,user.getId(),user.getUsername()));
+                count++;
             }
-            activityService.createActivity(new ActivityDTO(orderId, content, "", 1, type,SecurityUser.getUser().getUsername()));
         }
+
+        return count;
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void delete(Long[] ids) {
+    public boolean delete(Long[] ids) {
         // 删除order file
         orderFileService.deleteByOrderId(ids);
 
@@ -204,7 +237,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         orderPriceService.deleteByOrderId(ids);
 
         // 删除order
-        deleteBatchIds(Arrays.asList(ids));
+        return deleteBatchIds(Arrays.asList(ids));
 
         // todo 删除文件
     }
@@ -382,9 +415,9 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         update.eq(OrderEntity::getId,orderId);
 
         String content = "";
-        int type;
         if(1 == orderEditDTO.getOperateType()){
-            update.set(OrderEntity::getOrderStatus,OrderConstant.CREATED);
+            update.set(OrderEntity::getDeal,3);
+            update.set(OrderEntity::getOrderStatus,OrderConstant.IN_POOL);
             update.set(OrderEntity::getOwnerId,null);
             content = "把单子放回了公海。" + orderEditDTO.getRemark();
         }else if(2 == orderEditDTO.getOperateType()){
@@ -394,21 +427,21 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             // 成单
             update.set(OrderEntity::getDeal,2);
             update.set(OrderEntity::getOrderStatus,OrderConstant.SUCCESS);
+            content = "成交了这个单子" + orderEditDTO.getUsername() + "。"  + orderEditDTO.getRemark();
+            // todo 后续成单也需要修改count计数
         }
         baseDao.update(update);
 
         activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",1,16,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public OrderEntity electOrder(Long userId) {
         OrderEntity orderEntity = baseDao.electOneOrder();
         if(ObjectUtils.isEmpty(orderEntity)){
             return null;
         }
-
-        // 检查用户当前是否可以抢单 ，次数是否已经超了限制
-
 
         // 更新抢到的这个单子的状态
         orderEntity.setDeal(1);
@@ -421,10 +454,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         return orderEntity;
     }
 
-    @Override
-    public Map<String, Long> countByType() {
-        return baseDao.countByType();
-    }
 
     @Override
     public OrderVO findById(Long id) {
@@ -432,13 +461,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         if(ObjectUtils.isEmpty(orderEntity)){
             throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
         }
-//        Long ownerId = orderEntity.getOwnerId();
-//        Integer superAdmin = SecurityUser.getUser().getSuperAdmin();
-//        if(1 != superAdmin){
-//            if(!Objects.equals(SecurityUser.getUserId(), ownerId)){
-//                throw new OrderException(OrderExceptionEnum.NO_PERMISSION_OPERATE);
-//            }
-//        }
 
         OrderVO orderVO = ConvertUtils.sourceToTarget(orderEntity, OrderVO.class);
         orderVO.setOrderPriceVO(orderPriceService.findByOrderId(id));
@@ -447,4 +469,5 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
         return orderVO;
     }
+
 }

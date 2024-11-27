@@ -71,4 +71,11 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 	 */
     boolean checkAuth(Long id,String auth);
 
+	/**
+	 * 稍微优化了一点的获取用户名方法
+	 * @param userId
+	 * @return
+	 */
+	String findUsernameByUserId(Long userId);
+
 }

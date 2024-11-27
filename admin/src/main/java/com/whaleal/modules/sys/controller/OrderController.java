@@ -11,9 +11,11 @@ import com.whaleal.modules.security.user.UserDetail;
 import com.whaleal.modules.sys.entity.dto.order.*;
 import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
+import com.whaleal.modules.sys.entity.vo.OrderGrabVO;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
 import com.whaleal.modules.sys.service.CustomerService;
 import com.whaleal.modules.sys.service.OrderService;
+import com.whaleal.modules.sys.service.UserGrabService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -43,6 +45,8 @@ public class OrderController {
 
     private final CustomerService customerService;
 
+    private final UserGrabService userGrabService;
+
 
     @GetMapping("/all/page")
     @Operation(summary = "分页获取列表")
@@ -70,6 +74,7 @@ public class OrderController {
                 params.put("ownerId",user.getId());
             }
         }
+
         PageData<OrderVO> page = orderService.page(params);
         return new Result<PageData<OrderVO>>().ok(page);
     }
@@ -110,15 +115,20 @@ public class OrderController {
     @PostMapping("/save/byUser")
     @Operation(summary = "普通用户通过门户网站新提一个商标注册申请")
     public Result<String> saveByUser(@RequestBody OrderDTO orderDTO) {
-        orderService.saveSimpleOrder(orderDTO,false);
+        if(orderService.saveSimpleOrder(orderDTO,false)){
+            userGrabService.addGraped(1);
+        }
+
         return new Result<String>().ok("创建成功");
     }
 
     @PostMapping("/save/inner")
     @Operation(summary = "业务员创建单子")
-    @RequiresPermissions("order:create")
-    public Result<String> saveInner(@RequestBody OrderDTO orderDTO ) {
-        orderService.saveSimpleOrder(orderDTO,true);
+    @RequiresPermissions("sys:inner_order:save")
+    public Result<String> saveInner(@RequestBody OrderDTO orderDTO) {
+        if(orderService.saveSimpleOrder(orderDTO,true)){
+            userGrabService.addGraped(1);
+        }
         return new Result<String>().ok("创建成功");
     }
 
@@ -133,7 +143,11 @@ public class OrderController {
         if(ObjectUtils.isEmpty(orderDistributeDTO.getUserId())){
             orderDistributeDTO.setUserId(SecurityUser.getUserId());
         }
-        orderService.distributeOrder(orderDistributeDTO.getOrderIds(),orderDistributeDTO.getUserId());
+        long l = orderService.distributeOrder(orderDistributeDTO.getOrderIds(), orderDistributeDTO.getUserId());
+
+        if(l != 0){
+            userGrabService.grapeOrder(orderDistributeDTO.getUserId(),l);
+        }
         return new Result<String>().ok("分配成功");
     }
 
@@ -143,7 +157,11 @@ public class OrderController {
     public Result chooseOrder(@RequestBody OrderDistributeDTO orderDistributeDTO) {
         Long userId = SecurityUser.getUserId();
         orderDistributeDTO.setUserId(userId);
-        orderService.distributeOrder(orderDistributeDTO.getOrderIds(),userId);
+        long l = orderService.distributeOrder(orderDistributeDTO.getOrderIds(), userId);
+
+        if(l != 0){
+            userGrabService.grapeOrder(orderDistributeDTO.getUserId(),l);
+        }
         return new Result();
     }
 
@@ -152,11 +170,19 @@ public class OrderController {
     @RequiresPermissions("grab:grab")
     public Result grabOrder() {
         Long userId = SecurityUser.getUserId();
-        OrderEntity orderEntity = orderService.electOrder(userId);
 
+        //已抢单数量小于1 不能再进行抢单
+        OrderGrabVO countByUserId = userGrabService.findCountByUserId(userId);
+        if(countByUserId.getRemainCount() < 1){
+            return new Result().ok("此时间周期内已不允许抢单");
+        }
+
+        OrderEntity orderEntity = orderService.electOrder(userId);
         if(ObjectUtils.isEmpty(orderEntity)){
             return new Result().ok("没有可以抢的单子");
         }
+
+        userGrabService.grapeOrder(userId,1);
         return new Result().ok(orderEntity);
     }
 
@@ -221,7 +247,9 @@ public class OrderController {
     public Result delete(@RequestBody Long[] ids) {
         //效验数据
         AssertUtils.isArrayEmpty(ids, "id");
+        // todo
         orderService.delete(ids);
+
         return new Result();
     }
 }

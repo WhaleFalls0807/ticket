@@ -21,6 +21,4 @@ public interface OrderDao extends BaseDao<OrderEntity> {
      * @return
      */
     OrderEntity electOneOrder();
-
-    Map<String,Long> countByType();
 }

@@ -72,7 +72,7 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
     }
 
     @Override
-    public void download(long id, HttpServletResponse response) {
+    public String download(long id) {
         CorDocumentsEntity corDocumentsEntity = selectById(id);
 
         DownloadRecord downloadRecord = new DownloadRecord();
@@ -82,38 +82,42 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
 
         String filePath = corDocumentsEntity.getFilePath();
         File file = new File(basePath + filePath);
+
+        String filename;
         if(!file.exists()){
-            log.error("文件不存在");
-            throw new RuntimeException("文件不存在");
-        }
-
-//        response.reset();
-        response.setContentType("application/octet-stream");
-
-        String contractId = UUID.randomUUID().toString().replace("-", "") + "_";
-        downloadRecord.setContractNum(contractId);
-        String filename = contractId + corDocumentsEntity.getFileName();
-        try {
-            InputStream inputStream = new FileInputStream(file);
-            response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, "UTF-8"));
-
-            ServletOutputStream outputStream = response.getOutputStream();
-            byte[] b = new byte[1024];
-            int len;
-            //从输入流中读取一定数量的字节，并将其存储在缓冲区字节数组中，读到末尾返回-1
-            while ((len = inputStream.read(b)) > 0) {
-                outputStream.write(b, 0, len);
-            }
-
-            inputStream.close();
-            downloadRecord.setSuccess(1);
-            downloadService.insert(downloadRecord);
-        } catch (Exception e) {
             downloadRecord.setSuccess(2);
-            downloadRecord.setFailedReason("系统异常");
-            downloadService.insert(downloadRecord);
-            handleError(response,e.getMessage(),5002);
+            downloadRecord.setFailedReason("文件不存在");
+            filename = "文件不存在";
+        }else {
+            String contractId = UUID.randomUUID().toString().replace("-", "") + "_";
+            downloadRecord.setSuccess(1);
+            downloadRecord.setContractNum(contractId);
+            filename =  contractId + corDocumentsEntity.getFileName();
+            downloadRecord.setFilename(filename);
         }
+        downloadService.insert(downloadRecord);
+        return filename;
+//        try {
+//            InputStream inputStream = new FileInputStream(file);
+//            response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, "UTF-8"));
+//
+//            ServletOutputStream outputStream = response.getOutputStream();
+//            byte[] b = new byte[1024];
+//            int len;
+//            //从输入流中读取一定数量的字节，并将其存储在缓冲区字节数组中，读到末尾返回-1
+//            while ((len = inputStream.read(b)) > 0) {
+//                outputStream.write(b, 0, len);
+//            }
+//
+//            inputStream.close();
+//            downloadRecord.setSuccess(1);
+//            downloadService.insert(downloadRecord);
+//        } catch (Exception e) {
+//            downloadRecord.setSuccess(2);
+//            downloadRecord.setFailedReason("系统异常");
+//            downloadService.insert(downloadRecord);
+//            handleError(response,e.getMessage(),5002);
+//        }
     }
 
     @Override

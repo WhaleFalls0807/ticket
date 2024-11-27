@@ -25,7 +25,7 @@ import java.util.Map;
  * @create: 2024-11-19 17:05
  **/
 @Tag(name = "企业文书管理")
-@Controller
+@RestController
 @RequestMapping("/corDocument")
 public class CorDocumentController {
 
@@ -43,7 +43,6 @@ public class CorDocumentController {
 
     @PostMapping("/upload")
     @LogOperation("上传")
-    @ResponseBody
     @Operation(summary = "上传企业文书")
     public Result upload(@RequestBody CorDocumentDTO corDocumentDTO){
         corDocumentService.uploadFile(corDocumentDTO);
@@ -52,7 +51,6 @@ public class CorDocumentController {
 
 
     @GetMapping("/page")
-    @ResponseBody
     @Operation(summary = "分页查看所有的企业文书")
     public Result<PageData<CorDocumentsEntity>> page(@RequestParam Map<String,Object> params){
         PageData<CorDocumentsEntity> page = corDocumentService.page(params);
@@ -72,7 +70,6 @@ public class CorDocumentController {
 
 
     @GetMapping("/download/page")
-    @ResponseBody
     @Operation(summary = "分页查看文件下载记录")
     public Result<PageData<DownloadRecord>> pageDownload(@RequestParam Map<String,Object> params){
         PageData<DownloadRecord> page = downloadService.page(params);
@@ -82,14 +79,11 @@ public class CorDocumentController {
 
     @GetMapping("/download/{fileId}")
     @Operation(summary = "下载企业文书")
-    public void download(@PathVariable("fileId") Long fileId,
-                           HttpServletResponse response){
-        corDocumentService.download(fileId,response);
+    public Result download(@PathVariable("fileId") Long fileId){
+       return new Result().ok( corDocumentService.download(fileId));
     }
 
-//    @RequiresPermissions("customer:delete")
     @Operation(summary = "删除企业文书")
-    @ResponseBody
     @DeleteMapping("/del")
     public Result deleteByIds(@RequestBody Long[] ids){
         AssertUtils.isArrayEmpty(ids, "id");

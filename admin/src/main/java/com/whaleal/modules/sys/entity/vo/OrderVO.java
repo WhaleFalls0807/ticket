@@ -43,9 +43,18 @@ public class OrderVO {
 
     private Date createDate;
 
+
     private Long reviewUserId;
 
+    private String reviewUsername;
+
+    private Date reviewDate;
+
     private Long ownerId;
+
+    private String ownerUsername;
+
+    private Date dealDate;
 
     private OrderFileVO orderFileVO;
 

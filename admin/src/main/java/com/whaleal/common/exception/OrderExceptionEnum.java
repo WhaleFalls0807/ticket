@@ -14,6 +14,8 @@ public enum OrderExceptionEnum {
     NO_PERMISSION_OPERATE(1003,"没有权限操作非本人的订单"),
     ORDER_NOT_EXISTS(1004,"订单不存在"),
 
+    ORDER_GRAPED_HAS_LIMIT(1005,"此时间周期内已不允许抢单"),
+
 
     NO_PERMISSION_UPDATE_CUSTOMER(2003,"没有权限操作非本人的客户"),
     CUSTOMER_EXISTS(2005,"客户信息已存在，无法重复创建"),
