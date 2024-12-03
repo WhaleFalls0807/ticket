@@ -17,4 +17,11 @@ public interface LocalStorageService {
      * @return
      */
     String uploadFile(Long associationId, MultipartFile file);
+
+    /**
+     * 删除服务器上上传的文件
+     * @param filepath
+     */
+    void deleteFile(String filepath);
+
 }

@@ -43,7 +43,7 @@ public class FieldMetaObjectHandler implements MetaObjectHandler {
         strictInsertFill(metaObject, DEPT_ID, Long.class, user.getDeptId());
 
         //更新者
-        strictInsertFill(metaObject, UPDATER, Long.class, user.getId());
+        strictInsertFill(metaObject, UPDATER, String.class, user.getUsername());
         //更新时间
         strictInsertFill(metaObject, UPDATE_DATE, Date.class, date);
     }
@@ -51,7 +51,7 @@ public class FieldMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         //更新者
-        strictUpdateFill(metaObject, UPDATER, Long.class, SecurityUser.getUserId());
+        strictUpdateFill(metaObject, UPDATER, String.class, SecurityUser.getUser().getUsername());
         //更新时间
         strictUpdateFill(metaObject, UPDATE_DATE, Date.class, new Date());
     }

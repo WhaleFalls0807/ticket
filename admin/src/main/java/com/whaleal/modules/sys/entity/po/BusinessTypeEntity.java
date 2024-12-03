@@ -8,18 +8,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * @author lyz
- * @desc 业务文件实体类
+ * @desc 单子的业务类型实体
  * @create: 2024-11-11 21:31
  **/
 @Data
-@TableName("order_file")
+@TableName("order_business_type")
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderFileEntity extends BaseEntity {
+public class BusinessTypeEntity extends BaseEntity {
 
     /**
      * 所属单子id
@@ -27,25 +28,20 @@ public class OrderFileEntity extends BaseEntity {
     private Long orderId;
 
     /**
-     * 上传的合同文件路径 -- 第一次上传
+     *  业务类型
+     *
      */
-    private String contract;
-
-//    private String contractName;
+    private String  businessType;
 
     /**
-     * 支付类型 这里保存的是上传的支付截图 的地址链接 -- 第一次上传
+     * 商标名称
      */
-    private String payType;
-
-//    private String payTypeName;
+    private String brandName;
 
     /**
      * logo
      */
     private String logo;
-
-//    private String logoName;
 
     /**
      * 身份证
@@ -53,45 +49,62 @@ public class OrderFileEntity extends BaseEntity {
     @TableField(value = "IDCard")
     private String IDCard;
 
-//    private String IDCardName;
-
     /**
      * 申请书
      */
     private String applyBook;
 
-//    private String applyBookName;
 
     /**
      * 委托书
      */
     private String commission;
 
-//    private String commissionName;
 
     /**
      * 营业执照
      */
     private String businessLicense;
 
-//    private String businessLicenseName;
 
     /**
      * 盖章合同
      */
     private String sealedContract;
 
-//    private String sealedContractName;
+    /**
+     * 官费
+     */
+    private BigDecimal officialPrice;
+
+    /**
+     * 代理费
+     */
+    private BigDecimal agencyPrice;
+
+    /**
+     * 总费用
+     */
+    private BigDecimal totalPrice;
+
+    /**
+     * 颁发的商标文件
+     */
+    private String issueBrand;
 
     /**
      * 更新时间
      */
-    @TableField(value = "update_date",fill = FieldFill.INSERT)
+    @TableField(value = "update_date",fill = FieldFill.INSERT_UPDATE)
     private Date updateDate;
 
-    public OrderFileEntity(Long orderId, String contract, String payType) {
-        this.orderId = orderId;
-        this.contract = contract;
-        this.payType = payType;
+    public String getIDCard() {
+        return IDCard;
     }
+
+    public void setIDCard(String IDCard) {
+        this.IDCard = IDCard;
+    }
+
+    //
 }

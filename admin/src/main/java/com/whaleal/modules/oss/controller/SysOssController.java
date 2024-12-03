@@ -138,6 +138,19 @@ public class SysOssController {
         return new Result<String>().ok(localStorageService.uploadFile(associationId, file));
     }
 
+
+    /**
+     * 自定义文件上传
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/delete")
+    @Operation(summary = "删除文件")
+    public Result<String> deleteFile(@RequestParam String filepath)  {
+        localStorageService.deleteFile(filepath);
+        return new Result<String>();
+    }
+
     @DeleteMapping
     @Operation(summary = "删除")
     @LogOperation("删除")

@@ -67,4 +67,12 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
 
         return baseDao.selectCount(lambdaQueryWrapper);
     }
+
+    @Override
+    public void deleteByAssId(Long[] ids) {
+        LambdaQueryWrapper<ActivityEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(ActivityEntity::getAssociationId,ids);
+
+        baseDao.delete(lambdaQueryWrapper);
+    }
 }

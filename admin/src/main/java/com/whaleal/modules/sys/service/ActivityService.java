@@ -44,4 +44,10 @@ public interface ActivityService extends BaseService<ActivityEntity> {
      * @return
      */
     long countBetween(Long userId, LocalDateTime startDate, LocalDateTime now);
+
+    /**
+     * 主业务删除后 清空所有关联的跟进记录
+     * @param ids
+     */
+    void deleteByAssId(Long[] ids);
 }

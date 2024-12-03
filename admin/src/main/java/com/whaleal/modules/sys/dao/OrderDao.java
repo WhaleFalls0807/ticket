@@ -3,7 +3,9 @@ package com.whaleal.modules.sys.dao;
 import com.whaleal.common.dao.BaseDao;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,4 +23,6 @@ public interface OrderDao extends BaseDao<OrderEntity> {
      * @return
      */
     OrderEntity electOneOrder();
+
+    List<Long> findUnlinkOrder(@Param("startDate") Date time);
 }

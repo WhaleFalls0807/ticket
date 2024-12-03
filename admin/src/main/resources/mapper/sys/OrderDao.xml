@@ -10,4 +10,20 @@
                  and deal = 0
         limit 1
     </select>
+
+    <select id="findUnlinkOrder" resultType="java.lang.Long">
+        SELECT bo.id
+        FROM brand_order bo
+        WHERE bo.deal = 1
+          AND NOT EXISTS (
+                SELECT 1
+                FROM activity a
+                WHERE a.association_id = bo.id
+                  AND a.create_date > #{startDate}
+            );
+        and update_date &lt; #{startDate}
+
+    </select>
+
+
 </mapper>

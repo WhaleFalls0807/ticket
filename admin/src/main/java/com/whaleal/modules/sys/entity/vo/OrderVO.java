@@ -1,11 +1,12 @@
 package com.whaleal.modules.sys.entity.vo;
 
-import com.whaleal.common.utils.ConvertUtils;
-import com.whaleal.modules.sys.entity.po.OrderFileEntity;
-import com.whaleal.modules.sys.entity.po.OrderPriceEntity;
+import com.whaleal.modules.sys.entity.po.BusinessTypeEntity;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 
 /**
  * @author lyz
@@ -25,13 +26,15 @@ public class OrderVO {
 
     private String customerName;
 
-    private String  businessType;
+    private String  businessName;
 
     private String applyMethod;
 
     private String commitOption;
 
     private String payType;
+
+    private String contract;
 
     private String industry;
 
@@ -42,7 +45,6 @@ public class OrderVO {
     private Integer orderStatus;
 
     private Date createDate;
-
 
     private Long reviewUserId;
 
@@ -56,15 +58,11 @@ public class OrderVO {
 
     private Date dealDate;
 
-    private OrderFileVO orderFileVO;
+    private BigDecimal aPrice;
 
-    private OrderPriceVO orderPriceVO;
+    private BigDecimal bPrice;
 
-    public void setOrderFileVO(OrderFileEntity orderFileEntity) {
-        this.orderFileVO = ConvertUtils.sourceToTarget(orderFileEntity, OrderFileVO.class);
-    }
+    private BigDecimal totalPrice;
 
-    public void setOrderPriceVO(OrderPriceEntity orderPriceEntity) {
-        this.orderPriceVO = ConvertUtils.sourceToTarget(orderPriceEntity, OrderPriceVO.class);
-    }
+    private List<BusinessTypeEntity> businessTypeList;
 }

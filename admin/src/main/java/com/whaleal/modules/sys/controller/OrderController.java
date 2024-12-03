@@ -122,6 +122,19 @@ public class OrderController {
         return new Result<String>().ok("创建成功");
     }
 
+    /**
+     *  todo 加一些限流或其他安全机制 防止单设备攻击
+     * @param orderDTO
+     * @return
+     */
+    @PostMapping("/delete/file")
+    @Operation(summary = "更新工单信息 - 专用于删除文件")
+    public Result<String> updateOrder(@RequestBody OrderFileDeleteDTO orderFileDeleteDTO) {
+        orderService.deleteFile(orderFileDeleteDTO);
+        return new Result<String>().ok("创建成功");
+    }
+
+    @LogOperation("内部创建单子")
     @PostMapping("/save/inner")
     @Operation(summary = "业务员创建单子")
     @RequiresPermissions("sys:inner_order:save")
@@ -132,6 +145,7 @@ public class OrderController {
         return new Result<String>().ok("创建成功");
     }
 
+    @LogOperation("分配工单")
     @PostMapping("/distribute")
     @Operation(summary = "管理员分配单子")
     @RequiresPermissions("order:assign")
@@ -151,6 +165,7 @@ public class OrderController {
         return new Result<String>().ok("分配成功");
     }
 
+    @LogOperation("领取单子")
     @PostMapping("/choose")
     @Operation(summary = "业务员领取单子")
     @RequiresPermissions("grab:grab")
@@ -165,6 +180,7 @@ public class OrderController {
         return new Result();
     }
 
+    @LogOperation("抢单")
     @GetMapping("/grab")
     @Operation(summary = "业务员抢单子-系统随机分配一个单子")
     @RequiresPermissions("grab:grab")
@@ -173,7 +189,7 @@ public class OrderController {
 
         //已抢单数量小于1 不能再进行抢单
         OrderGrabVO countByUserId = userGrabService.findCountByUserId(userId);
-        if(countByUserId.getRemainCount() < 1){
+        if(countByUserId.getUserRemainCount() < 1){
             return new Result().ok("此时间周期内已不允许抢单");
         }
 
@@ -186,6 +202,7 @@ public class OrderController {
         return new Result().ok(orderEntity);
     }
 
+    @LogOperation("补充单子信息")
     @PostMapping("/info/add")
     @Operation(summary = "补充单子信息")
     @RequiresPermissions("todo:update")
@@ -216,6 +233,7 @@ public class OrderController {
         return new Result();
     }
 
+    @LogOperation("提交工单")
     @PostMapping("/commit")
     @Operation(summary = "业务员提交单子")
     @RequiresPermissions("todo:commit")
@@ -224,9 +242,9 @@ public class OrderController {
         return new Result<String>().ok("提交成功");
     }
 
+    @LogOperation("修改工单状态")
     @PostMapping("/status/change")
     @Operation(summary = "修改工单状态",description = "1: 放回公海  2: 指派给其他人 3: 成单")
-//    @RequiresPermissions("order:create")
     public Result<String> editOrderStatus(@RequestBody OrderEditDTO orderEditDTO ) {
         orderService.editStatus(orderEditDTO);
         return new Result<String>().ok("提交成功");
@@ -235,21 +253,30 @@ public class OrderController {
     @PostMapping("/review")
     @RequiresPermissions("approve:approve")
     @Operation(summary = "审核员对单子进行审核")
+    @LogOperation("审核工单")
     public Result<String> review(@RequestBody OrderReviewDTO orderReviewDTO) {
         orderService.review(orderReviewDTO);
         return new Result<String>().ok("审核成功");
     }
 
+    @LogOperation("提交商标正式文件")
+    @PostMapping("/issue/order/brand")
+    @Operation(summary = "管理员提交商标正式文件")
+    @RequiresPermissions("order:issue")
+    public Result<String> issueOrderBrand(@RequestBody OrderIssueDTO orderIssueDTO) {
+        orderService.issueOrder(orderIssueDTO);
+        return new Result<String>().ok("创建成功");
+    }
+
     @DeleteMapping("/delete")
     @Operation(summary = "删除")
-    @LogOperation("删除")
-    @RequiresPermissions("order:delete")
+    @LogOperation("删除工单")
+    @RequiresPermissions("todo:delete")
     public Result delete(@RequestBody Long[] ids) {
         //效验数据
         AssertUtils.isArrayEmpty(ids, "id");
-        // todo
         orderService.delete(ids);
-
+        // todo 清空重置单子信息
         return new Result();
     }
 }

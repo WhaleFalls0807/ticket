@@ -22,7 +22,7 @@ public class OrderDTO {
     @Schema(title = "商标简单说明",requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String remark;
 
-    @Schema(title = "客户名称",requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(title = "客户名称",requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private String customerName;
 
     @Schema(title = "联系电话",requiredMode = Schema.RequiredMode.REQUIRED)

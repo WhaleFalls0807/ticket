@@ -28,12 +28,6 @@ public interface OrderService extends BaseService<OrderEntity> {
      */
     boolean saveSimpleOrder(OrderDTO orderDTO,boolean isInner);
 
-//    /**
-//     * 管理员创建订单
-//     * @param orderEntity
-//     */
-//    void save(OrderEntity orderEntity);
-
     /**
      * 管理员简单的分配单子
      * @param userId
@@ -85,4 +79,24 @@ public interface OrderService extends BaseService<OrderEntity> {
      * @return
      */
     OrderVO findById(Long id);
+
+    /**
+     * 获取所有需要丢入公海的单子
+     * @return
+     */
+    List<Long> findNeedToPool();
+
+    /**
+     * 把单子丢入到公海中
+     * @param ids
+     */
+    int convertPool(List<Long> ids);
+
+    void deleteFile(OrderFileDeleteDTO orderFileDeleteDTO);
+
+    /**
+     * 下发单子
+     * @param orderIssueDTO
+     */
+    void issueOrder(OrderIssueDTO orderIssueDTO);
 }

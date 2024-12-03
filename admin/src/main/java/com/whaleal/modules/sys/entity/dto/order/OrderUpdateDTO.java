@@ -1,9 +1,10 @@
 package com.whaleal.modules.sys.entity.dto.order;
 
+import com.whaleal.modules.sys.entity.po.BusinessTypeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author lyz
@@ -32,29 +33,8 @@ public class OrderUpdateDTO {
     @Schema(title = "上传的合同文件路径")
     private String contract;
 
-//    @Schema(title = "上传的合同文件名")
-//    private String contractName;
-
     @Schema(title = "支付类型")
     private String payType;
-
-//    @Schema(title = "支付类型文件名")
-//    private String payTypeName;
-
-    @Schema(title = "官费")
-    private BigDecimal officialPrice;
-
-    @Schema(title = "代理费")
-    private BigDecimal agencyPrice;
-
-    @Schema(title = "总费用")
-    private BigDecimal totalPrice;
-
-    @Schema(title = "甲方支付费用")
-    private BigDecimal aPrice;
-
-    @Schema(title = "乙方支付费用")
-    private BigDecimal bPrice;
 
     @Schema(title = "行业")
     private String industry;
@@ -65,41 +45,51 @@ public class OrderUpdateDTO {
     @Schema(title = "客户邮箱")
     private String email;
 
-    @Schema(title = "业务类型")
-    private String  businessType;
-
     @Schema(title = "申请方式")
     private String applyMethod;
 
     @Schema(title = "提交选项")
     private String commitOption;
 
-    /**
-     * 二次补充内容
-     */
-    @Schema(title = "logo")
-    private String logo;
+    @Schema(title = "业务类型，二次上传传入参数")
+    private List<BusinessTypeEntity> businessTypeList;
+
+
+//    @Schema(title = "官费")
+//    private BigDecimal officialPrice;
 //
+//    @Schema(title = "代理费")
+//    private BigDecimal agencyPrice;
+//
+//    @Schema(title = "总费用")
+//    private BigDecimal totalPrice;
+//
+//    @Schema(title = "甲方支付费用")
+//    private BigDecimal aPrice;
+//
+//    @Schema(title = "乙方支付费用")
+//    private BigDecimal bPrice;
+
+//    /**
+//     * 二次补充内容
+//     */
 //    @Schema(title = "logo")
-//    private String logoName;
-
-    @Schema(title = "身份证")
-    private String IDCard;
-
+//    private String logo;
+//
 //    @Schema(title = "身份证")
-//    private String IDCardName;
-
-    @Schema(title = "申请书")
-    private String applyBook;
-
-    @Schema(title = "委托书")
-    private String commission;
-
-    @Schema(title = "营业执照")
-    private String businessLicense;
-
-    @Schema(title = "盖章合同")
-    private String sealedContract;
+//    private String IDCard;
+//
+//    @Schema(title = "申请书")
+//    private String applyBook;
+//
+//    @Schema(title = "委托书")
+//    private String commission;
+//
+//    @Schema(title = "营业执照")
+//    private String businessLicense;
+//
+//    @Schema(title = "盖章合同")
+//    private String sealedContract;
 
 
 }

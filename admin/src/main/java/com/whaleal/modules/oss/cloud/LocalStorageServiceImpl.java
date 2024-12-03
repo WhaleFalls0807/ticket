@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,6 +61,16 @@ public class LocalStorageServiceImpl implements LocalStorageService{
         } catch (IOException e) {
             log.error("文件上传时出现异常：{}", e.getMessage());
             throw new OrderException(5001, "上传文件时出现错误：" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteFile(String filepath) {
+        String realPath = path + "/" + filepath;
+        File file = new File(realPath);
+        if(file.exists()){
+            log.info("删除了一个文件");
+            file.delete();
         }
     }
 

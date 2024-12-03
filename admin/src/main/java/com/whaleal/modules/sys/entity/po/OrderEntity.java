@@ -8,6 +8,9 @@ import com.whaleal.modules.sys.enums.OrderConstant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 
 /**
  * @author lyz
@@ -51,11 +54,16 @@ public class OrderEntity extends BaseEntity {
      */
     private String email;
 
+
     /**
-     *  业务类型
-     *  前端借助数据字典实现 后端暂时以string 接收即可
+     * 上传的合同文件路径
      */
-    private String  businessType;
+    private String contract;
+
+    /**
+     * 支付类型 这里保存的是上传的支付截图 的地址链接
+     */
+    private String payType;
 
     /**
      * 申请方式
@@ -66,6 +74,27 @@ public class OrderEntity extends BaseEntity {
      * 提交选项
      */
     private String commitOption;
+
+    // 单子级别只承接这部分价格
+    /**
+     *  总费用
+     */
+    private BigDecimal totalPrice;
+
+    /**
+     * 甲方承担价格
+     */
+    private BigDecimal aPrice;
+
+    /**
+     * 乙方承担价格
+     */
+    private BigDecimal bPrice;
+
+    /**
+     * 业务名称
+     */
+    private String businessName;
 
     /**
      * 单子状态
@@ -100,6 +129,12 @@ public class OrderEntity extends BaseEntity {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updater;
+
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_date",fill = FieldFill.INSERT_UPDATE)
+    private Date updateDate;
 
     public OrderEntity(String orderName,String phone, String email,String industry,String customerName) {
         this.orderStatus = OrderConstant.CREATED;
