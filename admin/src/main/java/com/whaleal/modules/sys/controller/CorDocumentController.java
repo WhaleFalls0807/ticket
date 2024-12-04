@@ -83,6 +83,7 @@ public class CorDocumentController {
        return new Result().ok( corDocumentService.download(fileId));
     }
 
+    @LogOperation("删除")
     @Operation(summary = "删除企业文书")
     @DeleteMapping("/del")
     public Result deleteByIds(@RequestBody Long[] ids){
@@ -91,5 +92,15 @@ public class CorDocumentController {
         corDocumentService.delete(ids);
         return new Result();
     }
+
+//
+//    @Operation(summary = "删除企业文书的字段文件")
+//    @DeleteMapping("/delete/file/{id}")
+//    public Result deleteFileByIds(@RequestBody){
+//        AssertUtils.isArrayEmpty(ids, "id");
+//
+//        corDocumentService.delete(ids);
+//        return new Result();
+//    }
 
 }

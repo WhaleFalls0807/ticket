@@ -16,6 +16,10 @@ public enum OrderExceptionEnum {
 
     ORDER_GRAPED_HAS_LIMIT(1005,"此时间周期内已不允许抢单"),
 
+    UNFINISHED_ORDER_CANT_UPLOAD_TRADE(1006,"未成单的单子不能上传商标"),
+
+    UNREVIEW_ORDER_CANT_UPLOAD_TRADE(1007,"未审核完成的单子不能成单"),
+
 
     NO_PERMISSION_UPDATE_CUSTOMER(2003,"没有权限操作非本人的客户"),
     CUSTOMER_EXISTS(2005,"客户信息已存在，无法重复创建"),

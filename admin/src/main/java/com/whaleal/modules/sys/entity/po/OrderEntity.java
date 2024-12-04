@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.whaleal.common.entity.BaseEntity;
 import com.whaleal.modules.sys.enums.OrderConstant;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,6 +21,8 @@ import java.util.Date;
  **/
 @Data
 @EqualsAndHashCode(callSuper=false)
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("brand_order")
 public class OrderEntity extends BaseEntity {
 

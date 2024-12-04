@@ -1,6 +1,7 @@
 package com.whaleal.modules.sys.entity.vo;
 
 import com.whaleal.modules.sys.entity.po.BusinessTypeEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -25,8 +26,6 @@ public class OrderVO {
     private Long customerId;
 
     private String customerName;
-
-    private String  businessName;
 
     private String applyMethod;
 
@@ -56,6 +55,9 @@ public class OrderVO {
 
     private String ownerUsername;
 
+    @Schema(name = "抢单后未付款天数")
+    private Long daysUnPay;
+
     private Date dealDate;
 
     private BigDecimal aPrice;
@@ -63,6 +65,8 @@ public class OrderVO {
     private BigDecimal bPrice;
 
     private BigDecimal totalPrice;
+
+    private String  businessName;
 
     private List<BusinessTypeEntity> businessTypeList;
 }

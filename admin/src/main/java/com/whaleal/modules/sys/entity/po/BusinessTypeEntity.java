@@ -93,18 +93,32 @@ public class BusinessTypeEntity extends BaseEntity {
     private String issueBrand;
 
     /**
+     * 商标注册申请回执文件
+     */
+    @TableField("regi_app_receipt")
+    private String  regiAppReceipt;
+
+    /**
+     * 商标注册申请受理通知书
+     */
+    @TableField("regi_app_accept_notice")
+    private String regiAppAcceptNotice;
+
+    /**
+     * 商标注册申请初步审定公告通知书
+     */
+    @TableField("regi_app_pre_approve_notice")
+    private String regiAppPreApproveNotice;
+
+    /**
+     * 商标注册证
+     */
+    @TableField("regi_certificate")
+    private String regiCertificate;
+
+    /**
      * 更新时间
      */
     @TableField(value = "update_date",fill = FieldFill.INSERT_UPDATE)
     private Date updateDate;
-
-    public String getIDCard() {
-        return IDCard;
-    }
-
-    public void setIDCard(String IDCard) {
-        this.IDCard = IDCard;
-    }
-
-    //
 }

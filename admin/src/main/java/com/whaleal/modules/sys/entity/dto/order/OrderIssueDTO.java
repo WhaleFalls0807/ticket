@@ -1,5 +1,6 @@
 package com.whaleal.modules.sys.entity.dto.order;
 
+import com.whaleal.modules.sys.entity.po.OrderTradeReceiptEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -16,6 +17,5 @@ public class OrderIssueDTO {
 
     private Long orderId;
 
-    private List<String> filePath;
-
+    private List<OrderTradeReceiptEntity> tradeList;
 }

@@ -10,7 +10,7 @@ public interface OrderConstant {
     /**
      * 单子状态
      *  0：新建(待分配)
-     *  1：已分配(确认客户信息中)
+     *  1：已分配(待补充单子与客户信息)
      *  2: 提交待审核
      *  3  审核通过 待二次提交
      *  4: 审核被驳回 待重新提交
@@ -18,9 +18,10 @@ public interface OrderConstant {
      *  6: 二次审核被驳回 待重新提交
      *  7：审核通过
      *  8: 已成单
-     *
      *  9：公海中的单子
-     *  10：异常
+     *  10: 完单（单子已完成）
+     *  11：异常
+     *
      *  99：已删除
      */
     int CREATED = 0;
@@ -38,17 +39,23 @@ public interface OrderConstant {
     int SUCCESS = 8;
     int IN_POOL = 9;
 
-    int EXCEPTION = 10;
+    int FINISH = 10;
+
+    int EXCEPTION = 11;
+
     int DELETED = 99;
 
 
-    /**
-     *     activity 常量
-     */
-    int SYSTEM_GENERATE = 1;
-//    int SYSTEM_GENERATE = 1;
-//    int SYSTEM_GENERATE = 1;
-//    int SYSTEM_GENERATE = 1;
-//    int SYSTEM_GENERATE = 1;
+
+
+    // 系统用户
+    long SYSTEM_ID = 888;
+    // 匿名用户
+    long ANNO_USER_ID = 999;
+
+    String SYSTEM_NAME = "System";
+
+    String ANNO_USER_NAME = "Anonymous";
+
 
 }

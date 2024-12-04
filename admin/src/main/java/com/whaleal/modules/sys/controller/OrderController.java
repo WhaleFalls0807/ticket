@@ -47,7 +47,6 @@ public class OrderController {
 
     private final UserGrabService userGrabService;
 
-
     @GetMapping("/all/page")
     @Operation(summary = "分页获取列表")
     @Parameters({
@@ -124,7 +123,7 @@ public class OrderController {
 
     /**
      *  todo 加一些限流或其他安全机制 防止单设备攻击
-     * @param orderDTO
+     * @param
      * @return
      */
     @PostMapping("/delete/file")
@@ -140,7 +139,8 @@ public class OrderController {
     @RequiresPermissions("sys:inner_order:save")
     public Result<String> saveInner(@RequestBody OrderDTO orderDTO) {
         if(orderService.saveSimpleOrder(orderDTO,true)){
-            userGrabService.addGraped(1);
+            userGrabService.addRemain(1);
+            userGrabService.grapeOrder(SecurityUser.getUserId(),1);
         }
         return new Result<String>().ok("创建成功");
     }
@@ -148,7 +148,7 @@ public class OrderController {
     @LogOperation("分配工单")
     @PostMapping("/distribute")
     @Operation(summary = "管理员分配单子")
-    @RequiresPermissions("order:assign")
+    @RequiresPermissions("seas:assign")
     public Result<String> distributeOrder(@RequestBody OrderDistributeDTO orderDistributeDTO) {
         List<Long> orderIds = orderDistributeDTO.getOrderIds();
         if(orderIds.isEmpty()){
@@ -159,8 +159,11 @@ public class OrderController {
         }
         long l = orderService.distributeOrder(orderDistributeDTO.getOrderIds(), orderDistributeDTO.getUserId());
 
+        // 分配的单子不占用业务员抢单子上限
         if(l != 0){
-            userGrabService.grapeOrder(orderDistributeDTO.getUserId(),l);
+            userGrabService.addRemain(-1);
+            userGrabService.addGraped(1);
+//            userGrabService.grapeOrder(orderDistributeDTO.getUserId(),l);
         }
         return new Result<String>().ok("分配成功");
     }
@@ -259,14 +262,14 @@ public class OrderController {
         return new Result<String>().ok("审核成功");
     }
 
-    @LogOperation("提交商标正式文件")
-    @PostMapping("/issue/order/brand")
-    @Operation(summary = "管理员提交商标正式文件")
-    @RequiresPermissions("order:issue")
-    public Result<String> issueOrderBrand(@RequestBody OrderIssueDTO orderIssueDTO) {
-        orderService.issueOrder(orderIssueDTO);
-        return new Result<String>().ok("创建成功");
-    }
+//    @LogOperation("提交商标正式文件")
+//    @PostMapping("/issue/order/brand")
+//    @Operation(summary = "管理员提交商标正式文件")
+//    @RequiresPermissions("order:issue")
+//    public Result<String> issueOrderBrand(@RequestBody OrderIssueDTO orderIssueDTO) {
+//        orderTradeService.issueOrderBrade(orderIssueDTO);
+//        return new Result<String>().ok("创建成功");
+//    }
 
     @DeleteMapping("/delete")
     @Operation(summary = "删除")
@@ -276,6 +279,9 @@ public class OrderController {
         //效验数据
         AssertUtils.isArrayEmpty(ids, "id");
         orderService.delete(ids);
+
+        // 重新初始化一下池子信息
+        userGrabService.initPoolCount();
         // todo 清空重置单子信息
         return new Result();
     }

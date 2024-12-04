@@ -1,11 +1,13 @@
 package com.whaleal.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.common.utils.ConvertUtils;
+import com.whaleal.modules.oss.cloud.LocalStorageService;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.sys.dao.CorDocumentDao;
 import com.whaleal.modules.sys.entity.dto.CorDocumentDTO;
@@ -13,19 +15,15 @@ import com.whaleal.modules.sys.entity.po.CorDocumentsEntity;
 import com.whaleal.modules.sys.entity.po.DownloadRecord;
 import com.whaleal.modules.sys.service.CorDocumentService;
 import com.whaleal.modules.sys.service.DownloadService;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.io.*;
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author lyz
@@ -41,8 +39,11 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
 
     private final DownloadService downloadService;
 
-    public CorDocumentServiceImpl(DownloadService downloadService) {
+    private final LocalStorageService localStorageService;
+
+    public CorDocumentServiceImpl(DownloadService downloadService, LocalStorageService localStorageService) {
         this.downloadService = downloadService;
+        this.localStorageService = localStorageService;
     }
 
     @Override
@@ -120,8 +121,18 @@ public class CorDocumentServiceImpl extends BaseServiceImpl<CorDocumentDao, CorD
 //        }
     }
 
+    @Transactional
     @Override
     public void delete(Long[] ids) {
+        LambdaQueryWrapper<CorDocumentsEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(CorDocumentsEntity::getId,Arrays.asList(ids));
+
+        List<CorDocumentsEntity> corDocumentsEntities = baseDao.selectList(queryWrapper);
+        for (CorDocumentsEntity corDocumentsEntity : corDocumentsEntities) {
+            String filePath = corDocumentsEntity.getFilePath();
+            localStorageService.deleteFile(filePath);
+        }
+
         deleteBatchIds(Arrays.asList(ids));
     }
 

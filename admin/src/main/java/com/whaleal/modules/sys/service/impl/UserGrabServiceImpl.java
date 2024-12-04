@@ -39,10 +39,17 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
 
     @Override
     public void saveOrUpdate(UserGrabConfigEntity userGrabConfigEntity) {
-        if(ObjectUtils.isEmpty(userGrabConfigEntity.getId())){
+        Long userId = userGrabConfigEntity.getUserId();
+
+        UserGrabConfigEntity byUserId = findByUserId(userId);
+        if(ObjectUtils.isEmpty(byUserId)){
             insert(userGrabConfigEntity);
         }else {
-            updateById(userGrabConfigEntity);
+            byUserId.setGrain(userGrabConfigEntity.getGrain());
+            byUserId.setGap(userGrabConfigEntity.getGap());
+            byUserId.setTotalCount(userGrabConfigEntity.getTotalCount());
+
+            updateById(byUserId);
         }
     }
 
@@ -117,11 +124,11 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
         if(count < 1){
             return;
         }
-        Object o = redisUtils.get(RedisConstant.GRAB_REMAIN_COUNT);
+        Object o = redisUtils.get(RedisConstant.GRAB_GRAPED_COUNT);
         // redis 缓存中有数据就更新 没有就不操作
         if(!ObjectUtils.isEmpty(o)){
             long l = Long.parseLong(o.toString()) + count;
-            redisUtils.add(RedisConstant.GRAB_REMAIN_COUNT,l);
+            redisUtils.add(RedisConstant.GRAB_GRAPED_COUNT,l);
         }else {
             initPoolCount();
         }
@@ -223,7 +230,8 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
 
     }
 
-    private Map<String, Long> initPoolCount(){
+    @Override
+    public Map<String, Long> initPoolCount(){
         Map<String, Long> map = baseDao.countByType();
         Long remain = map.get("remainCount");
         Long graped = map.get("grapedCount");

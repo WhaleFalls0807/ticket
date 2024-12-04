@@ -4,6 +4,8 @@ import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.sys.entity.po.UserGrabConfigEntity;
 import com.whaleal.modules.sys.entity.vo.OrderGrabVO;
 
+import java.util.Map;
+
 /**
  * @author lyz
  * @desc
@@ -40,10 +42,14 @@ public interface UserGrabService extends BaseService<UserGrabConfigEntity> {
     OrderGrabVO findCountByUserId(long userId);
 
     /**
-     * 池子中新增一个order
+     * 公共池子抢掉一个单子
      */
     void addGraped(long count);
 
+    /**
+     *
+     * @param count
+     */
     void addRemain(long count);
 
     /**
@@ -54,4 +60,5 @@ public interface UserGrabService extends BaseService<UserGrabConfigEntity> {
     void grapeOrder(long userId,long count);
 
 
+    Map<String, Long> initPoolCount();
 }

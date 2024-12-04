@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NotificationEntity extends BaseEntity {
 
-
     /**
      *
      */
@@ -38,6 +37,6 @@ public class NotificationEntity extends BaseEntity {
      * 1：已读
      *
      */
-    private Integer read;
+    private Integer isRead;
 
 }

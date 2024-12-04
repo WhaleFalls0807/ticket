@@ -1,13 +1,14 @@
 package com.whaleal.modules.sys.service.impl;
 
+import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import com.whaleal.modules.sys.entity.vo.SysUserVO;
 import com.whaleal.modules.sys.service.ActivityService;
 import com.whaleal.modules.sys.service.SysUserService;
 import com.whaleal.modules.sys.service.UserPortraitService;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author lyz
@@ -27,11 +28,22 @@ public class UserPortraitServiceImpl implements UserPortraitService {
     }
 
     @Override
-    public List findUserGrap(Date startTime, Date endTime) {
-        // 获取所有的业务员信息
-        List<SysUserVO> sysUserVOS = sysUserService.listUserByPermission("grab:grab");
+    public Map<String,List> findUserGrap(Date startTime, Date endTime) {
+        Map<String,List> result = new HashMap<>();
 
+        List<String> username = new ArrayList<>();
+        List<Integer> count = new ArrayList<>();
 
-        return null;
+        List<ActivityEntity> activityEntities = activityService.listAllBetween(startTime, endTime);
+
+        Map<String, List<ActivityEntity>> collect = activityEntities.stream().collect(Collectors.groupingBy(ActivityEntity::getCreateName));
+        collect.entrySet().forEach(s -> {
+            username.add(s.getKey());
+            count.add(s.getValue().size());
+        });
+
+        result.put("username",username);
+        result.put("count",count);
+        return result;
     }
 }

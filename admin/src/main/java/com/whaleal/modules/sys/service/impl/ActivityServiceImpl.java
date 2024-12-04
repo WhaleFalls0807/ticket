@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,8 +74,20 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
     @Override
     public void deleteByAssId(Long[] ids) {
         LambdaQueryWrapper<ActivityEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.in(ActivityEntity::getAssociationId,ids);
+        lambdaQueryWrapper.in(ActivityEntity::getAssociationId, Arrays.asList(ids));
 
         baseDao.delete(lambdaQueryWrapper);
+    }
+
+    @Override
+    public List<ActivityEntity> listAllBetween(Date startDate, Date endDate) {
+        LambdaQueryWrapper<ActivityEntity> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(ActivityEntity::getActivityType,1)
+                        .eq(ActivityEntity::getOperateType,11)
+                        .ge(ActivityEntity::getCreateDate,startDate)
+                        .le(ActivityEntity::getCreateDate,endDate);
+
+        return baseDao.selectList(queryWrapper);
     }
 }

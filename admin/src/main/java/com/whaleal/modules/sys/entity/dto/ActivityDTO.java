@@ -1,5 +1,6 @@
 package com.whaleal.modules.sys.entity.dto;
 
+import com.whaleal.modules.sys.enums.OrderConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,18 +41,19 @@ public class ActivityDTO {
     @Schema(title = "创建人")
     private String createName;
 
-    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,Integer operateType,String createName) {
+    public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,Integer operateType) {
         this.associationId = associationId;
         this.content = content;
         this.filePath = filePath;
         this.activityType = activityType;
         this.operateType = operateType;
-        this.creator = 999L;
-        this.createName = createName;
+        this.creator = OrderConstant.SYSTEM_ID;
+        this.createName = OrderConstant.SYSTEM_NAME;
     }
 
     public ActivityDTO(Long associationId, String content, String filePath, Integer activityType,Integer operateType, long creator,String createName) {
-        this(associationId, content, filePath, activityType, operateType, createName);
+        this(associationId, content, filePath, activityType, operateType);
         this.creator = creator;
+        this.createName = createName;
     }
 }

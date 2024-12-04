@@ -6,6 +6,8 @@ import com.whaleal.modules.sys.entity.dto.ActivityDTO;
 import com.whaleal.modules.sys.entity.po.ActivityEntity;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,4 +52,10 @@ public interface ActivityService extends BaseService<ActivityEntity> {
      * @param ids
      */
     void deleteByAssId(Long[] ids);
+
+    /**
+     *
+     * @return
+     */
+    List<ActivityEntity> listAllBetween(Date startDate, Date endDate);
 }

@@ -45,6 +45,12 @@ public class NotificationController {
         return new Result<PageData<NotificationEntity>>().ok(pageData);
     }
 
+    @GetMapping("/total/count")
+    @Operation(summary = "获取当前用户站内信总条数")
+    public Result<Long> getAllCount(){
+        return new Result<Long>().ok(notificationService.queryCount());
+    }
+
 
     @Operation(summary = "标记站内信已读")
     @PostMapping("/read/{id}")

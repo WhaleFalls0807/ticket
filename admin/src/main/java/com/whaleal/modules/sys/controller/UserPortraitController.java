@@ -29,11 +29,12 @@ public class UserPortraitController {
     }
 
     @GetMapping("/grapedCount")
-    public Result getGrabCount(@RequestParam("startTime")Date startTime,
-                               @RequestParam("endTime") Date endTime){
+    public Result getGrabCount(@RequestParam("startTime")Long  startTime,
+                               @RequestParam("endTime") Long  endTime){
 
-        List list = userPortraitService.findUserGrap(startTime,endTime);
-        return new Result();
+        Date start = new Date(startTime);
+        Date end = new Date(endTime);
+        return new Result().ok(userPortraitService.findUserGrap(start,end));
     }
 
 }

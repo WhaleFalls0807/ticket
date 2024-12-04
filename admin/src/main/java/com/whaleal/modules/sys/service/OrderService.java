@@ -90,7 +90,7 @@ public interface OrderService extends BaseService<OrderEntity> {
      * 把单子丢入到公海中
      * @param ids
      */
-    int convertPool(List<Long> ids);
+    void pollUnlinkOrder();
 
     void deleteFile(OrderFileDeleteDTO orderFileDeleteDTO);
 

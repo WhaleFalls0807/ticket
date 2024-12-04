@@ -2,6 +2,7 @@ package com.whaleal.modules.sys.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lyz
@@ -16,5 +17,5 @@ public interface UserPortraitService {
      * @param endTime
      * @return
      */
-    List findUserGrap(Date startTime, Date endTime);
+    Map<String,List> findUserGrap(Date startTime, Date endTime);
 }

@@ -59,7 +59,7 @@ public class RenExceptionHandler {
     }
 
     @ExceptionHandler(OrderException.class)
-    public Result handleOrderException(RenException ex) {
+    public Result handleOrderException(OrderException ex) {
         Result result = new Result();
         result.error(ex.getCode(), ex.getMsg());
 

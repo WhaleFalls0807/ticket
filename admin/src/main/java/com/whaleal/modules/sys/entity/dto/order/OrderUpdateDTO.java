@@ -4,6 +4,7 @@ import com.whaleal.modules.sys.entity.po.BusinessTypeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -51,45 +52,20 @@ public class OrderUpdateDTO {
     @Schema(title = "提交选项")
     private String commitOption;
 
+    @Schema(title = "甲方承担价格")
+    private BigDecimal aPrice;
+
+    @Schema(title = "乙方承担价格")
+    private BigDecimal bPrice;
+
+    @Schema(title = "总价格")
+    private BigDecimal totalPrice;
+
+    @Schema(title = "业务类型")
+    private String businessName;
+
     @Schema(title = "业务类型，二次上传传入参数")
     private List<BusinessTypeEntity> businessTypeList;
-
-
-//    @Schema(title = "官费")
-//    private BigDecimal officialPrice;
-//
-//    @Schema(title = "代理费")
-//    private BigDecimal agencyPrice;
-//
-//    @Schema(title = "总费用")
-//    private BigDecimal totalPrice;
-//
-//    @Schema(title = "甲方支付费用")
-//    private BigDecimal aPrice;
-//
-//    @Schema(title = "乙方支付费用")
-//    private BigDecimal bPrice;
-
-//    /**
-//     * 二次补充内容
-//     */
-//    @Schema(title = "logo")
-//    private String logo;
-//
-//    @Schema(title = "身份证")
-//    private String IDCard;
-//
-//    @Schema(title = "申请书")
-//    private String applyBook;
-//
-//    @Schema(title = "委托书")
-//    private String commission;
-//
-//    @Schema(title = "营业执照")
-//    private String businessLicense;
-//
-//    @Schema(title = "盖章合同")
-//    private String sealedContract;
 
 
 }

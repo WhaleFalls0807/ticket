@@ -29,12 +29,7 @@ public class ConvertPoolTask implements ITask{
     @Override
     public void run(String params) {
         log.info("开始执行超时单子转公海任务");
-        List<Long> ids =  orderService.findNeedToPool();
-        orderService.convertPool(ids);
-
-        for (Long id : ids){
-            activityService.createActivity(new ActivityDTO(id,"工单超时未操作自动转入公海","",1,16,999,"System"));
-        }
+        orderService.pollUnlinkOrder();
         log.info("完成超时单子转公海任务");
     }
 }

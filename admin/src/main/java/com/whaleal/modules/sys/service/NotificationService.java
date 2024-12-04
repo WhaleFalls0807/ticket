@@ -40,4 +40,5 @@ public interface NotificationService extends BaseService<NotificationEntity> {
      */
     void deleteAllRead();
 
+    long queryCount();
 }

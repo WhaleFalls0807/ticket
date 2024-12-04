@@ -29,8 +29,8 @@ public class OrderGrabController {
 
     @PostMapping("/config/save")
     @Operation(summary = "修改/保存用户抢单设置")
-    @LogOperation("更新")
-    @RequiresPermissions("order:grab:save")
+    @LogOperation("新增/保存")
+    @RequiresPermissions("sys:user:count")
     public Result saveOrUpdate(@RequestBody UserGrabConfigEntity userGrabConfigEntity) {
         userGrabService.saveOrUpdate(userGrabConfigEntity);
         return new Result();
@@ -38,7 +38,7 @@ public class OrderGrabController {
 
     @GetMapping("/config/{userId}")
     @Operation(summary = "查询客户抢单配置")
-    @RequiresPermissions("order:grab:info")
+    @RequiresPermissions("sys:user:count")
     public Result<UserGrabConfigEntity> updateGrabConfig(@PathVariable Long userId) {
         return new Result<UserGrabConfigEntity>().ok(userGrabService.findByUserId(userId));
     }

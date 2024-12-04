@@ -34,7 +34,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -131,22 +133,36 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 String username = sysUserService.findUsernameByUserId(orderVO.getOwnerId());
                 orderVO.setOwnerUsername(username);
             }
-            Integer orderStatus = orderVO.getOrderStatus();
-            if(orderStatus > 2 && orderStatus < 9){
-                ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(orderVO.getId(), 15);
-                if(!ObjectUtils.isEmpty(lastByAssociationId)){
-                    orderVO.setReviewUserId(lastByAssociationId.getCreator());
-                    orderVO.setReviewUsername(lastByAssociationId.getCreateName());
-                    orderVO.setReviewDate(lastByAssociationId.getCreateDate());
-                }
-            }
-
-            if(orderStatus == 8){
-                ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(orderVO.getId(), 16);
-                orderVO.setDealDate(lastByAssociationId.getCreateDate());
-            }
+            completeInfo(orderVO);
         }
         return pageData;
+    }
+
+    private void completeInfo(OrderVO orderVO){
+        Integer orderStatus = orderVO.getOrderStatus();
+        if(orderStatus == 1){
+            // 计算未付款时间
+
+            ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(orderVO.getId(), 11);
+            long diffInMillis = System.currentTimeMillis() - lastByAssociationId.getCreateDate().getTime();
+
+            long diffInDays = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+            orderVO.setDaysUnPay(diffInDays);
+        }
+
+        if(orderStatus > 2 && orderStatus < 9){
+            ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(orderVO.getId(), 15);
+            if(!ObjectUtils.isEmpty(lastByAssociationId)){
+                orderVO.setReviewUserId(lastByAssociationId.getCreator());
+                orderVO.setReviewUsername(lastByAssociationId.getCreateName());
+                orderVO.setReviewDate(lastByAssociationId.getCreateDate());
+            }
+        }
+
+        if(orderStatus == OrderConstant.SUCCESS){
+            ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(orderVO.getId(), 16);
+            orderVO.setDealDate(lastByAssociationId.getCreateDate());
+        }
     }
 
     @Override
@@ -228,9 +244,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         // 删除order type
         businessTypeService.deleteByOrderId(ids);
 
-        // 删除 order price
-//        orderPriceService.deleteByOrderId(ids);
-
         // 删除order
         boolean b = deleteBatchIds(Arrays.asList(ids));
 
@@ -244,14 +257,16 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void addInformation(OrderEntity orderEntity,OrderUpdateDTO orderUpdateDTO) {
-        if(orderEntity.getOrderStatus() != OrderConstant.DISTRIBUTED && orderEntity.getOrderStatus() != OrderConstant.WAIT_COMMIT_TWICE &&
-            orderEntity.getOrderStatus() != OrderConstant.REVIEW_REJECT && orderEntity.getOrderStatus() != OrderConstant.TWICE_REVIEW_REJECT){
-            // 只有已分配的单子才能补充信息
-            throw new OrderException(OrderExceptionEnum.ONLY_DISTRIBUTE_CAN_OPERATE);
-        }
+//        if(orderEntity.getOrderStatus() != OrderConstant.DISTRIBUTED && orderEntity.getOrderStatus() != OrderConstant.WAIT_COMMIT_TWICE &&
+//            orderEntity.getOrderStatus() != OrderConstant.REVIEW_REJECT && orderEntity.getOrderStatus() != OrderConstant.TWICE_REVIEW_REJECT){
+//            // 只有已分配的单子才能补充信息
+//            throw new OrderException(OrderExceptionEnum.ONLY_DISTRIBUTE_CAN_OPERATE);
+//        }
 
         BeanUtils.copyProperties(orderUpdateDTO,orderEntity, BeanCopyUtil.getNullPropertyNames(orderUpdateDTO));
 
+        // 1 业务员修改单子信息（首次上传） 2 业务员二次上传 3 admin 回传商标文件
+        int type = 0;
         if(!ObjectUtils.isEmpty(orderUpdateDTO.getBusinessTypeList()) && !orderUpdateDTO.getBusinessTypeList().isEmpty()){
             List<BusinessTypeEntity> orderType = orderUpdateDTO.getBusinessTypeList();
             for(BusinessTypeEntity businessTypeEntity : orderType){
@@ -260,84 +275,39 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 }else {
                     businessTypeService.updateById(businessTypeEntity);
                 }
+
+                if(!ObjectUtils.isEmpty(businessTypeEntity.getRegiAppAcceptNotice() )|| !ObjectUtils.isEmpty(businessTypeEntity.getRegiAppReceipt()) ||
+                    !ObjectUtils.isEmpty(businessTypeEntity.getRegiAppPreApproveNotice()) || !ObjectUtils.isEmpty(businessTypeEntity.getRegiCertificate())){
+                    type = 3;
+                }else {
+                    type = 2;
+                }
             }
+        }else {
+            type = 1;
         }
-        // 补充单子信息
-//        if(StringUtils.hasText(orderUpdateDTO.getContract()) || StringUtils.hasText(orderUpdateDTO.getPayType())){
-//            // 加载orderFile信息
-//            // todo 可能会出现重复更新的问题
-//            OrderFileEntity orderFileEntity = orderFileService.findByOrderId(orderUpdateDTO.getId());
-//            if(ObjectUtils.isEmpty(orderFileEntity)){
-//                orderFileEntity = new OrderFileEntity(orderUpdateDTO.getId(), orderUpdateDTO.getContract(), orderUpdateDTO.getPayType());
-//                orderFileService.insert(orderFileEntity);
-//            }else {
-//                if(!ObjectUtils.isEmpty(orderUpdateDTO.getContract()) ){
-//                    orderFileEntity.setContract(orderUpdateDTO.getContract());
-//                }
-//                if(!ObjectUtils.isEmpty(orderUpdateDTO.getPayType())){
-//                    orderFileEntity.setPayType(orderUpdateDTO.getPayType());
-//                }
-//                orderFileService.updateById(orderFileEntity);
-//            }
-//
-
-//        if(StringUtils.hasText(orderUpdateDTO.getLogo()) || StringUtils.hasText(orderUpdateDTO.getIDCard()) ||
-//            StringUtils.hasText(orderUpdateDTO.getApplyBook()) || StringUtils.hasText(orderUpdateDTO.getCommission()) ||
-//            StringUtils.hasText(orderUpdateDTO.getBusinessLicense()) || StringUtils.hasText(orderUpdateDTO.getSealedContract())){
-//            // 加载orderFile信息
-//            //第二次提交内容 记录一定不为空
-//            OrderTypeEntity orderFile = orderTypeService.findByOrderId(orderUpdateDTO.getId());
-//            if(StringUtils.hasText(orderUpdateDTO.getLogo())){
-//                orderFile.setLogo(orderUpdateDTO.getLogo());
-//            }
-//            if(StringUtils.hasText(orderUpdateDTO.getIDCard())){
-//                orderFile.setIDCard(orderUpdateDTO.getIDCard());
-//            }
-//            if(StringUtils.hasText(orderUpdateDTO.getApplyBook())){
-//                orderFile.setApplyBook(orderUpdateDTO.getApplyBook());
-//            }
-//            if(StringUtils.hasText(orderUpdateDTO.getCommission())){
-//                orderFile.setCommission(orderUpdateDTO.getCommission());
-//            }
-//            if(StringUtils.hasText(orderUpdateDTO.getBusinessLicense())){
-//                orderFile.setBusinessLicense(orderUpdateDTO.getBusinessLicense());
-//            }
-//            if(StringUtils.hasText(orderUpdateDTO.getSealedContract())){
-//                orderFile.setSealedContract(orderUpdateDTO.getSealedContract());
-//            }
-//            orderTypeService.updateById(orderFile);
-//        }
-
-//        if(!ObjectUtils.isEmpty(orderUpdateDTO.getTotalPrice()) && orderUpdateDTO.getTotalPrice().compareTo(BigDecimal.ZERO) > 0){
-//            // 加载order price信息
-//            // todo 可能会出现重复更新的问题
-//            OrderPriceEntity orderPriceEntity = orderPriceService.findByOrderId(orderUpdateDTO.getId());
-//            if(ObjectUtils.isEmpty(orderPriceEntity)){
-//                orderPriceEntity = new OrderPriceEntity(orderUpdateDTO.getId(), orderUpdateDTO.getOfficialPrice(),orderUpdateDTO.getAgencyPrice(),orderUpdateDTO.getTotalPrice(),orderUpdateDTO.getAPrice(),orderUpdateDTO.getBPrice());
-//                orderPriceService.insert(orderPriceEntity);
-//            }else {
-//
-//                if(!ObjectUtils.isEmpty(orderUpdateDTO.getOfficialPrice()) ){
-//                    orderPriceEntity.setOfficialPrice(orderUpdateDTO.getOfficialPrice());
-//                }
-//                if(!ObjectUtils.isEmpty(orderUpdateDTO.getOfficialPrice()) ){
-//                    orderPriceEntity.setOfficialPrice(orderUpdateDTO.getOfficialPrice());
-//                }
-//                if(!ObjectUtils.isEmpty(orderUpdateDTO.getOfficialPrice()) ){
-//                    orderPriceEntity.setOfficialPrice(orderUpdateDTO.getOfficialPrice());
-//                }
-//                if(!ObjectUtils.isEmpty(orderUpdateDTO.getOfficialPrice()) ){
-//                    orderPriceEntity.setOfficialPrice(orderUpdateDTO.getOfficialPrice());
-//                }
-//                orderPriceService.updateById(orderPriceEntity);
-//            }
-//        }
-        // 信息提交完成处于待提交审核状态
-        orderEntity.setUpdater(SecurityUser.getUser().getUsername());
-        updateById(orderEntity);
 
         String username = SecurityUser.getUser().getUsername();
-        activityService.createActivity(new ActivityDTO(orderUpdateDTO.getId(),username + "补充了订单信息","",1,13,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
+        if(type == 1){
+            activityService.createActivity(new ActivityDTO(orderUpdateDTO.getId(),username + "首次补充信息","",1,13,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
+        }else if(type == 2){
+            activityService.createActivity(new ActivityDTO(orderUpdateDTO.getId(),username + "二次补充信息","",1,13,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
+        }else if(type ==3){
+            activityService.createActivity(new ActivityDTO(orderUpdateDTO.getId(),username + "补充商标回传信息","",1,18,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
+            List<Long> longs = new ArrayList<>(Collections.singletonList(orderEntity.getOwnerId()));
+
+            longs.add(orderEntity.getReviewUserId());
+            notificationService.createNotification(new NotificationDTO(orderUpdateDTO.getId(),longs,username + "已上传商标回传文件",5));
+
+            // todo 是否要自动完成单子
+//            orderEntity.setOrderStatus(OrderConstant.);
+        }
+
+        // 信息提交完成处于待提交审核状态
+        orderEntity.setUpdater(username);
+        updateById(orderEntity);
+
+
     }
 
     @Override
@@ -381,6 +351,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
             String username = SecurityUser.getUser().getUsername();
             if (orderReviewDTO.getPass() == 3) {
+                // 其实没用
                 Long[] ids = {orderEntity.getId()};
                 delete(ids);
                 log.info("{}删除了一个order：{}", username, orderEntity);
@@ -434,24 +405,32 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
         String content = "";
         if(1 == orderEditDTO.getOperateType()){
-            convertPool(Collections.singletonList(orderId));
+            update.set(OrderEntity::getDeal,3);
+            update.set(OrderEntity::getOrderStatus,OrderConstant.IN_POOL);
+            update.set(OrderEntity::getOwnerId,null);
             content = "把单子放回了公海。" + orderEditDTO.getRemark();
-        }else {
-            if(2 == orderEditDTO.getOperateType()) {
-                update.set(OrderEntity::getOwnerId, orderEditDTO.getNewOwnerId());
-                content = "把单子转给了" + orderEditDTO.getUsername() + "。" + orderEditDTO.getRemark();
-                notificationService.createNotification(new NotificationDTO(orderId,Collections.singletonList(orderEditDTO.getNewOwnerId()),"把单子转给了您",4));
-            }else if(3 == orderEditDTO.getOperateType()){
-                    // 成单
-                    update.set(OrderEntity::getDeal,2);
-                    update.set(OrderEntity::getOrderStatus,OrderConstant.SUCCESS);
-                    content = "成交了这个单子" + orderEditDTO.getUsername() + "。"  + orderEditDTO.getRemark();
-                    // todo 后续成单也需要修改count计数
-                // todo 需要告知给管理员
-//                notificationService.createNotification(new NotificationDTO(orderId,Collections.singletonList(orderEditDTO.getNewOwnerId()),"成交了单子",5));
+        }else if(2 == orderEditDTO.getOperateType()) {
+            update.set(OrderEntity::getOwnerId, orderEditDTO.getNewOwnerId());
+            content = "把单子转给了" + orderEditDTO.getUsername() + "。" + orderEditDTO.getRemark();
+            notificationService.createNotification(new NotificationDTO(orderId,Collections.singletonList(orderEditDTO.getNewOwnerId()),"把单子转给了您",4));
+        }else if(3 == orderEditDTO.getOperateType()){
+            if(OrderConstant.REVIEW_COMPLETE != orderEntity.getOrderStatus()){
+                throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
             }
-            baseDao.update(update);
+
+            // 成单
+            update.set(OrderEntity::getDeal,2);
+            update.set(OrderEntity::getOrderStatus,OrderConstant.SUCCESS);
+
+            content = user.getUsername() + "成交了这个单子" + "。" ;
+            if(StringUtils.hasText(content)){
+                content = content  + orderEditDTO.getRemark();
+            }
+            // todo 后续成单也需要修改count计数
+            // todo 需要告知给管理员
+//           notificationService.createNotification(new NotificationDTO(orderId,Collections.singletonList(orderEditDTO.getNewOwnerId()),"成交了单子",5));
         }
+        baseDao.update(update);
         activityService.createActivity(new ActivityDTO(orderEntity.getId(),content,"",1,16,SecurityUser.getUserId(),SecurityUser.getUser().getUsername()));
     }
 
@@ -492,6 +471,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             }
         }
         orderVO.setBusinessTypeList(byOrderId);
+
+        completeInfo(orderVO);
         return orderVO;
     }
 
@@ -501,21 +482,31 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
         instance.setTime(new Date());
         instance.add(Calendar.DAY_OF_MONTH,-10);
-
         return  baseDao.findUnlinkOrder(instance.getTime());
     }
 
     @Override
-    public int convertPool(List<Long> ids) {
+    public void pollUnlinkOrder() {
+        Calendar instance = Calendar.getInstance();
+
+        instance.setTime(new Date());
+        instance.add(Calendar.DAY_OF_MONTH,-10);
+        List<Long> ids = baseDao.findUnlinkOrder(instance.getTime());
+
         LambdaUpdateWrapper<OrderEntity> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
 
         // todo 需要确定这种情况下哪些信息置空
         lambdaUpdateWrapper.in(OrderEntity::getId,ids);
         lambdaUpdateWrapper.set(OrderEntity::getDeal,3)
-                .set(OrderEntity::getOrderStatus,9)
+                .set(OrderEntity::getOrderStatus,OrderConstant.IN_POOL)
                 .set(OrderEntity::getOwnerId,null)
                 .set(OrderEntity::getReviewUserId,null);
-        return baseDao.update(lambdaUpdateWrapper);
+        baseDao.update(lambdaUpdateWrapper);
+
+        for (Long id : ids){
+            activityService.createActivity(new ActivityDTO(id,"工单超时未操作自动转入公海","",1,16,999,"System"));
+        }
+
     }
 
     @Override
@@ -565,8 +556,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
     @Override
     public void issueOrder(OrderIssueDTO orderIssueDTO) {
         Long orderId = orderIssueDTO.getOrderId();
-
-
     }
 
 }

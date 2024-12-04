@@ -179,7 +179,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
             return SecurityUser.getUser().getUsername();
         }
 
-        return selectById(userId1).getUsername();
+        return selectById(userId).getUsername();
     }
 
 }

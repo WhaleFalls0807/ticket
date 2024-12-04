@@ -35,11 +35,11 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationDao, No
 
         LambdaQueryWrapper<NotificationEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
 
-        lambdaQueryWrapper.eq(NotificationEntity::getId, SecurityUser.getUserId());
-        if(!ObjectUtils.isEmpty(params.get("read"))){
-            int read = Integer.parseInt(params.get("read").toString());
+        lambdaQueryWrapper.eq(NotificationEntity::getReceiveId, SecurityUser.getUserId());
+        if(!ObjectUtils.isEmpty(params.get("isRead"))){
+            int read = Integer.parseInt(params.get("isRead").toString());
             if(2 != read){
-                lambdaQueryWrapper.eq(NotificationEntity::getRead,read);
+                lambdaQueryWrapper.eq(NotificationEntity::getIsRead,read);
             }
         }
 
@@ -54,18 +54,18 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationDao, No
         List<NotificationEntity> list = new ArrayList<>();
         for (Long receive : notificationDTO.getReceiveIds()){
             NotificationEntity notificationEntity = ConvertUtils.sourceToTarget(notificationDTO, NotificationEntity.class);
-            notificationEntity.setRead(0);
+            notificationEntity.setIsRead(0);
             notificationEntity.setReceiveId(receive);
             UserDetail user = SecurityUser.getUser();
 
             Long userId ;
             String username;
             if(ObjectUtils.isEmpty(user)){
-                userId = user.getId();
-                username = user.getUsername();
-            }else {
                 userId = 999L;
                 username = "System";
+            }else {
+                userId = user.getId();
+                username = user.getUsername();
             }
             notificationEntity.setCreator(userId);
             notificationEntity.setCreateName(username);
@@ -79,14 +79,14 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationDao, No
     @Override
     public void read(Long id) {
         LambdaUpdateWrapper<NotificationEntity> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        lambdaUpdateWrapper.eq(NotificationEntity::getRead,0)
+        lambdaUpdateWrapper.eq(NotificationEntity::getIsRead,0)
                 .eq(NotificationEntity::getReceiveId,SecurityUser.getUserId());
 
         if(!ObjectUtils.isEmpty(id)){
             lambdaUpdateWrapper.eq(NotificationEntity::getId, id);
         }
 
-        lambdaUpdateWrapper.set(NotificationEntity::getRead,1);
+        lambdaUpdateWrapper.set(NotificationEntity::getIsRead,1);
         baseDao.update(lambdaUpdateWrapper);
     }
 
@@ -96,7 +96,16 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationDao, No
 
         QueryWrapper<NotificationEntity> wrapper = new QueryWrapper<>();
         wrapper.eq("receive_id",userId)
-                .eq("read",1);
+                .eq("is_read",1);
         baseDao.delete(wrapper);
+    }
+
+    @Override
+    public long queryCount() {
+        LambdaQueryWrapper<NotificationEntity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        lambdaQueryWrapper.eq(NotificationEntity::getReceiveId,SecurityUser.getUserId())
+                        .eq(NotificationEntity::getIsRead,0);
+        return baseDao.selectCount(lambdaQueryWrapper);
     }
 }
