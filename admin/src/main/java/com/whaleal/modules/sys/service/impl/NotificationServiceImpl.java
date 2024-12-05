@@ -54,6 +54,7 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationDao, No
         List<NotificationEntity> list = new ArrayList<>();
         for (Long receive : notificationDTO.getReceiveIds()){
             NotificationEntity notificationEntity = ConvertUtils.sourceToTarget(notificationDTO, NotificationEntity.class);
+
             notificationEntity.setIsRead(0);
             notificationEntity.setReceiveId(receive);
             UserDetail user = SecurityUser.getUser();

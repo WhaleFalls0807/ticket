@@ -15,6 +15,7 @@ import com.whaleal.modules.sys.entity.vo.OrderGrabVO;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
 import com.whaleal.modules.sys.service.CustomerService;
 import com.whaleal.modules.sys.service.OrderService;
+import com.whaleal.modules.sys.service.SysUserService;
 import com.whaleal.modules.sys.service.UserGrabService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,6 +48,8 @@ public class OrderController {
 
     private final UserGrabService userGrabService;
 
+    private final SysUserService sysUserService;
+
     @GetMapping("/all/page")
     @Operation(summary = "分页获取列表")
     @Parameters({
@@ -66,11 +69,21 @@ public class OrderController {
         if(deal == 3){
             //判断是否是查询公海order，公海查询不限制权限
             params.remove("ownerId");
-        }else {
-            UserDetail user = SecurityUser.getUser();
-            if(user.getSuperAdmin() != 1){
-                //普通用户只能查看自己的order
-                params.put("ownerId",user.getId());
+        }else if(deal == 1){
+            if(!sysUserService.checkAuth(SecurityUser.getUserId(), "todo:list:all")){
+                UserDetail user = SecurityUser.getUser();
+                if(user.getSuperAdmin() != 1){
+                    //普通用户只能查看自己的order
+                    params.put("ownerId",user.getId());
+                }
+            }
+        }else if(deal == 2){
+            if(!sysUserService.checkAuth(SecurityUser.getUserId(), "completed:list:all")){
+                UserDetail user = SecurityUser.getUser();
+                if(user.getSuperAdmin() != 1){
+                    //普通用户只能查看自己的order
+                    params.put("ownerId",user.getId());
+                }
             }
         }
 
@@ -117,7 +130,6 @@ public class OrderController {
         if(orderService.saveSimpleOrder(orderDTO,false)){
             userGrabService.addGraped(1);
         }
-
         return new Result<String>().ok("创建成功");
     }
 
@@ -161,9 +173,8 @@ public class OrderController {
 
         // 分配的单子不占用业务员抢单子上限
         if(l != 0){
-            userGrabService.addRemain(-1);
-            userGrabService.addGraped(1);
-//            userGrabService.grapeOrder(orderDistributeDTO.getUserId(),l);
+            userGrabService.addRemain(-l);
+            userGrabService.addGraped(l);
         }
         return new Result<String>().ok("分配成功");
     }
@@ -190,6 +201,11 @@ public class OrderController {
     public Result grabOrder() {
         Long userId = SecurityUser.getUserId();
 
+        if(!userGrabService.checkGrabInterval(userId)){
+            return new Result().ok("此时间周期内已不允许抢单");
+        }
+
+
         //已抢单数量小于1 不能再进行抢单
         OrderGrabVO countByUserId = userGrabService.findCountByUserId(userId);
         if(countByUserId.getUserRemainCount() < 1){
@@ -203,6 +219,15 @@ public class OrderController {
 
         userGrabService.grapeOrder(userId,1);
         return new Result().ok(orderEntity);
+    }
+
+    @LogOperation("抢单")
+    @GetMapping("/grab")
+    @Operation(summary = "业务员抢单子-系统随机分配一个单子")
+    @RequiresPermissions("grab:grab")
+    public Result<Boolean> getLastGrabOrder() {
+        Long userId = SecurityUser.getUserId();
+        return new Result<Boolean>().ok(userGrabService.checkGrabInterval(userId));
     }
 
     @LogOperation("补充单子信息")
@@ -262,15 +287,6 @@ public class OrderController {
         return new Result<String>().ok("审核成功");
     }
 
-//    @LogOperation("提交商标正式文件")
-//    @PostMapping("/issue/order/brand")
-//    @Operation(summary = "管理员提交商标正式文件")
-//    @RequiresPermissions("order:issue")
-//    public Result<String> issueOrderBrand(@RequestBody OrderIssueDTO orderIssueDTO) {
-//        orderTradeService.issueOrderBrade(orderIssueDTO);
-//        return new Result<String>().ok("创建成功");
-//    }
-
     @DeleteMapping("/delete")
     @Operation(summary = "删除")
     @LogOperation("删除工单")
@@ -282,6 +298,8 @@ public class OrderController {
 
         // 重新初始化一下池子信息
         userGrabService.initPoolCount();
+
+//        userGrabService.initUserCount();
         // todo 清空重置单子信息
         return new Result();
     }

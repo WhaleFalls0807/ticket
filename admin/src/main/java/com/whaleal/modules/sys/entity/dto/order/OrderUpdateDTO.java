@@ -37,6 +37,10 @@ public class OrderUpdateDTO {
     @Schema(title = "支付类型")
     private String payType;
 
+    @Schema(title = "支付截图")
+    private String payment;
+
+
     @Schema(title = "行业")
     private String industry;
 

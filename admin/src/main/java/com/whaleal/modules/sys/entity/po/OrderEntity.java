@@ -65,9 +65,14 @@ public class OrderEntity extends BaseEntity {
     private String contract;
 
     /**
-     * 支付类型 这里保存的是上传的支付截图 的地址链接
+     * 支付类型  微信 / 支付宝 / 对公转账
      */
     private String payType;
+
+    /**
+     * 支付截图
+     */
+    private String payment;
 
     /**
      * 申请方式

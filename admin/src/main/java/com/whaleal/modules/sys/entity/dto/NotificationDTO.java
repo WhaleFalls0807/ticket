@@ -22,6 +22,7 @@ public class NotificationDTO {
      */
     private Long associationId;
 
+
     private List<Long> receiveIds;
 
     private String content;

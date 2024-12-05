@@ -60,5 +60,10 @@ public interface UserGrabService extends BaseService<UserGrabConfigEntity> {
     void grapeOrder(long userId,long count);
 
 
+    Map<String ,Long> initUserCount(long userId);
+
     Map<String, Long> initPoolCount();
+
+    Boolean checkGrabInterval(Long userId);
+
 }

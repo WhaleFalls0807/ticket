@@ -32,6 +32,10 @@ public class UserDetail implements Serializable {
     private Long deptId;
     private String password;
     private Integer status;
+
+    /**
+     *  1 超级管理员
+     */
     private Integer superAdmin;
     /**
      * 部门数据权限

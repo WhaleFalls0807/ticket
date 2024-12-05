@@ -65,8 +65,9 @@ public class CustomerController {
         UserDetail user = SecurityUser.getUser();
         boolean isUser = sysUserService.checkAuth(user.getId(),"customer:list:all");
         if(!isUser){
-            // todo 当前只有超级管理员能看到所有的客户 后续应该更新为根据具体的权限去判断是否给看所有用户的客户
-            params.put("ownerId",user.getId());
+            if(1 != user.getSuperAdmin()){
+                params.put("ownerId",user.getId());
+            }
         }
 
         PageData<CustomerVO> page = customerService.page(params);
@@ -107,7 +108,7 @@ public class CustomerController {
 
     @RequiresPermissions("customer:delete")
     @Operation(summary = "删除客户")
-    @PostMapping("/del")
+    @DeleteMapping("/del")
     public Result deleteByIds(@RequestBody Long[] ids){
         AssertUtils.isArrayEmpty(ids, "id");
 

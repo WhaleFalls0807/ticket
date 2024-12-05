@@ -14,7 +14,7 @@ import java.util.List;
  * @create: 2024-11-29 17:57
  **/
 @Slf4j
-@Component
+@Component("poolTask")
 public class ConvertPoolTask implements ITask{
 
     private final OrderService orderService;

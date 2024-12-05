@@ -42,6 +42,11 @@ public class UserGrabConfigEntity extends BaseEntity {
     private Long totalCount;
 
     /**
+     *  两次抢单时间最少间隔 单位毫秒
+     */
+    private Long grabGap;
+
+    /**
      * 关联用户名 公共配置此字段为空
      */
     private String username;

@@ -33,6 +33,8 @@ public class OrderVO {
 
     private String payType;
 
+    private String payment;
+
     private String contract;
 
     private String industry;

@@ -33,7 +33,16 @@ public class BusinessTypeServiceImpl extends BaseServiceImpl<BusinessTypeDao, Bu
     public void deleteByOrderId(Long[] orderIds) {
         QueryWrapper<BusinessTypeEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("order_id", List.of( orderIds));
+
+        List<BusinessTypeEntity> businessTypeEntities = baseDao.selectList(queryWrapper);
+
+        for (BusinessTypeEntity businessTypeEntity : businessTypeEntities){
+
+        }
         baseDao.delete(queryWrapper);
+
+        // 删除完成后要删除对应的文件
+
     }
 
     @Override

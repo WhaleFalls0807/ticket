@@ -5,6 +5,7 @@ import com.whaleal.common.redis.RedisUtils;
 import com.whaleal.common.service.impl.BaseServiceImpl;
 import com.whaleal.modules.security.user.SecurityUser;
 import com.whaleal.modules.sys.dao.UserGrabDao;
+import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import com.whaleal.modules.sys.entity.po.UserGrabConfigEntity;
 import com.whaleal.modules.sys.entity.vo.OrderGrabVO;
 import com.whaleal.modules.sys.redis.RedisConstant;
@@ -15,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -168,7 +170,8 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
         }
     }
 
-    private Map<String ,Long> initUserCount(long userId){
+    @Override
+    public Map<String ,Long> initUserCount(long userId){
         Map<String, Long> map = new HashMap<>();
 
         //不存在就从数据库查询 并更新redis的缓存
@@ -243,5 +246,25 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
         redisUtils.set(RedisConstant.GRAB_GRAPED_COUNT,graped,remainSecond);
         redisUtils.set(RedisConstant.GRAB_REMAIN_COUNT,remain,remainSecond);
         return map;
+    }
+
+
+
+
+    @Override
+    public Boolean checkGrabInterval(Long userId) {
+
+        ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(userId, 11);
+        if(ObjectUtils.isEmpty(lastByAssociationId)){
+            return true;
+        }
+
+        Date createDate = lastByAssociationId.getCreateDate();
+
+        UserGrabConfigEntity byUserId = findByUserId(userId);
+        Long grabGap = byUserId.getGrabGap();
+
+        return (System.currentTimeMillis() - createDate.getTime()) >= grabGap;
+
     }
 }

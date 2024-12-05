@@ -37,7 +37,10 @@ public class UserPortraitServiceImpl implements UserPortraitService {
         List<ActivityEntity> activityEntities = activityService.listAllBetween(startTime, endTime);
 
         Map<String, List<ActivityEntity>> collect = activityEntities.stream().collect(Collectors.groupingBy(ActivityEntity::getCreateName));
-        collect.entrySet().forEach(s -> {
+
+        collect.entrySet().stream()
+                .sorted((e1, e2) -> Integer.compare(e1.getValue().size(), e2.getValue().size())) // 按键排序
+                .forEach(s -> {
             username.add(s.getKey());
             count.add(s.getValue().size());
         });

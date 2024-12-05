@@ -92,6 +92,10 @@ public interface OrderService extends BaseService<OrderEntity> {
      */
     void pollUnlinkOrder();
 
+    /**
+     * shan
+     * @param orderFileDeleteDTO
+     */
     void deleteFile(OrderFileDeleteDTO orderFileDeleteDTO);
 
     /**
