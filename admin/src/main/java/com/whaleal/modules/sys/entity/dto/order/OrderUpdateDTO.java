@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,6 +41,11 @@ public class OrderUpdateDTO {
     @Schema(title = "支付截图")
     private String payment;
 
+    @Schema(title = "支付时间")
+    private Date payDate;
+
+    @Schema(title = "支付金额")
+    private BigDecimal paymentAmount;
 
     @Schema(title = "行业")
     private String industry;

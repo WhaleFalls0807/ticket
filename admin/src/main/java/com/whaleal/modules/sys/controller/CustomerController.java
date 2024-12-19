@@ -110,8 +110,8 @@ public class CustomerController {
     @Operation(summary = "删除客户")
     @DeleteMapping("/del")
     public Result deleteByIds(@RequestBody Long[] ids){
-        AssertUtils.isArrayEmpty(ids, "id");
 
+        AssertUtils.isArrayEmpty(ids, "id");
         customerService.delete(ids);
         return new Result();
     }

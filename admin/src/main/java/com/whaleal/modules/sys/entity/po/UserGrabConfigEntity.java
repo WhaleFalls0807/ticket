@@ -42,7 +42,7 @@ public class UserGrabConfigEntity extends BaseEntity {
     private Long totalCount;
 
     /**
-     *  两次抢单时间最少间隔 单位毫秒
+     *  两次抢单时间最少间隔 单位分钟
      */
     private Long grabGap;
 

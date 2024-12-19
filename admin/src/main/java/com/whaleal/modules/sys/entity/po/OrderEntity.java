@@ -82,7 +82,17 @@ public class OrderEntity extends BaseEntity {
     /**
      * 提交选项
      */
-    private String commitOption;
+//    private String commitOption;
+
+    /**
+     * 支付金额
+     */
+    private BigDecimal paymentAmount;
+
+    /**
+     * 支付时间
+     */
+    private Date payDate;
 
     // 单子级别只承接这部分价格
     /**

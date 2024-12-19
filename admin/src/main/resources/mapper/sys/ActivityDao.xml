@@ -12,4 +12,14 @@
         order by create_date desc
         limit 1
     </select>
+
+    <select id="findLastByUserId" resultType="com.whaleal.modules.sys.entity.po.ActivityEntity">
+
+        select * from activity
+        where creator  = #{userId}
+          and activity_type = 1
+          and operate_type = #{operateType}
+        order by create_date desc
+        limit 1
+    </select>
 </mapper>

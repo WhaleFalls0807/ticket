@@ -55,4 +55,6 @@ public interface CustomerService extends BaseService<CustomerEntity> {
      */
     CustomerEntity loadCustomer(OrderUpdateDTO orderEntity);
 
+    void deleteCustomer(Long[] ids);
+
 }

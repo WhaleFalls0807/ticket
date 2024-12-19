@@ -1,5 +1,6 @@
 package com.whaleal.modules.sys.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.whaleal.common.service.impl.BaseServiceImpl;
@@ -48,5 +49,14 @@ public class BusinessTypeServiceImpl extends BaseServiceImpl<BusinessTypeDao, Bu
     @Override
     public void updateByQuery(UpdateWrapper<BusinessTypeEntity> updateWrapper) {
         baseDao.update(updateWrapper);
+    }
+
+    @Override
+    public List<BusinessTypeEntity> findByType(List<String> type) {
+        LambdaQueryWrapper<BusinessTypeEntity> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.in(BusinessTypeEntity::getBusinessType,type);
+        return baseDao.selectList(queryWrapper);
+
     }
 }

@@ -24,4 +24,12 @@ public interface BusinessTypeService extends BaseService<BusinessTypeEntity> {
     void deleteByOrderId(Long[] orderIds);
 
     void updateByQuery(UpdateWrapper<BusinessTypeEntity> updateWrapper);
+
+    /**
+     * 根据具体类型查找记录
+     * @param type
+     * @return
+     */
+    List<BusinessTypeEntity> findByType(List<String> type);
+
 }

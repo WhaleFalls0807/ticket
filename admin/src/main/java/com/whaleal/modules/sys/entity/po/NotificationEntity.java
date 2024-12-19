@@ -22,11 +22,6 @@ public class NotificationEntity extends BaseEntity {
      */
     private Long associationId;
 
-    /**
-     * 关联业务名
-     */
-//    private String associationName;
-
     private Long receiveId;
 
     private String content;
@@ -34,7 +29,6 @@ public class NotificationEntity extends BaseEntity {
     private String createName;
 
     private Integer type;
-
 
     /**
      * 是否已读

@@ -61,6 +61,7 @@ public class OrderController {
             @Parameter(name = "deal", description = "0：新建 1：待成单 2：已成单 3：公海", in = ParameterIn.QUERY, ref = "int",required = true),
             @Parameter(name = "sortField", description = "排序字段", in = ParameterIn.QUERY, ref = "String"),
             @Parameter(name = "isAsc", description = "是否升序", in = ParameterIn.QUERY, ref = "boolean"),
+            @Parameter(name = "businessType",description = "业务类型",in = ParameterIn.QUERY,ref = "String"),
             @Parameter(name = "startDate", description = "开始时间", in = ParameterIn.QUERY, ref = "Date"),
             @Parameter(name = "endDate", description = "结束时间", in = ParameterIn.QUERY, ref = "Date"),
     })
@@ -188,9 +189,9 @@ public class OrderController {
         orderDistributeDTO.setUserId(userId);
         long l = orderService.distributeOrder(orderDistributeDTO.getOrderIds(), userId);
 
-        if(l != 0){
-            userGrabService.grapeOrder(orderDistributeDTO.getUserId(),l);
-        }
+//        if(l != 0){
+//            userGrabService.grapeOrder(orderDistributeDTO.getUserId(),l);
+//        }
         return new Result();
     }
 
@@ -221,9 +222,9 @@ public class OrderController {
         return new Result().ok(orderEntity);
     }
 
-    @LogOperation("抢单")
-    @GetMapping("/grab")
-    @Operation(summary = "业务员抢单子-系统随机分配一个单子")
+    @LogOperation("抢单查询")
+    @GetMapping("/check/grab")
+    @Operation(summary = "检查与上一次抢单时间间隔是否满足要求")
     @RequiresPermissions("grab:grab")
     public Result<Boolean> getLastGrabOrder() {
         Long userId = SecurityUser.getUserId();

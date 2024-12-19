@@ -27,11 +27,15 @@ public class OrderVO {
 
     private String customerName;
 
+    private String customerWebsite;
+
     private String applyMethod;
 
-    private String commitOption;
-
     private String payType;
+
+    private BigDecimal paymentAmount;
+
+    private Date payDate;
 
     private String payment;
 

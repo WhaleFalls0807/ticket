@@ -21,6 +21,7 @@ import com.whaleal.modules.sys.entity.dto.*;
 import com.whaleal.modules.sys.entity.dto.order.*;
 import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import com.whaleal.modules.sys.entity.po.BusinessTypeEntity;
+import com.whaleal.modules.sys.entity.po.CustomerEntity;
 import com.whaleal.modules.sys.entity.po.OrderEntity;
 import com.whaleal.modules.sys.entity.vo.OrderVO;
 import com.whaleal.modules.sys.entity.vo.SysUserVO;
@@ -34,11 +35,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author lyz
@@ -57,14 +56,17 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
 
     private final LocalStorageService localStorageService;
 
+    private final CustomerService customerService;
+
 
     public OrderServiceImpl(BusinessTypeService businessTypeService,
                             ActivityService activityService,
-                            SysUserService sysUserService, LocalStorageService localStorageService, NotificationService notificationService) {
+                            SysUserService sysUserService, LocalStorageService localStorageService, CustomerService customerService, NotificationService notificationService) {
         this.businessTypeService = businessTypeService;
         this.activityService = activityService;
         this.sysUserService = sysUserService;
         this.localStorageService = localStorageService;
+        this.customerService = customerService;
         this.notificationService = notificationService;
     }
 
@@ -96,6 +98,17 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             wrapper.eq(!ObjectUtils.isEmpty(params.get("ownerId")),"owner_id",Long.parseLong(params.get("ownerId").toString()));
         }
 
+        if(!ObjectUtils.isEmpty(params.get("businessType"))){
+           String type = params.get("businessType").toString();
+            String[] split = type.split(",");
+
+            List<BusinessTypeEntity> list = businessTypeService.findByType(Arrays.asList(split));
+
+            // 符合条件的order
+            List<Long> collect = list.stream().map(BusinessTypeEntity::getOrderId).distinct().collect(Collectors.toList());
+            wrapper.in("id",collect);
+        }
+
         if(!ObjectUtils.isEmpty(params.get("keyword"))){
             String keyword = params.get("keyword").toString();
             wrapper.and(wrapper1 -> {
@@ -124,9 +137,11 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         PageData<OrderVO> pageData = getPageData(orderEntityIPage, OrderVO.class);
         for (OrderVO orderVO : pageData.getList()){
             if(deal == 0 || deal == 3){
-                orderVO.setCustomerId(null);
-                orderVO.setCustomerName(null);
-                continue;
+//                if(){
+                    orderVO.setCustomerId(null);
+                    orderVO.setCustomerName(null);
+                    continue;
+//                }
             }
 
             if(deal == 1 || deal == 2){
@@ -215,6 +230,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         long count = 0;
         for (Long orderId : orderIds) {
             OrderEntity orderEntity = selectById(orderId);
+
+            boolean idPool = orderEntity.getDeal() == 3;
             if (ObjectUtils.isEmpty(orderEntity)) {
                 throw new OrderException(OrderExceptionEnum.ORDER_NOT_EXISTS);
             }
@@ -228,8 +245,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 int type;
                 UserDetail user = SecurityUser.getUser();
                 if (Objects.equals(userId, user.getId())) {
-                    content = user.getUsername() + "抢到了这个单子";
-                    type = 11;
+                    if(idPool){
+                        type = 11;
+                        content = user.getUsername() + "抢到了这个单子";
+                    }else {
+                        type = 19;
+                        content = user.getUsername() + "领取了这个单子";
+                    }
                 } else {
                     content = user.getUsername() + "把单子分配给了" + sysUserService.get(userId).getUsername();
                     type = 12;
@@ -476,6 +498,11 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
             }
         }
         orderVO.setBusinessTypeList(byOrderId);
+
+        CustomerEntity customerEntity = customerService.selectById(orderEntity.getId());
+        if(!ObjectUtils.isEmpty(customerEntity)){
+            orderVO.setCustomerWebsite(customerEntity.getWebsite());
+        }
 
         completeInfo(orderVO);
         return orderVO;

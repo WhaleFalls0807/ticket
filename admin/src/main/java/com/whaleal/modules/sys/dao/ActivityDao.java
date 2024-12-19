@@ -15,4 +15,7 @@ public interface ActivityDao extends BaseDao<ActivityEntity> {
     ActivityEntity findLastByAssociationId(@Param("associationId") long id,
                                            @Param("operateType") int type);
 
+
+    ActivityEntity findLastByUserId(@Param("userId") long userId,
+                                    @Param("operateType") int type);
 }

@@ -35,7 +35,21 @@ public interface ActivityService extends BaseService<ActivityEntity> {
      */
     void updateActivity(ActivityEntity activityEntity);
 
+    /**
+     * 查询某个单子某种操作的最新一次
+     * @param id
+     * @param type
+     * @return
+     */
     ActivityEntity findLastByAssociationId(long id,int type);
+
+    /**
+     * 查询某个用户 最近一次某个操作的时间
+     * @param id
+     * @param type
+     * @return
+     */
+    ActivityEntity findLastByUserId(long id,int type);
 
 
     /**

@@ -123,6 +123,13 @@ public class CustomerServiceImpl extends BaseServiceImpl<CustomerDao, CustomerEn
         return customerEntity;
     }
 
+    @Override
+    public void deleteCustomer(Long[] ids) {
+        for (Long id : ids){
+
+        }
+    }
+
 
     public boolean checkPhone(String phone){
         QueryWrapper<CustomerEntity> wrapper = new QueryWrapper<>();

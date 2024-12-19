@@ -34,7 +34,7 @@ public class ActivityDTO {
     @Schema(title = "操作类型")
     private Integer operateType;
 
-    @Schema(title = "创建人id",description = "外部人员 为888")
+    @Schema(title = "创建人id")
     private Long creator;
 
 

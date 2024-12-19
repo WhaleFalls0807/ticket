@@ -16,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
             byUserId.setGrain(userGrabConfigEntity.getGrain());
             byUserId.setGap(userGrabConfigEntity.getGap());
             byUserId.setTotalCount(userGrabConfigEntity.getTotalCount());
+            byUserId.setGrabGap(userGrabConfigEntity.getGrabGap());
 
             updateById(byUserId);
         }
@@ -254,7 +256,8 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
     @Override
     public Boolean checkGrabInterval(Long userId) {
 
-        ActivityEntity lastByAssociationId = activityService.findLastByAssociationId(userId, 11);
+        // 公海领取单子不占有抢单 次数和时间
+        ActivityEntity lastByAssociationId = activityService.findLastByUserId(userId, 11);
         if(ObjectUtils.isEmpty(lastByAssociationId)){
             return true;
         }
@@ -262,9 +265,32 @@ public class UserGrabServiceImpl extends BaseServiceImpl<UserGrabDao,UserGrabCon
         Date createDate = lastByAssociationId.getCreateDate();
 
         UserGrabConfigEntity byUserId = findByUserId(userId);
-        Long grabGap = byUserId.getGrabGap();
+        long grab ;
+        if(ObjectUtils.isEmpty(byUserId) || ObjectUtils.isEmpty(byUserId.getGrabGap()) || 0 == byUserId.getGrabGap()){
+            return true;
+        }else {
+            grab = byUserId.getGrabGap();
+        }
+        // 配置的两次抢单间隔 单位为分钟这里转为秒
+        long grabGap = grab * 60 * 1000;
 
         return (System.currentTimeMillis() - createDate.getTime()) >= grabGap;
+    }
 
+    public static void main(String[] args) {
+        Date date = new Date();
+
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(date);
+        instance.add(Calendar.MINUTE,2);
+        long time = instance.getTime().getTime();
+        System.out.println(time);
+
+//        System.out.println(date.getTime());
+        long l = System.currentTimeMillis();
+        System.out.println(l);
+
+        System.out.println(time - l);
+        System.out.println(2 * 60 * 1000);
     }
 }
