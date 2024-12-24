@@ -13,6 +13,8 @@ import com.whaleal.modules.sys.service.InvoiceService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,5 +68,10 @@ public class InvoiceServiceImpl extends BaseServiceImpl<InvoiceDao, InvoiceEntit
     @Override
     public void delete(Long id) {
         baseDao.deleteById(id);
+    }
+
+    @Override
+    public List<Map<String, Object>> findUserInvoice(Date start, Date end) {
+        return baseDao.findUserInvoice(start, end);
     }
 }

@@ -3,6 +3,7 @@ package com.whaleal.modules.sys.service;
 import com.whaleal.common.page.PageData;
 import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.sys.entity.dto.CorDocumentDTO;
+import com.whaleal.modules.sys.entity.dto.DownloadDTO;
 import com.whaleal.modules.sys.entity.po.CorDocumentsEntity;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -36,7 +37,7 @@ public interface CorDocumentService extends BaseService<CorDocumentsEntity> {
      * @param ids
      * @param response
      */
-    String download(long id);
+    String download(DownloadDTO downloadDTO);
 
     /**
      * 删除文书

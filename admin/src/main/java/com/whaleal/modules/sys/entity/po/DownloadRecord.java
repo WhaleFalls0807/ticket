@@ -28,7 +28,22 @@ public class DownloadRecord implements Serializable {
      */
     private Long associationId;
 
+    /**
+     * 文件名
+     */
     private String filename;
+
+
+    /**
+     * 关联客户id
+     */
+    private Long customerId;
+
+    /**
+     * 客户名称
+     */
+    private String customerName;
+
 
     /**
      * 下载者用户名

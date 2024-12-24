@@ -85,14 +85,28 @@ public class ActivityServiceImpl extends BaseServiceImpl<ActivityDao, ActivityEn
     }
 
     @Override
-    public List<ActivityEntity> listAllBetween(Date startDate, Date endDate) {
+    public List<ActivityEntity> listAllBetween(int actType,int oprType,Date startDate, Date endDate) {
         LambdaQueryWrapper<ActivityEntity> queryWrapper = new LambdaQueryWrapper<>();
 
-        queryWrapper.eq(ActivityEntity::getActivityType,1)
-                        .eq(ActivityEntity::getOperateType,11)
+        queryWrapper.eq(ActivityEntity::getActivityType,actType)
+                        .eq(ActivityEntity::getOperateType,oprType)
                         .ge(ActivityEntity::getCreateDate,startDate)
                         .le(ActivityEntity::getCreateDate,endDate);
 
         return baseDao.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<Map<String,Object>> listOrderBetween(int type, Date startTime, Date endTime) {
+        if(type == 1){
+            return baseDao.getOrderCountForPart(startTime,endTime);
+        }else {
+            return baseDao.getOrderCountForPart(startTime,endTime);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getWechatCount(Date start, Date end) {
+        return baseDao.getWechatCount(start,end);
     }
 }

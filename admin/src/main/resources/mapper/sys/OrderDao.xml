@@ -19,8 +19,8 @@
                 SELECT 1
                 FROM activity a
                 WHERE a.association_id = bo.id
-                  AND a.create_date > #{startDate}
-            );
+                  AND a.create_date &gt; #{startDate}
+            )
         and update_date &lt; #{startDate}
 
     </select>

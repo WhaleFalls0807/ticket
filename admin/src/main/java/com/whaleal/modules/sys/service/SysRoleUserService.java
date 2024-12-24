@@ -45,4 +45,6 @@ public interface SysRoleUserService extends BaseService<SysRoleUserEntity> {
      * @param userId  用户ID
      */
     List<Long> getRoleIdList(Long userId);
+
+    List<Long> getRoleUserId(String roleName);
 }

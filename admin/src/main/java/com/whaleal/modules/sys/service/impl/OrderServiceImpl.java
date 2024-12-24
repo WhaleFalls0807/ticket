@@ -499,7 +499,7 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         }
         orderVO.setBusinessTypeList(byOrderId);
 
-        CustomerEntity customerEntity = customerService.selectById(orderEntity.getId());
+        CustomerEntity customerEntity = customerService.selectById(orderEntity.getCustomerId());
         if(!ObjectUtils.isEmpty(customerEntity)){
             orderVO.setCustomerWebsite(customerEntity.getWebsite());
         }
@@ -525,6 +525,10 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
         instance.add(Calendar.DAY_OF_MONTH,-10);
         List<Long> ids = baseDao.findUnlinkOrder(instance.getTime());
 
+        if(ObjectUtils.isEmpty(ids)){
+            return;
+        }
+
         LambdaUpdateWrapper<OrderEntity> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
 
         // todo 需要确定这种情况下哪些信息置空
@@ -533,6 +537,8 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderDao, OrderEntity> imp
                 .set(OrderEntity::getOrderStatus,OrderConstant.IN_POOL)
                 .set(OrderEntity::getOwnerId,null)
                 .set(OrderEntity::getReviewUserId,null);
+
+
         baseDao.update(lambdaUpdateWrapper);
 
         for (Long id : ids){

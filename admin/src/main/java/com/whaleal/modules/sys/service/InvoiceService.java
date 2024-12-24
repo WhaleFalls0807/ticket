@@ -5,6 +5,7 @@ import com.whaleal.common.service.BaseService;
 import com.whaleal.modules.sys.entity.dto.InvoiceDTO;
 import com.whaleal.modules.sys.entity.po.InvoiceEntity;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,4 +36,6 @@ public interface InvoiceService extends BaseService<InvoiceEntity> {
      */
     void delete(Long id);
 
+
+    List<Map<String, Object>> findUserInvoice(Date start, Date end);
 }

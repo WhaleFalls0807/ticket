@@ -62,4 +62,9 @@ public class SysRoleUserServiceImpl extends BaseServiceImpl<SysRoleUserDao, SysR
 
         return baseDao.getRoleIdList(userId);
     }
+
+    @Override
+    public List<Long> getRoleUserId(String roleName) {
+        return baseDao.getUserByRole(roleName);
+    }
 }

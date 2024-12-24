@@ -71,5 +71,22 @@ public interface ActivityService extends BaseService<ActivityEntity> {
      *
      * @return
      */
-    List<ActivityEntity> listAllBetween(Date startDate, Date endDate);
+    List<ActivityEntity> listAllBetween(int actType,int oprType,Date startDate, Date endDate);
+
+    /**
+     *
+     * @param type
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<Map<String,Object>> listOrderBetween(int type, Date startTime, Date endTime);
+
+    /**
+     * 获取沟通次数
+     * @param start
+     * @param end
+     * @return
+     */
+    List<Map<String, Object>> getWechatCount(Date start, Date end);
 }

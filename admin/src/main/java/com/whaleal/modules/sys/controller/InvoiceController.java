@@ -42,7 +42,7 @@ public class InvoiceController {
     }
 
     @LogOperation("保存/保存开票记录")
-    @Tag(name = "修改或新增一个invoice")
+    @Operation(summary = "修改或新增一个invoice")
     @PostMapping("/saveOrUpdate")
     public Result saveOrUpdate(@RequestBody InvoiceDTO invoiceDTO){
         invoiceService.saveOrUpdate(invoiceDTO);
@@ -50,7 +50,7 @@ public class InvoiceController {
     }
 
 
-    @Tag(name = "保存或新增一个invoice")
+    @Operation(summary = "保存或新增一个invoice")
     @GetMapping("/page")
     @Parameters({
             @Parameter(name = Constant.PAGE, description = "当前页码，从1开始", in = ParameterIn.QUERY, required = true, ref = "int"),
@@ -76,7 +76,7 @@ public class InvoiceController {
         return new Result<PageData<InvoiceEntity>>().ok(page);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     @Operation(summary = "删除")
     @LogOperation("删除")
     @RequiresPermissions("invoice:delete")

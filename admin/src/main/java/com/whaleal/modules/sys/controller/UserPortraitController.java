@@ -2,6 +2,7 @@ package com.whaleal.modules.sys.controller;
 
 import com.whaleal.common.utils.Result;
 import com.whaleal.modules.sys.service.UserPortraitService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,12 +30,35 @@ public class UserPortraitController {
     }
 
     @GetMapping("/grapedCount")
+    @Operation(summary = "获取抢单数")
     public Result getGrabCount(@RequestParam("startTime")Long  startTime,
                                @RequestParam("endTime") Long  endTime){
 
         Date start = new Date(startTime);
         Date end = new Date(endTime);
         return new Result().ok(userPortraitService.findUserGrap(start,end));
+    }
+
+    @GetMapping("/wechatCount")
+    @Operation(summary = "获取沟通次数")
+    public Result getWechat(@RequestParam("startTime")Long  startTime,
+                               @RequestParam("endTime") Long  endTime){
+
+        Date start = new Date(startTime);
+        Date end = new Date(endTime);
+
+        return new Result().ok(userPortraitService.getWeChatCount(start,end));
+    }
+
+    @GetMapping("/totalInvoice")
+    @Operation(summary = "获取开票金额")
+    public Result getInvoice(@RequestParam("startTime")Long  startTime,
+                               @RequestParam("endTime") Long  endTime){
+
+        Date start = new Date(startTime);
+        Date end = new Date(endTime);
+
+        return new Result().ok(userPortraitService.listInvoicePrice(start,end));
     }
 
 }

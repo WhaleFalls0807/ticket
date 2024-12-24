@@ -34,6 +34,9 @@ public class NotificationDTO {
      * 4：单子拥有权转移
      * 5: 成单后管理员上传商标文件
      *
+     * 11：下载了企业文书
+     *
+     *
      */
     private Integer type;
 

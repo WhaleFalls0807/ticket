@@ -5,6 +5,10 @@ import com.whaleal.modules.sys.entity.po.ActivityEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author lyz
  * @desc
@@ -18,4 +22,13 @@ public interface ActivityDao extends BaseDao<ActivityEntity> {
 
     ActivityEntity findLastByUserId(@Param("userId") long userId,
                                     @Param("operateType") int type);
+
+    List<Map<String,Object>> getOrderCountForPart(Date startTime, Date endTime);
+
+    /**
+     *
+     * @param start
+     * @param end
+     */
+    List<Map<String,Object>> getWechatCount(Date start, Date end);
 }

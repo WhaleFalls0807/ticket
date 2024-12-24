@@ -5,6 +5,7 @@ import com.whaleal.common.page.PageData;
 import com.whaleal.common.utils.Result;
 import com.whaleal.common.validator.AssertUtils;
 import com.whaleal.modules.sys.entity.dto.CorDocumentDTO;
+import com.whaleal.modules.sys.entity.dto.DownloadDTO;
 import com.whaleal.modules.sys.entity.dto.SysUserDTO;
 import com.whaleal.modules.sys.entity.po.CorDocumentsEntity;
 import com.whaleal.modules.sys.entity.po.DownloadRecord;
@@ -77,10 +78,10 @@ public class CorDocumentController {
         return new Result<PageData<DownloadRecord>>().ok(page);
     }
 
-    @GetMapping("/download/{fileId}")
+    @GetMapping("/download")
     @Operation(summary = "下载企业文书")
-    public Result download(@PathVariable("fileId") Long fileId){
-       return new Result().ok( corDocumentService.download(fileId));
+    public Result download(DownloadDTO downloadDTO){
+       return new Result().ok( corDocumentService.download(downloadDTO));
     }
 
     @LogOperation("删除")
